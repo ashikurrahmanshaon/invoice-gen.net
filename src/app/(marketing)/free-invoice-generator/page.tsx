@@ -10,8 +10,10 @@ export const metadata: Metadata = {
 
 export default function FreeInvoiceGeneratorPage() {
   return (
-    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] pt-16">
-      <FreeInvoiceBuilder />
+    <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] pt-8 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <FreeInvoiceBuilder />
+      </div>
     </div>
   );
 }

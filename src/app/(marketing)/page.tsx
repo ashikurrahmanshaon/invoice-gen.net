@@ -67,18 +67,8 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] dark:bg-[#0A0A0A] text-zinc-900 dark:text-zinc-100 font-sans selection:bg-zinc-200 dark:selection:bg-zinc-800">
-      
 
-
-      {/* 1. Free Generator Panel */}
-      <section className="pt-6 pb-20 px-4 sm:px-6 max-w-7xl mx-auto border-b border-zinc-200 dark:border-zinc-850 no-print" id="free-generator">
-        <div className="border border-emerald-500/20 shadow-[0_0_80px_-15px_rgba(16,185,129,0.15)] bg-white/80 dark:bg-[#0A0A0A]/80 backdrop-blur-xl rounded-[2.5rem] p-4 sm:p-8 overflow-hidden relative">
-          <div className="absolute top-0 right-0 -mr-20 -mt-20 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
-          <FreeInvoiceBuilder />
-        </div>
-      </section>
-
-      {/* 2. Hero Section */}
+      {/* 1. Hero Section — first impression */}
       <section className="relative pt-20 pb-20 px-6 max-w-7xl mx-auto border-b border-zinc-200 dark:border-zinc-850 no-print">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
@@ -349,8 +339,98 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 2. Design Tool Builder Section */}
+      <section className="pt-20 pb-10 px-4 sm:px-6 max-w-[1400px] mx-auto no-print" id="free-generator">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-black tracking-tight text-zinc-900 dark:text-white mb-4">
+            Try the Pro Workspace
+          </h2>
+          <p className="text-zinc-500 dark:text-zinc-400 max-w-2xl mx-auto">
+            Experience our premium, Figma-inspired invoice builder right here. No account required.
+          </p>
+        </div>
+        
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ type: "spring", stiffness: 200, damping: 25, delay: 0.1 }}
+          className="relative rounded-[2.5rem] p-1 overflow-hidden"
+        >
+          {/* Gradient Border Effect */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/30 via-emerald-500/0 to-emerald-500/30 blur-sm pointer-events-none"></div>
+          
+          <FreeInvoiceBuilder />
+        </motion.div>
+      </section>
 
-      {/* 4. Why Businesses Choose Invoice-Gen.Net */}
+      {/* 3. Social Proof Section */}
+      <section className="pt-20 pb-20 px-6 max-w-7xl mx-auto border-b border-zinc-200 dark:border-zinc-800 no-print text-center">
+        <p className="text-sm font-bold text-zinc-500 uppercase tracking-widest mb-10">Trusted by modern companies worldwide</p>
+        <div className="flex flex-wrap justify-center items-center gap-10 md:gap-20 opacity-60 grayscale hover:grayscale-0 transition-all duration-500">
+          <div className="flex items-center gap-2 font-black text-2xl text-zinc-800 dark:text-zinc-200"><div className="w-8 h-8 bg-zinc-800 rounded-lg flex items-center justify-center text-white"><span className="text-xl">V</span></div> Vercell</div>
+          <div className="flex items-center gap-2 font-black text-2xl text-zinc-800 dark:text-zinc-200"><span className="text-3xl text-blue-600">S</span> StripePay</div>
+          <div className="flex items-center gap-2 font-black text-xl text-zinc-800 dark:text-zinc-200"><Building2 size={24} className="text-emerald-500"/> Acme Corp</div>
+          <div className="flex items-center gap-2 font-black text-2xl text-zinc-800 dark:text-zinc-200 italic">Linearity</div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20">
+          <div className="p-8 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-left hover:-translate-y-1 transition-transform">
+            <div className="flex text-amber-400 mb-4">
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+            </div>
+            <p className="text-zinc-700 dark:text-zinc-300 font-medium mb-6 leading-relaxed">"This is the cleanest invoice generator I have ever used. My clients love the modern PDFs, and I love how fast it is to get paid."</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+              <div>
+                <p className="font-bold text-zinc-900 dark:text-white text-sm">Sarah Jenkins</p>
+                <p className="text-xs text-zinc-500">Freelance Designer</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-8 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-left hover:-translate-y-1 transition-transform">
+            <div className="flex text-amber-400 mb-4">
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+            </div>
+            <p className="text-zinc-700 dark:text-zinc-300 font-medium mb-6 leading-relaxed">"We switched our entire agency billing over. The automated workflows save us at least 10 hours a week on manual follow-ups."</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+              <div>
+                <p className="font-bold text-zinc-900 dark:text-white text-sm">Marcus Chen</p>
+                <p className="text-xs text-zinc-500">Agency Director</p>
+              </div>
+            </div>
+          </div>
+          <div className="p-8 rounded-[2rem] bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-left hover:-translate-y-1 transition-transform">
+            <div className="flex text-amber-400 mb-4">
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+              <Star fill="currentColor" size={18} />
+            </div>
+            <p className="text-zinc-700 dark:text-zinc-300 font-medium mb-6 leading-relaxed">"I love how I don't even need an account to create a beautiful invoice. It's incredibly fast and doesn't ask for a ton of information."</p>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800"></div>
+              <div>
+                <p className="font-bold text-zinc-900 dark:text-white text-sm">Elena Rodriguez</p>
+                <p className="text-xs text-zinc-500">Consultant</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+
+      {/* 3. Why Businesses Choose Invoice-Gen.Net */}
       <section className="relative pt-12 pb-32 px-6 max-w-7xl mx-auto border-b border-zinc-200 dark:border-zinc-850 no-print overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none -z-10"></div>

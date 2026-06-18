@@ -1,141 +1,322 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { useAuth } from '@/context/auth';
 import { Button } from '@/components/ui/button';
-import { Menu, X, FileText, ArrowRight } from 'lucide-react';
+import {
+  Menu, X, FileText, ArrowRight, Sparkles,
+  Zap, Users, Star, ChevronDown
+} from 'lucide-react';
+
+/* ─── Ticker messages ─────────────────────────────────── */
+const TICKER_ITEMS = [
+  { icon: '⚡', text: 'Free invoice generator — no sign-up needed.' },
+  { icon: '🎉', text: '10,000+ invoices created this week.' },
+  { icon: '🔒', text: 'Bank-grade security powered by Stripe.' },
+  { icon: '🚀', text: 'Create a professional invoice in under 2 minutes.' },
+];
+
+function AnnouncementBar({ onDismiss }: { onDismiss: () => void }) {
+  const [idx, setIdx] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setIdx(i => (i + 1) % TICKER_ITEMS.length);
+    }, 4000);
+    return () => clearInterval(t);
+  }, []);
+
+  const item = TICKER_ITEMS[idx];
+
+  return (
+    <div className="relative z-50 bg-zinc-950 border-b border-white/[0.06] overflow-hidden">
+      {/* subtle emerald glow line at top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent" />
+
+      <div className="relative flex items-center justify-center h-9 px-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={idx}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-center gap-2.5 text-[12.5px]"
+          >
+            {/* glowing badge */}
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Free
+            </span>
+
+            <span className="text-zinc-300 font-medium">
+              {item.text}
+            </span>
+
+            <Link
+              href="/free-invoice-generator"
+              className="flex items-center gap-1 text-white font-bold hover:text-emerald-400 transition-colors"
+            >
+              Try it free
+              <ArrowRight size={12} strokeWidth={2.5} />
+            </Link>
+          </motion.div>
+        </AnimatePresence>
+
+        <button
+          onClick={onDismiss}
+          aria-label="Dismiss"
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-zinc-600 hover:text-zinc-300 hover:bg-white/10 transition-all cursor-pointer"
+        >
+          <X size={12} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Navbar ─────────────────────────────────────── */
+const navLinks = [
+  { label: 'Home',     href: '/' },
+  { label: 'Features', href: '/features' },
+  { label: 'Solutions',href: '/solutions' },
+  { label: 'Pricing',  href: '/pricing' },
+];
 
 export default function Navbar() {
   const { user } = useAuth();
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
-  const navLinks = [
-    { label: 'Home', href: '/' },
-    { label: 'Features', href: '/features' },
-    { label: 'Solutions', href: '/solutions' },
-    { label: 'Pricing', href: '/pricing' },
-  ];
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 16);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
+  }, []);
 
   const isActive = (href: string) => pathname === href;
 
   return (
-    <header className="sticky top-4 z-50 w-full max-w-7xl mx-auto px-4 lg:px-6 transition-all duration-350">
-      <div className="border border-zinc-200/80 dark:border-zinc-800/80 bg-white/80 dark:bg-[#0A0A0A]/85 backdrop-blur-xl shadow-lg shadow-zinc-800/5 dark:shadow-black/20 rounded-2xl h-16 px-5 flex items-center justify-between">
-        
-        {/* Brand Logo */}
-        <Link href="/" className="flex items-center space-x-2.5 group">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 dark:from-emerald-500 dark:to-emerald-700 flex items-center justify-center transition-all duration-300 group-hover:scale-105 group-hover:shadow-md shadow-sm border border-emerald-500/20">
-            <FileText className="w-5 h-5 text-white drop-shadow-sm" strokeWidth={2.5} />
-          </div>
-          <span className="font-black text-lg tracking-tighter text-zinc-950 dark:text-white group-hover:text-zinc-800 dark:group-hover:text-zinc-200 transition-colors flex items-center">
-            invoice<span className="text-zinc-400 dark:text-zinc-500 mx-[1px]">-</span>gen<span className="text-emerald-600 dark:text-emerald-500">.net</span>
-          </span>
-        </Link>
+    <div className="sticky top-0 z-50 w-full no-print">
 
-        {/* Desktop Navigation Links */}
-        <nav className="hidden lg:flex items-center space-x-2">
-          {navLinks.map((link) => (
+
+      {/* ── Navbar Shell ── */}
+      <div
+        className={`w-full transition-all duration-300 ${
+          scrolled
+            ? 'bg-white/90 dark:bg-[#080808]/90 backdrop-blur-2xl border-b border-zinc-200/80 dark:border-zinc-800/80 shadow-[0_1px_24px_-4px_rgba(0,0,0,0.08)]'
+            : 'bg-white/60 dark:bg-[#080808]/60 backdrop-blur-lg border-b border-zinc-100/60 dark:border-zinc-900/60'
+        }`}
+      >
+        {/* top edge glow line */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-400/50 to-transparent pointer-events-none" />
+
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 h-[60px] flex items-center justify-between gap-6">
+
+          {/* ── Logo ── */}
+          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+            <div className="relative">
+              <div className="h-9 w-9 rounded-[10px] bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-[0_4px_14px_-2px_rgba(16,185,129,0.5)] transition-all duration-300 group-hover:shadow-[0_6px_20px_-2px_rgba(16,185,129,0.65)] group-hover:scale-105">
+                <FileText className="w-[18px] h-[18px] text-white" strokeWidth={2.5} />
+              </div>
+              {/* live pulse dot */}
+              <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border-2 border-white dark:border-[#080808]" />
+              </span>
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="font-black text-[17px] tracking-[-0.03em] text-zinc-900 dark:text-white flex items-baseline">
+                invoice<span className="text-zinc-300 dark:text-zinc-600 mx-[1px] font-light">-</span>gen
+                <span className="text-emerald-500">.net</span>
+              </span>
+              <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-zinc-400 dark:text-zinc-600 leading-none mt-0.5">
+                Invoice Platform
+              </span>
+            </div>
+          </Link>
+
+          {/* ── Desktop Nav ── */}
+          <nav className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => {
+              const active = isActive(link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className={`
+                    relative group px-4 py-2 text-[14px] font-semibold rounded-lg transition-colors duration-200
+                    ${active
+                      ? 'text-emerald-600 dark:text-emerald-400'
+                      : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100'}
+                  `}
+                >
+                  {/* active background */}
+                  {active && (
+                    <motion.span
+                      layoutId="nav-bg"
+                      className="absolute inset-0 rounded-lg bg-emerald-50 dark:bg-emerald-500/10"
+                      transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                    />
+                  )}
+                  {/* hover bg */}
+                  <span className="absolute inset-0 rounded-lg bg-zinc-50 dark:bg-zinc-800/50 opacity-0 group-hover:opacity-100 transition-opacity duration-150" />
+                  {/* underline */}
+                  <span
+                    className={`absolute bottom-1 left-4 right-4 h-[2px] rounded-full bg-emerald-500 transition-all duration-200 origin-left
+                      ${active ? 'scale-x-100 opacity-100' : 'scale-x-0 opacity-0 group-hover:scale-x-100 group-hover:opacity-40'}
+                    `}
+                  />
+                  <span className="relative z-10">{link.label}</span>
+                </Link>
+              );
+            })}
+
+            {/* Separator */}
+            <div className="w-px h-5 bg-zinc-200 dark:bg-zinc-800 mx-1" />
+
+            {/* Free Tool highlight link */}
             <Link
-              key={link.href}
-              href={link.href}
-              className={`relative px-4 py-2 rounded-full text-[15px] font-semibold transition-all duration-300 ${
-                isActive(link.href)
-                  ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)] dark:shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)]'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10'
-              }`}
+              href="/free-invoice-generator"
+              className="relative group flex items-center gap-1.5 px-4 py-2 text-[14px] font-bold text-emerald-600 dark:text-emerald-400 rounded-lg hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-colors duration-200"
             >
-              {link.label}
+              <Zap size={13} className="shrink-0" />
+              Free Tool
+              <span className="ml-0.5 flex items-center gap-0.5 bg-emerald-500 text-white text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full leading-none">
+                100% Free
+              </span>
             </Link>
-          ))}
-        </nav>
+          </nav>
 
-        {/* Right Actions Block */}
-        <div className="flex items-center space-x-4">
-          
-          {/* Guest or User Session CTA Buttons */}
-          <div className="hidden sm:flex items-center space-x-3">
+          {/* ── Right CTA ── */}
+          <div className="hidden lg:flex items-center gap-2 shrink-0">
             {user ? (
               <Link href="/dashboard">
-                <Button className="group h-10 px-5 text-[15px] font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white border-none rounded-lg shadow-md shadow-emerald-500/20 hover:shadow-emerald-500/40">
-                  Go to Workspace
-                  <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                </Button>
+                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}>
+                  <button className="group relative overflow-hidden flex items-center gap-2 h-9 pl-4 pr-3 text-[13.5px] font-bold text-white rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-[0_4px_14px_-2px_rgba(16,185,129,0.45)] hover:shadow-[0_6px_20px_-2px_rgba(16,185,129,0.6)] transition-shadow duration-300">
+                    <span className="absolute inset-0 [transform:skew(-12deg)_translateX(-160%)] group-hover:[transform:skew(-12deg)_translateX(160%)] transition-transform duration-700 flex justify-center">
+                      <span className="w-8 h-full bg-white/25" />
+                    </span>
+                    <span className="relative">Go to Workspace</span>
+                    <span className="relative flex items-center justify-center w-5 h-5 rounded-md bg-white/20">
+                      <ArrowRight size={12} strokeWidth={2.5} />
+                    </span>
+                  </button>
+                </motion.div>
               </Link>
             ) : (
               <>
                 <Link href="/login">
-                  <Button variant="ghost" className="h-10 px-5 text-[15px] font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200 rounded-lg">
-                    Sign In
-                  </Button>
+                  <button className="h-9 px-4 text-[13.5px] font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-all duration-200">
+                    Sign in
+                  </button>
                 </Link>
                 <Link href="/login?signup=true">
-                  <Button className="group h-10 px-6 text-[15px] font-bold transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white border-none rounded-lg shadow-md shadow-emerald-500/20 hover:shadow-emerald-500/40">
-                    Get Started Free
-                    <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Button>
+                  <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+                    <button className="group relative overflow-hidden flex items-center gap-2 h-9 pl-3.5 pr-4 text-[13.5px] font-bold text-white rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-[0_4px_14px_-2px_rgba(16,185,129,0.4)] hover:shadow-[0_6px_20px_-2px_rgba(16,185,129,0.55)] transition-shadow duration-300">
+                      <span className="absolute inset-0 [transform:skew(-12deg)_translateX(-160%)] group-hover:[transform:skew(-12deg)_translateX(160%)] transition-transform duration-700 flex justify-center">
+                        <span className="w-8 h-full bg-white/25" />
+                      </span>
+                      <Sparkles size={13} className="relative shrink-0" />
+                      <span className="relative">Get Started Free</span>
+                    </button>
+                  </motion.div>
                 </Link>
               </>
             )}
           </div>
 
-          {/* Mobile Menu Toggle Button */}
+          {/* ── Mobile Hamburger ── */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-md hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 cursor-pointer"
-            aria-label="Toggle mobile menu"
+            onClick={() => setMobileOpen(o => !o)}
+            className="lg:hidden p-2 rounded-xl hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-400 transition-colors cursor-pointer"
+            aria-label="Toggle menu"
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={mobileOpen ? 'x' : 'burger'}
+                initial={{ rotate: -90, opacity: 0, scale: 0.7 }}
+                animate={{ rotate: 0, opacity: 1, scale: 1 }}
+                exit={{ rotate: 90, opacity: 0, scale: 0.7 }}
+                transition={{ duration: 0.18 }}
+                className="block"
+              >
+                {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+              </motion.span>
+            </AnimatePresence>
           </button>
         </div>
       </div>
 
-      {/* Mobile Slide-down Menu Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-zinc-200 dark:border-zinc-800 bg-[#FAFAFA] dark:bg-[#0A0A0A] py-4 px-6 space-y-4 shadow-inner">
-          <nav className="flex flex-col space-y-2.5">
-            {navLinks.map((link) => (
+      {/* ── Mobile Drawer ── */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            key="drawer"
+            initial={{ opacity: 0, y: -10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.98 }}
+            transition={{ duration: 0.2, ease: 'easeOut' }}
+            className="lg:hidden absolute left-0 right-0 mt-1 mx-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800/80 bg-white/96 dark:bg-[#0A0A0A]/96 backdrop-blur-2xl shadow-2xl shadow-zinc-900/10 overflow-hidden"
+          >
+            <nav className="p-3 flex flex-col gap-0.5">
+              {navLinks.map(link => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileOpen(false)}
+                  className={`flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    isActive(link.href)
+                      ? 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400'
+                      : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900/60'
+                  }`}
+                >
+                  {link.label}
+                  {isActive(link.href) && (
+                    <span className="ml-auto w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  )}
+                </Link>
+              ))}
               <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className={`block py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                  isActive(link.href)
-                    ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)] dark:shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)]'
-                    : 'text-zinc-600 dark:text-zinc-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50/50 dark:hover:bg-emerald-500/10'
-                }`}
+                href="/free-invoice-generator"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-3 rounded-xl text-sm font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50/60 dark:bg-emerald-500/5 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all"
               >
-                {link.label}
+                <Zap size={15} />
+                Free Tool
+                <span className="ml-1 text-[9px] font-black uppercase tracking-wider bg-emerald-500 text-white px-1.5 py-0.5 rounded-full">Free</span>
               </Link>
-            ))}
-          </nav>
-          
-          <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex flex-col space-y-3">
+            </nav>
 
-
-            {user ? (
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                <Button className="w-full h-10 font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg shadow-sm">Go to Workspace</Button>
-              </Link>
-            ) : (
-              <div className="grid grid-cols-2 gap-3">
-                <Link href="/login" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                  <Button variant="outline" className="w-full h-10 font-medium bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-850 rounded-lg text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors">
-                    Sign In
-                  </Button>
+            <div className="p-3 border-t border-zinc-100 dark:border-zinc-800">
+              {user ? (
+                <Link href="/dashboard" onClick={() => setMobileOpen(false)}>
+                  <button className="w-full h-11 font-bold text-white rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-sm flex items-center justify-center gap-2">
+                    Go to Workspace <ArrowRight size={15} />
+                  </button>
                 </Link>
-                <Link href="/login?signup=true" onClick={() => setMobileMenuOpen(false)} className="w-full">
-                  <Button className="w-full h-10 font-bold bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white rounded-lg shadow-sm border-none transition-all">
-                    Get Started Free
-                  </Button>
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </header>
+              ) : (
+                <div className="grid grid-cols-2 gap-2">
+                  <Link href="/login" onClick={() => setMobileOpen(false)}>
+                    <button className="w-full h-11 font-semibold rounded-xl border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-all">
+                      Sign In
+                    </button>
+                  </Link>
+                  <Link href="/login?signup=true" onClick={() => setMobileOpen(false)}>
+                    <button className="w-full h-11 font-bold text-white rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 shadow-sm flex items-center justify-center gap-1.5">
+                      <Sparkles size={13} /> Get Started
+                    </button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

@@ -134,6 +134,12 @@
   }
 }
 
+/* Shimmer sweep animation (used in announcement banner) */
+@keyframes shimmer {
+  0%   { transform: skewX(-12deg) translateX(-200%); }
+  100% { transform: skewX(-12deg) translateX(400%); }
+}
+
 /* Custom styles for printing invoices */
 @media print {
   body {
