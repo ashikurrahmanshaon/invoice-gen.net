@@ -9,8 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@eslint/eslintrc": "^3",
     "@stripe/stripe-js": "^9.8.0",
     "@supabase/supabase-js": "^2.108.2",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.19",
     "framer-motion": "^12.40.0",
     "html2canvas": "^1.4.1",
     "jspdf": "^4.2.1",
@@ -19,17 +26,9 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "recharts": "^3.8.1",
-    "stripe": "^22.2.1"
-  },
-  "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.19",
+    "stripe": "^22.2.1",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "devDependencies": {}
 }
