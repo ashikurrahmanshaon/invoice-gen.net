@@ -8,7 +8,7 @@ import {
   Plus, Trash2, Download, ChevronDown,
   Image as ImageIcon, CreditCard,
   Check, DollarSign, Building2, User, FileText,
-  Calendar, Layers, Paintbrush, FileBadge, Settings2
+  Calendar, Layers, Paintbrush, FileBadge, Settings2, ArrowRight
 } from 'lucide-react';
 
 // --- Types ---
