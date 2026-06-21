@@ -226,39 +226,26 @@ export function FreeInvoiceBuilder() {
     );
   }
 
-  // Common premium input styles
-  const premiumInput = "w-full bg-transparent border-b-2 border-transparent hover:border-zinc-200 focus:border-zinc-900 focus:outline-none transition-all py-2 text-zinc-900 placeholder:text-zinc-300";
-  const labelClass = "block text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-1";
+  const inputClass = "w-full min-h-[44px] rounded-xl bg-white border border-zinc-200 px-4 py-3 text-[14px] text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all";
+  const labelClass = "block text-[13px] font-semibold text-zinc-700 mb-2";
 
   return (
-    <div className="w-full max-w-5xl mx-auto font-sans bg-white sm:p-14 p-6 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-zinc-100 mt-8 mb-24 relative overflow-hidden">
+    <div className="w-full max-w-4xl mx-auto font-sans bg-white sm:p-12 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 mt-8 mb-24 relative">
       
-      {/* Decorative Blur */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-zinc-100 to-transparent rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
-
       {/* 1. Header Area */}
-      <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-8 mb-16 relative z-10">
-        <div className="flex-1">
-          <h1 className="text-5xl font-black tracking-tighter text-zinc-900 mb-4 flex items-center gap-3">
-            Invoice <Sparkles className="text-zinc-300" size={32} />
-          </h1>
-          <div className="max-w-xs">
-            <label className={labelClass}>Invoice Number</label>
-            <input 
-              value={invoiceNumber} 
-              onChange={e => setInvoiceNumber(e.target.value)} 
-              placeholder="#INV-001" 
-              className="w-full text-xl font-semibold text-zinc-900 bg-transparent border-b-2 border-zinc-100 focus:border-zinc-900 focus:outline-none transition-all py-2 placeholder:text-zinc-200" 
-            />
-          </div>
-        </div>
-        
-        {/* Premium Logo Upload */}
-        <div className="w-full md:w-64">
+      <div className="flex justify-between items-center mb-10 border-b border-zinc-100 pb-8">
+        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
+          Invoice Details
+        </h1>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+        {/* Logo Upload */}
+        <div>
           <label className={labelClass}>Company Logo</label>
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="relative h-28 w-full border-2 border-dashed border-zinc-200 rounded-2xl flex items-center justify-center hover:bg-zinc-50 hover:border-zinc-300 transition-all cursor-pointer group bg-white overflow-hidden"
+            className="relative h-24 w-full border-2 border-dashed border-zinc-200 rounded-xl flex items-center justify-center hover:bg-zinc-50 hover:border-zinc-300 transition-all cursor-pointer bg-white overflow-hidden group"
           >
             <input
               type="file"
@@ -277,161 +264,165 @@ export function FreeInvoiceBuilder() {
             />
             {logoUrl ? (
               <div className="absolute inset-0 p-4 bg-white flex flex-col items-center justify-center group">
-                <img src={logoUrl} alt="Logo" className="h-16 w-full object-contain mb-2" />
+                <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
                 <button 
                   type="button" 
                   onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} 
-                  className="absolute inset-0 bg-black/50 text-white font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                  className="absolute inset-0 bg-black/40 text-white font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
                 >
-                  Remove Logo
+                  Clear Logo
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-400 group-hover:text-zinc-600 transition-colors">
-                <UploadCloud size={24} strokeWidth={1.5} />
-                <span className="text-xs font-semibold">Upload Image</span>
+              <div className="flex flex-col items-center gap-2 text-zinc-500">
+                <UploadCloud size={20} strokeWidth={2} />
+                <span className="text-[13px] font-medium">Upload Image</span>
               </div>
             )}
           </div>
         </div>
+
+        {/* Invoice Number */}
+        <div>
+          <label className={labelClass}>Invoice Number</label>
+          <input 
+            value={invoiceNumber} 
+            onChange={e => setInvoiceNumber(e.target.value)} 
+            placeholder="#INV-001" 
+            className={inputClass} 
+          />
+        </div>
       </div>
 
-      {/* 2. From / To & Dates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-10">
-        {/* From */}
-        <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:shadow-zinc-100 transition-all duration-300">
+      {/* 2. From / To Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+        <div>
           <label className={labelClass}>Your Details (From)</label>
           <textarea 
             value={companyDetails} 
             onChange={e => setCompanyDetails(e.target.value)} 
             placeholder="Your Company Name&#10;123 Business Avenue&#10;City, State, Zip" 
             rows={4} 
-            className="w-full bg-transparent resize-y text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-[15px] leading-relaxed mt-2" 
+            className={`${inputClass} resize-y leading-relaxed`} 
           />
         </div>
         
-        {/* To */}
-        <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:shadow-zinc-100 transition-all duration-300">
+        <div>
           <label className={labelClass}>Client Details (Bill To)</label>
           <textarea 
             value={clientDetails} 
             onChange={e => setClientDetails(e.target.value)} 
             placeholder="Client Name&#10;456 Client Street&#10;City, State, Zip" 
             rows={4} 
-            className="w-full bg-transparent resize-y text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-[15px] leading-relaxed mt-2" 
+            className={`${inputClass} resize-y leading-relaxed`} 
           />
         </div>
+      </div>
 
-        {/* Dates */}
-        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
-            <label className={labelClass}>Date Issued</label>
-            <div className="relative group">
-              <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${premiumInput} text-lg [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} />
-              <Calendar size={20} className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-hover:text-zinc-500 transition-colors pointer-events-none z-0" />
-            </div>
+      {/* Dates Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-12">
+        <div>
+          <label className={labelClass}>Date Issued</label>
+          <div className="relative">
+            <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
+            <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-0" />
           </div>
-          <div>
-            <label className={labelClass}>Due Date</label>
-            <div className="relative group">
-              <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${premiumInput} text-lg [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} />
-              <Calendar size={20} className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-hover:text-zinc-500 transition-colors pointer-events-none z-0" />
-            </div>
+        </div>
+        <div>
+          <label className={labelClass}>Due Date</label>
+          <div className="relative">
+            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
+            <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-0" />
           </div>
         </div>
       </div>
 
-      {/* 3. Line Items (Borderless premium table) */}
-      <div className="mb-16 relative z-10">
-        <h2 className="text-xl font-bold tracking-tight text-zinc-900 mb-6">Line Items</h2>
-        
-        <div className="hidden md:flex text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-4 px-2">
-          <div className="flex-1">Description</div>
-          <div className="w-[120px] text-right">Rate</div>
-          <div className="w-[100px] text-right">Qty</div>
-          <div className="w-[140px] text-right">Amount</div>
-          <div className="w-10"></div>
-        </div>
-        
-        <div className="space-y-4">
-          {items.map((item, idx) => (
-            <div key={idx} className="group flex flex-col md:flex-row gap-4 items-center bg-white border border-zinc-100 hover:border-zinc-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300">
-               <div className="w-full md:flex-1 relative">
-                 <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Description</span>
-                 <input 
-                   value={item.description} 
-                   onChange={e => handleItemChange(idx, 'description', e.target.value)} 
-                   placeholder="Item description" 
-                   className="w-full bg-transparent text-zinc-900 font-medium text-[15px] focus:outline-none placeholder:text-zinc-300" 
-                 />
-               </div>
-               
-               <div className="flex w-full md:w-auto gap-4 md:gap-4">
-                 <div className="flex-1 md:w-[120px] relative">
-                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Rate</span>
-                   <div className="relative">
-                     <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                     <input 
-                       type="number" 
-                       placeholder="0.00" 
-                       value={item.unit_price} 
-                       onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
-                       className="w-full pl-5 bg-transparent text-left md:text-right text-zinc-900 font-medium focus:outline-none placeholder:text-zinc-300" 
-                     />
-                   </div>
+      {/* 3. Line Items */}
+      <div className="mb-12">
+        <label className={labelClass}>Line Items</label>
+        <div className="bg-zinc-50 rounded-2xl border border-zinc-200 p-4 sm:p-6 shadow-sm">
+          <div className="hidden md:flex text-[13px] font-semibold text-zinc-500 mb-3 px-1">
+            <div className="flex-1">Description</div>
+            <div className="w-[120px] text-left ml-3">Rate</div>
+            <div className="w-[80px] text-left ml-3">Qty</div>
+            <div className="w-[120px] text-left ml-3">Amount</div>
+            <div className="w-10 ml-3"></div>
+          </div>
+          
+          <div className="space-y-3">
+            {items.map((item, idx) => (
+              <div key={idx} className="flex flex-col md:flex-row gap-3 items-center">
+                 <div className="w-full md:flex-1">
+                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Description</span>
+                   <input 
+                     value={item.description} 
+                     onChange={e => handleItemChange(idx, 'description', e.target.value)} 
+                     placeholder="Item description" 
+                     className={inputClass} 
+                   />
                  </div>
                  
-                 <div className="flex-1 md:w-[100px]">
-                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Qty</span>
+                 <div className="w-full md:w-[120px] relative">
+                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Rate</span>
+                   <span className="absolute left-3 top-[34px] md:top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                   <input 
+                     type="number" 
+                     placeholder="0.00" 
+                     value={item.unit_price} 
+                     onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
+                     className={`${inputClass} pl-7`} 
+                   />
+                 </div>
+                 
+                 <div className="w-full md:w-[80px]">
+                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Qty</span>
                    <input 
                      type="number" 
                      placeholder="1" 
                      value={item.quantity} 
                      onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
-                     className="w-full bg-transparent text-left md:text-right text-zinc-900 font-medium focus:outline-none placeholder:text-zinc-300" 
+                     className={inputClass} 
                    />
                  </div>
                  
-                 <div className="flex-1 md:w-[140px] relative">
-                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Amount</span>
-                   <div className="relative">
-                     <span className="absolute left-0 md:left-auto md:right-24 top-1/2 -translate-y-1/2 text-zinc-400 font-medium opacity-0 md:opacity-100">$</span>
-                     <input 
-                       value={item.amount > 0 ? '$' + item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
-                       readOnly 
-                       placeholder="$0.00" 
-                       className="w-full bg-transparent text-left md:text-right font-bold text-zinc-900 focus:outline-none placeholder:text-zinc-200 cursor-default" 
-                     />
-                   </div>
+                 <div className="w-full md:w-[120px] relative">
+                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Amount</span>
+                   <span className="absolute left-3 top-[34px] md:top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                   <input 
+                     value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
+                     readOnly 
+                     placeholder="0.00" 
+                     className={`${inputClass} pl-7 bg-zinc-100 cursor-default focus:ring-0 focus:border-zinc-200`} 
+                   />
                  </div>
-               </div>
 
-               <div className="w-full md:w-10 flex justify-end md:justify-center mt-2 md:mt-0">
-                 <button 
-                   onClick={() => removeRow(idx)} 
-                   disabled={items.length === 1} 
-                   className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full disabled:opacity-0 transition-all"
-                 >
-                   <X size={18} strokeWidth={2} />
-                 </button>
-               </div>
-            </div>
-          ))}
-        </div>
-        
-        <button 
-          onClick={addRow} 
-          className="mt-6 flex items-center gap-2 text-zinc-900 font-semibold text-sm hover:text-zinc-600 transition-colors group"
-        >
-          <div className="h-8 w-8 rounded-full bg-zinc-100 group-hover:bg-zinc-200 text-zinc-900 flex items-center justify-center transition-colors">
-            <Plus size={16} strokeWidth={2.5} />
+                 <div className="w-full md:w-10 flex justify-end md:justify-center mt-2 md:mt-0">
+                   <button 
+                     onClick={() => removeRow(idx)} 
+                     disabled={items.length === 1} 
+                     className="text-zinc-400 hover:text-red-500 p-2 rounded-full disabled:opacity-0 transition-all bg-white shadow-sm border border-zinc-200"
+                   >
+                     <X size={16} strokeWidth={2} />
+                   </button>
+                 </div>
+              </div>
+            ))}
           </div>
-          Add new item
-        </button>
+          
+          <button 
+            onClick={addRow} 
+            className="mt-6 flex items-center gap-2 text-blue-600 font-semibold text-[14px] hover:text-blue-700 transition-colors"
+          >
+            <div className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center transition-colors">
+              <Plus size={16} strokeWidth={2.5} />
+            </div>
+            Add Line Item
+          </button>
+        </div>
       </div>
 
       {/* 4. Footer (Notes & Totals) */}
-      <div className="flex flex-col md:flex-row justify-between gap-12 relative z-10">
+      <div className="flex flex-col md:flex-row justify-between gap-10">
         
         {/* Notes */}
         <div className="flex-1">
@@ -441,57 +432,55 @@ export function FreeInvoiceBuilder() {
             onChange={e => setNotes(e.target.value)} 
             placeholder="Thank you for your business! Payment is due within 15 days." 
             rows={5} 
-            className="w-full bg-transparent border-2 border-zinc-100 hover:border-zinc-200 focus:border-zinc-900 rounded-2xl p-4 text-[15px] text-zinc-900 placeholder:text-zinc-300 focus:outline-none transition-all resize-y" 
+            className={`${inputClass} resize-y`} 
           />
         </div>
         
         {/* Totals */}
-        <div className="w-full md:w-[380px]">
-          <div className="bg-zinc-50 rounded-3xl p-8 border border-zinc-100">
-            <div className="space-y-4 mb-8">
-              <div className="flex justify-between items-center">
-                <span className="text-[15px] font-semibold text-zinc-500">Subtotal</span>
-                <span className="text-[16px] font-bold text-zinc-900">{fmtSummary(subtotal)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center group">
-                <span className="text-[15px] font-semibold text-zinc-500">Tax</span>
-                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                  <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center group">
-                <span className="text-[15px] font-semibold text-zinc-500">Discount</span>
-                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                  <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center group">
-                <span className="text-[15px] font-semibold text-zinc-500">Shipping</span>
-                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                  <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
-                </div>
+        <div className="w-full md:w-[340px]">
+          <div className="space-y-4 mb-6 pt-2">
+            <div className="flex justify-between items-center px-2">
+              <span className="text-[14px] font-semibold text-zinc-600">Subtotal</span>
+              <span className="text-[16px] font-bold text-zinc-900">{fmtSummary(subtotal)}</span>
+            </div>
+            
+            <div className="flex justify-between items-center gap-4">
+              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Tax</span>
+              <div className="relative w-32">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
               </div>
             </div>
             
-            {/* Hero Total */}
-            <div className="bg-zinc-900 rounded-2xl p-6 flex justify-between items-center shadow-xl shadow-zinc-900/10">
-              <span className="text-[18px] font-bold text-white">Total</span>
-              <span className="text-[28px] font-black text-white">{fmtSummary(total)}</span>
+            <div className="flex justify-between items-center gap-4">
+              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Discount</span>
+              <div className="relative w-32">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
+              </div>
             </div>
+            
+            <div className="flex justify-between items-center gap-4">
+              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Shipping</span>
+              <div className="relative w-32">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
+              </div>
+            </div>
+          </div>
+          
+          {/* Hero Total */}
+          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex justify-between items-center mb-6">
+            <span className="text-[16px] font-bold text-blue-900">Total</span>
+            <span className="text-[24px] font-black text-blue-600">{fmtSummary(total)}</span>
           </div>
 
           <button 
             onClick={() => setShowPreview(true)}
-            className="w-full mt-6 px-8 py-5 bg-zinc-900 hover:bg-black text-white font-bold text-[16px] rounded-2xl shadow-xl shadow-zinc-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+            className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[15px] rounded-xl shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           >
             Preview & Download
-            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+            <ArrowRight size={18} />
           </button>
         </div>
       </div>
