@@ -666,7 +666,7 @@ export function FreeInvoiceBuilder() {
         </div>
         
         <div className="space-y-4 mb-8">
-          <AnimatePresence>
+          <AnimatePresence initial={false}>
             {items.map((item, idx) => (
               <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col md:flex-row gap-4 items-start md:items-center bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border border-zinc-100 md:border-none shadow-sm md:shadow-none relative group">
                 <div className="flex-1 w-full">
