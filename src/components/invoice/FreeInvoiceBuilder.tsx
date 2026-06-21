@@ -226,15 +226,15 @@ export function FreeInvoiceBuilder() {
     );
   }
 
-  const inputClass = "w-full min-h-[44px] rounded-xl bg-white border border-zinc-200 px-4 py-3 text-[14px] text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all";
-  const labelClass = "block text-[13px] font-semibold text-zinc-700 mb-2";
+  const inputClass = "w-full min-h-[38px] rounded-lg bg-white border border-zinc-200 px-3 py-2 text-[14px] text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all";
+  const labelClass = "block text-[13px] font-medium text-zinc-500 mb-1.5";
 
   return (
-    <div className="w-full max-w-4xl mx-auto font-sans bg-white sm:p-12 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 mt-8 mb-24 relative">
+    <div className="w-full max-w-[850px] mx-auto font-sans bg-white sm:p-10 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 mt-8 mb-24 relative">
       
       {/* 1. Header Area */}
-      <div className="flex justify-between items-center mb-10 border-b border-zinc-100 pb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900">
+      <div className="flex justify-between items-center mb-8 border-b border-zinc-100 pb-6">
+        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
           Invoice Details
         </h1>
       </div>
@@ -245,7 +245,7 @@ export function FreeInvoiceBuilder() {
           <label className={labelClass}>Company Logo</label>
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="relative h-24 w-full border-2 border-dashed border-zinc-200 rounded-xl flex items-center justify-center hover:bg-zinc-50 hover:border-zinc-300 transition-all cursor-pointer bg-white overflow-hidden group"
+            className="relative h-20 w-full border border-dashed border-zinc-300 rounded-lg flex items-center justify-center hover:bg-zinc-50 hover:border-blue-400 transition-all cursor-pointer bg-white overflow-hidden group"
           >
             <input
               type="file"
@@ -263,20 +263,20 @@ export function FreeInvoiceBuilder() {
               className="hidden"
             />
             {logoUrl ? (
-              <div className="absolute inset-0 p-4 bg-white flex flex-col items-center justify-center group">
+              <div className="absolute inset-0 p-2 bg-white flex flex-col items-center justify-center group">
                 <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
                 <button 
                   type="button" 
                   onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} 
-                  className="absolute inset-0 bg-black/40 text-white font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                  className="absolute inset-0 bg-black/40 text-white text-sm font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
                 >
-                  Clear Logo
+                  Clear
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col items-center gap-2 text-zinc-500">
-                <UploadCloud size={20} strokeWidth={2} />
-                <span className="text-[13px] font-medium">Upload Image</span>
+              <div className="flex flex-col items-center gap-1.5 text-zinc-400">
+                <UploadCloud size={18} strokeWidth={2} />
+                <span className="text-[12px] font-medium">Upload Image</span>
               </div>
             )}
           </div>
@@ -302,7 +302,7 @@ export function FreeInvoiceBuilder() {
             value={companyDetails} 
             onChange={e => setCompanyDetails(e.target.value)} 
             placeholder="Your Company Name&#10;123 Business Avenue&#10;City, State, Zip" 
-            rows={4} 
+            rows={3} 
             className={`${inputClass} resize-y leading-relaxed`} 
           />
         </div>
@@ -313,7 +313,7 @@ export function FreeInvoiceBuilder() {
             value={clientDetails} 
             onChange={e => setClientDetails(e.target.value)} 
             placeholder="Client Name&#10;456 Client Street&#10;City, State, Zip" 
-            rows={4} 
+            rows={3} 
             className={`${inputClass} resize-y leading-relaxed`} 
           />
         </div>
@@ -338,22 +338,22 @@ export function FreeInvoiceBuilder() {
       </div>
 
       {/* 3. Line Items */}
-      <div className="mb-12">
+      <div className="mb-10">
         <label className={labelClass}>Line Items</label>
-        <div className="bg-zinc-50 rounded-2xl border border-zinc-200 p-4 sm:p-6 shadow-sm">
-          <div className="hidden md:flex text-[13px] font-semibold text-zinc-500 mb-3 px-1">
+        <div className="bg-[#F8F9FA] rounded-xl border border-zinc-200 p-4 sm:p-5 shadow-sm">
+          <div className="hidden md:flex text-[12px] font-semibold text-zinc-500 mb-2 px-1">
             <div className="flex-1">Description</div>
-            <div className="w-[120px] text-left ml-3">Rate</div>
-            <div className="w-[80px] text-left ml-3">Qty</div>
-            <div className="w-[120px] text-left ml-3">Amount</div>
-            <div className="w-10 ml-3"></div>
+            <div className="w-[110px] text-left ml-3">Rate</div>
+            <div className="w-[70px] text-left ml-3">Qty</div>
+            <div className="w-[110px] text-left ml-3">Amount</div>
+            <div className="w-8 ml-3"></div>
           </div>
           
           <div className="space-y-3">
             {items.map((item, idx) => (
               <div key={idx} className="flex flex-col md:flex-row gap-3 items-center">
                  <div className="w-full md:flex-1">
-                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Description</span>
+                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Description</span>
                    <input 
                      value={item.description} 
                      onChange={e => handleItemChange(idx, 'description', e.target.value)} 
@@ -362,20 +362,20 @@ export function FreeInvoiceBuilder() {
                    />
                  </div>
                  
-                 <div className="w-full md:w-[120px] relative">
-                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Rate</span>
-                   <span className="absolute left-3 top-[34px] md:top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                 <div className="w-full md:w-[110px] relative">
+                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Rate</span>
+                   <span className="absolute left-3 top-[32px] md:top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
                    <input 
                      type="number" 
                      placeholder="0.00" 
                      value={item.unit_price} 
                      onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
-                     className={`${inputClass} pl-7`} 
+                     className={`${inputClass} pl-6`} 
                    />
                  </div>
                  
-                 <div className="w-full md:w-[80px]">
-                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Qty</span>
+                 <div className="w-full md:w-[70px]">
+                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Qty</span>
                    <input 
                      type="number" 
                      placeholder="1" 
@@ -385,22 +385,22 @@ export function FreeInvoiceBuilder() {
                    />
                  </div>
                  
-                 <div className="w-full md:w-[120px] relative">
-                   <span className="md:hidden block text-[12px] font-semibold text-zinc-500 mb-1">Amount</span>
-                   <span className="absolute left-3 top-[34px] md:top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
+                 <div className="w-full md:w-[110px] relative">
+                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Amount</span>
+                   <span className="absolute left-3 top-[32px] md:top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
                    <input 
                      value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
                      readOnly 
                      placeholder="0.00" 
-                     className={`${inputClass} pl-7 bg-zinc-100 cursor-default focus:ring-0 focus:border-zinc-200`} 
+                     className={`${inputClass} pl-6 bg-zinc-100 cursor-default focus:ring-0 focus:border-zinc-200`} 
                    />
                  </div>
 
-                 <div className="w-full md:w-10 flex justify-end md:justify-center mt-2 md:mt-0">
+                 <div className="w-full md:w-8 flex justify-end md:justify-center mt-2 md:mt-0">
                    <button 
                      onClick={() => removeRow(idx)} 
                      disabled={items.length === 1} 
-                     className="text-zinc-400 hover:text-red-500 p-2 rounded-full disabled:opacity-0 transition-all bg-white shadow-sm border border-zinc-200"
+                     className="text-zinc-400 hover:text-red-500 p-1.5 rounded-md disabled:opacity-0 transition-all bg-white shadow-sm border border-zinc-200 hover:border-red-200 hover:bg-red-50"
                    >
                      <X size={16} strokeWidth={2} />
                    </button>
@@ -411,10 +411,10 @@ export function FreeInvoiceBuilder() {
           
           <button 
             onClick={addRow} 
-            className="mt-6 flex items-center gap-2 text-blue-600 font-semibold text-[14px] hover:text-blue-700 transition-colors"
+            className="mt-5 flex items-center gap-1.5 text-blue-600 font-medium text-[13px] hover:text-blue-700 transition-colors"
           >
-            <div className="h-7 w-7 rounded-full bg-blue-100 flex items-center justify-center transition-colors">
-              <Plus size={16} strokeWidth={2.5} />
+            <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center transition-colors">
+              <Plus size={14} strokeWidth={2.5} />
             </div>
             Add Line Item
           </button>
@@ -431,56 +431,56 @@ export function FreeInvoiceBuilder() {
             value={notes} 
             onChange={e => setNotes(e.target.value)} 
             placeholder="Thank you for your business! Payment is due within 15 days." 
-            rows={5} 
+            rows={3} 
             className={`${inputClass} resize-y`} 
           />
         </div>
         
         {/* Totals */}
-        <div className="w-full md:w-[340px]">
-          <div className="space-y-4 mb-6 pt-2">
-            <div className="flex justify-between items-center px-2">
-              <span className="text-[14px] font-semibold text-zinc-600">Subtotal</span>
-              <span className="text-[16px] font-bold text-zinc-900">{fmtSummary(subtotal)}</span>
+        <div className="w-full md:w-[320px]">
+          <div className="space-y-3 mb-6 pt-1">
+            <div className="flex justify-between items-center px-1">
+              <span className="text-[13px] font-medium text-zinc-500">Subtotal</span>
+              <span className="text-[15px] font-semibold text-zinc-900">{fmtSummary(subtotal)}</span>
             </div>
             
             <div className="flex justify-between items-center gap-4">
-              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Tax</span>
-              <div className="relative w-32">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
+              <span className="text-[13px] font-medium text-zinc-500 pl-1">Tax</span>
+              <div className="relative w-28">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
               </div>
             </div>
             
             <div className="flex justify-between items-center gap-4">
-              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Discount</span>
-              <div className="relative w-32">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
+              <span className="text-[13px] font-medium text-zinc-500 pl-1">Discount</span>
+              <div className="relative w-28">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
               </div>
             </div>
             
             <div className="flex justify-between items-center gap-4">
-              <span className="text-[14px] font-semibold text-zinc-600 pl-2">Shipping</span>
-              <div className="relative w-32">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-7 py-2 h-auto`} />
+              <span className="text-[13px] font-medium text-zinc-500 pl-1">Shipping</span>
+              <div className="relative w-28">
+                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
               </div>
             </div>
           </div>
           
           {/* Hero Total */}
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-5 flex justify-between items-center mb-6">
-            <span className="text-[16px] font-bold text-blue-900">Total</span>
-            <span className="text-[24px] font-black text-blue-600">{fmtSummary(total)}</span>
+          <div className="bg-[#f8fafc] border border-blue-100 rounded-xl p-4 flex justify-between items-center mb-5">
+            <span className="text-[15px] font-bold text-blue-900">Total</span>
+            <span className="text-[22px] font-black text-blue-600">{fmtSummary(total)}</span>
           </div>
 
           <button 
             onClick={() => setShowPreview(true)}
-            className="w-full px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[15px] rounded-xl shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            className="w-full px-5 py-3 bg-[#18181B] hover:bg-black text-white font-semibold text-[14px] rounded-lg shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
           >
             Preview & Download
-            <ArrowRight size={18} />
+            <ArrowRight size={16} />
           </button>
         </div>
       </div>
