@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Plus, X, UploadCloud, Calendar, FileText, Sparkles, ArrowRight } from 'lucide-react';
+import { Download, Plus, X, UploadCloud, Calendar } from 'lucide-react';
 
 interface InvoiceItem {
   description: string;
@@ -35,37 +35,12 @@ export function FreeInvoiceBuilder() {
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [shippingAmount, setShippingAmount] = useState<number>(0);
 
-  const [showPreview, setShowPreview] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [scale, setScale] = useState(1);
-
-  // --- Scale Logic ---
-  useEffect(() => {
-    const handleResize = () => {
-      if (containerRef.current) {
-        const w = containerRef.current.clientWidth;
-        if (w === 0) return;
-        const scaleW = (w - 64) / 800; 
-        setScale(Math.min(scaleW, 1)); 
-      }
-    };
-    handleResize();
-    const timer = setTimeout(handleResize, 100);
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(timer);
-    };
-  }, [showPreview]);
 
   // --- Calcs ---
   const subtotal = items.reduce((s, i) => s + i.amount, 0);
   const total = subtotal + (taxAmount || 0) - (discountAmount || 0) + (shippingAmount || 0);
 
-  const fmt = (v: number | string) => {
-    const num = typeof v === 'string' ? parseFloat(v) || 0 : v;
-    return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-  };
   const fmtSummary = (v: number) => {
     return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
@@ -88,12 +63,6 @@ export function FreeInvoiceBuilder() {
   const handleDownloadPDF = async () => {
     if (!invoiceRef.current) return;
     setIsDownloading(true);
-    
-    const currentScale = scale;
-    if (scale !== 1) {
-      setScale(1);
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
 
     try {
       const htmlToImageModule = await import('html-to-image');
@@ -102,12 +71,29 @@ export function FreeInvoiceBuilder() {
       const jsPDFModule = await import('jspdf') as any;
       const JsPDFClass = jsPDFModule.default?.jsPDF || (typeof jsPDFModule.default === 'function' ? jsPDFModule.default : jsPDFModule.jsPDF);
       
-      const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 3 });
+      // Temporarily hide UI elements for printing
+      const uiElements = invoiceRef.current.querySelectorAll('.hide-on-print');
+      uiElements.forEach(el => (el as HTMLElement).style.opacity = '0');
       
-      const node = invoiceRef.current;
+      // Remove hover backgrounds temporarily
+      const inputs = invoiceRef.current.querySelectorAll('input, textarea');
+      inputs.forEach(el => {
+        (el as HTMLElement).style.background = 'transparent';
+        (el as HTMLElement).style.boxShadow = 'none';
+      });
+
+      const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
+      
+      // Restore UI elements
+      uiElements.forEach(el => (el as HTMLElement).style.opacity = '1');
+      inputs.forEach(el => {
+        (el as HTMLElement).style.background = '';
+        (el as HTMLElement).style.boxShadow = '';
+      });
+
       const pdf = new JsPDFClass('p', 'mm', 'a4');
       const pw = pdf.internal.pageSize.getWidth();
-      const ph = (node.offsetHeight * pw) / node.offsetWidth;
+      const ph = (invoiceRef.current.offsetHeight * pw) / invoiceRef.current.offsetWidth;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
       pdf.save(`${invoiceNumber || 'Invoice'}.pdf`);
@@ -115,294 +101,186 @@ export function FreeInvoiceBuilder() {
       console.error('PDF Generation Error:', err);
       alert('Failed to generate PDF: ' + (err?.message || err));
     } finally {
-      if (scale !== 1) setScale(currentScale);
       setIsDownloading(false);
     }
   };
 
-  const renderPreviewTemplate = () => {
-    const [cName, ...cAddr] = companyDetails.split('\n');
-    const [clName, ...clAddr] = clientDetails.split('\n');
-
-    return (
-      <div className="bg-white min-h-[1130px] w-full text-[14px] text-zinc-800 font-sans p-16 relative flex flex-col shadow-2xl">
-        <div className="flex justify-between items-start mb-16">
-          <div>
-            {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-16 mb-4 object-contain" /> : null}
-            <h1 className="text-2xl font-bold tracking-tight mb-1 text-zinc-900">{cName || 'Your Company'}</h1>
-            <p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{cAddr.join('\n')}</p>
-          </div>
-          <div className="text-right">
-            <h2 className="text-4xl font-black tracking-tight text-zinc-200 uppercase mb-2">Invoice</h2>
-            <p className="font-semibold text-zinc-900 text-lg">{invoiceNumber}</p>
-          </div>
-        </div>
-        <div className="flex justify-between items-end mb-16">
-          <div>
-            <p className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Bill To</p>
-            <p className="font-bold text-base text-zinc-900">{clName}</p>
-            <p className="text-zinc-600 whitespace-pre-wrap mt-1 leading-relaxed">{clAddr.join('\n')}</p>
-          </div>
-          <div className="flex gap-16 text-right">
-            <div>
-              <p className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Date Issued</p>
-              <p className="font-semibold text-zinc-900">{issueDate}</p>
-            </div>
-            <div>
-              <p className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Due Date</p>
-              <p className="font-semibold text-zinc-900">{dueDate}</p>
-            </div>
-          </div>
-        </div>
-        <table className="w-full text-left mb-16">
-          <thead>
-            <tr className="border-b-2 border-zinc-100">
-              <th className="py-4 text-[13px] font-semibold text-zinc-500">Item</th>
-              <th className="py-4 text-[13px] font-semibold text-zinc-500 text-center w-28">Rate</th>
-              <th className="py-4 text-[13px] font-semibold text-zinc-500 text-center w-24">Qty</th>
-              <th className="py-4 text-[13px] font-semibold text-zinc-500 text-right w-36">Amount</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-zinc-50">
-            {items.map((item, idx) => (
-              <tr key={idx}>
-                <td className="py-5 text-zinc-900 font-medium text-[14px]">{item.description || 'Item'}</td>
-                <td className="py-5 text-zinc-600 text-center">{fmt(item.unit_price)}</td>
-                <td className="py-5 text-zinc-600 text-center">{item.quantity}</td>
-                <td className="py-5 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="mt-auto flex justify-between items-start gap-12">
-          <div className="flex-1 space-y-8">
-            {notes && (<div><p className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-600 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
-          </div>
-          <div className="w-80">
-            <div className="space-y-4 mb-6">
-              <div className="flex justify-between text-zinc-600 font-medium"><span>Subtotal</span><span className="text-zinc-900">{fmtSummary(subtotal)}</span></div>
-              {taxAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Tax</span><span>{fmtSummary(taxAmount)}</span></div>}
-              {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmtSummary(discountAmount)}</span></div>}
-              {shippingAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Shipping</span><span>{fmtSummary(shippingAmount)}</span></div>}
-            </div>
-            <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
-              <span className="text-lg font-bold text-[#111827]">Total</span>
-              <span className="text-3xl font-bold text-[#111827]">{fmtSummary(total)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  if (showPreview) {
-    return (
-      <div className="w-full flex flex-col items-center bg-[#F8F9FA] py-12 px-4 min-h-screen font-sans">
-        <div className="w-full max-w-4xl flex justify-between items-center mb-8">
-          <button 
-            onClick={() => setShowPreview(false)}
-            className="px-6 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-medium rounded-lg transition-all"
-          >
-            Back to Editor
-          </button>
-          <button
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            className="px-6 py-2.5 bg-[#111827] hover:bg-black text-white font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50"
-          >
-            {isDownloading ? <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={16} /> Download PDF</>}
-          </button>
-        </div>
-        <div ref={containerRef} className="w-full flex justify-center overflow-x-auto pb-24">
-          <div className="relative transition-all duration-300 ease-out origin-top" style={{ transform: `scale(${scale})` }}>
-            <div className="relative w-[800px] bg-white text-black shadow-2xl rounded-md overflow-hidden select-text pointer-events-auto border border-zinc-200">
-              <div ref={invoiceRef}>
-                {renderPreviewTemplate()}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const inputClass = "w-full min-h-[38px] rounded-lg bg-white border border-zinc-200 px-3 py-2 text-[14px] text-zinc-900 shadow-sm placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all";
-  const labelClass = "block text-[13px] font-medium text-zinc-500 mb-1.5";
+  const inputStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -ml-2 text-zinc-900 placeholder:text-zinc-400";
+  const textStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -ml-2 resize-none text-zinc-900 placeholder:text-zinc-400";
+  const rightInputStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -mr-2 text-right text-zinc-900 placeholder:text-zinc-400";
 
   return (
-    <div className="w-full max-w-[850px] mx-auto font-sans bg-white sm:p-10 p-6 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 mt-8 mb-24 relative">
+    <div className="w-full flex flex-col items-center justify-center font-sans pb-24">
       
-      {/* 1. Header Area */}
-      <div className="flex justify-between items-center mb-8 border-b border-zinc-100 pb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
-          Invoice Details
-        </h1>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
-        {/* Logo Upload */}
-        <div>
-          <label className={labelClass}>Company Logo</label>
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className="relative h-20 w-full border border-dashed border-zinc-300 rounded-lg flex items-center justify-center hover:bg-zinc-50 hover:border-blue-400 transition-all cursor-pointer bg-white overflow-hidden group"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              ref={fileInputRef}
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  const reader = new FileReader();
-                  reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
-                  reader.readAsDataURL(file);
-                } else { setLogoUrl(''); }
-                e.target.value = '';
-              }}
-              className="hidden"
-            />
-            {logoUrl ? (
-              <div className="absolute inset-0 p-2 bg-white flex flex-col items-center justify-center group">
-                <img src={logoUrl} alt="Logo" className="h-full w-full object-contain" />
+      {/* Editor Container (Looks like an A4 paper) */}
+      <div 
+        ref={invoiceRef}
+        className="w-full max-w-[850px] bg-white sm:p-16 p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-sm my-12 border border-zinc-200 relative"
+        style={{ minHeight: '1100px' }}
+      >
+        {/* Top Header */}
+        <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-16">
+          <div className="w-full md:w-1/2">
+            {/* Logo Upload */}
+            <div className="mb-6">
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
+                    reader.readAsDataURL(file);
+                  } else { setLogoUrl(''); }
+                  e.target.value = '';
+                }}
+                className="hidden"
+              />
+              {logoUrl ? (
+                <div className="relative group inline-block">
+                  <img src={logoUrl} alt="Logo" className="max-h-20 object-contain" />
+                  <button 
+                    onClick={() => setLogoUrl('')}
+                    className="absolute inset-0 bg-black/50 text-white text-xs font-semibold rounded opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all hide-on-print"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ) : (
                 <button 
-                  type="button" 
-                  onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} 
-                  className="absolute inset-0 bg-black/40 text-white text-sm font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-20 w-48 border-2 border-dashed border-zinc-200 rounded-lg flex flex-col items-center justify-center text-zinc-400 hover:text-blue-500 hover:border-blue-300 hover:bg-blue-50 transition-all hide-on-print"
                 >
-                  Clear
+                  <UploadCloud size={24} strokeWidth={1.5} className="mb-1" />
+                  <span className="text-xs font-semibold">Upload Logo</span>
                 </button>
+              )}
+            </div>
+
+            {/* From Details */}
+            <textarea 
+              value={companyDetails} 
+              onChange={e => setCompanyDetails(e.target.value)} 
+              placeholder="Your Company Name&#10;123 Business Rd&#10;City, State, Zip" 
+              rows={4} 
+              className={`${textStyles} text-[15px] font-medium leading-relaxed`} 
+            />
+          </div>
+
+          <div className="w-full md:w-1/2 flex flex-col items-start md:items-end md:text-right">
+            <h1 className="text-5xl font-black tracking-widest text-zinc-200 uppercase mb-6">Invoice</h1>
+            <div className="flex items-center justify-end w-full max-w-[200px]">
+              <span className="text-zinc-400 font-bold text-xl mr-2">#</span>
+              <input 
+                value={invoiceNumber} 
+                onChange={e => setInvoiceNumber(e.target.value)} 
+                placeholder="INV-001" 
+                className={`${rightInputStyles} text-xl font-bold placeholder:font-normal`} 
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Bill To & Dates */}
+        <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-16">
+          <div className="w-full md:w-1/2">
+            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 px-2">Bill To</h3>
+            <textarea 
+              value={clientDetails} 
+              onChange={e => setClientDetails(e.target.value)} 
+              placeholder="Client Name&#10;456 Client St&#10;City, State, Zip" 
+              rows={4} 
+              className={`${textStyles} text-[15px] leading-relaxed`} 
+            />
+          </div>
+          <div className="w-full md:w-1/2 flex gap-8 md:justify-end">
+            <div className="w-32">
+              <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 md:text-right px-2 md:px-0">Date Issued</h3>
+              <div className="relative">
+                <input 
+                  type="date" 
+                  value={issueDate} 
+                  onChange={e => setIssueDate(e.target.value)} 
+                  className={`${rightInputStyles} text-[15px] font-medium [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
+                />
+                <Calendar size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none z-0 hide-on-print md:hidden" />
               </div>
-            ) : (
-              <div className="flex flex-col items-center gap-1.5 text-zinc-400">
-                <UploadCloud size={18} strokeWidth={2} />
-                <span className="text-[12px] font-medium">Upload Image</span>
+            </div>
+            <div className="w-32">
+              <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 md:text-right px-2 md:px-0">Due Date</h3>
+              <div className="relative">
+                <input 
+                  type="date" 
+                  value={dueDate} 
+                  onChange={e => setDueDate(e.target.value)} 
+                  className={`${rightInputStyles} text-[15px] font-medium [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
+                />
+                <Calendar size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none z-0 hide-on-print md:hidden" />
               </div>
-            )}
+            </div>
           </div>
         </div>
 
-        {/* Invoice Number */}
-        <div>
-          <label className={labelClass}>Invoice Number</label>
-          <input 
-            value={invoiceNumber} 
-            onChange={e => setInvoiceNumber(e.target.value)} 
-            placeholder="#INV-001" 
-            className={inputClass} 
-          />
-        </div>
-      </div>
-
-      {/* 2. From / To Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-8">
-        <div>
-          <label className={labelClass}>Your Details (From)</label>
-          <textarea 
-            value={companyDetails} 
-            onChange={e => setCompanyDetails(e.target.value)} 
-            placeholder="Your Company Name&#10;123 Business Avenue&#10;City, State, Zip" 
-            rows={3} 
-            className={`${inputClass} resize-y leading-relaxed`} 
-          />
-        </div>
-        
-        <div>
-          <label className={labelClass}>Client Details (Bill To)</label>
-          <textarea 
-            value={clientDetails} 
-            onChange={e => setClientDetails(e.target.value)} 
-            placeholder="Client Name&#10;456 Client Street&#10;City, State, Zip" 
-            rows={3} 
-            className={`${inputClass} resize-y leading-relaxed`} 
-          />
-        </div>
-      </div>
-
-      {/* Dates Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-12">
-        <div>
-          <label className={labelClass}>Date Issued</label>
-          <div className="relative">
-            <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
-            <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-0" />
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Due Date</label>
-          <div className="relative">
-            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
-            <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none z-0" />
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Line Items */}
-      <div className="mb-10">
-        <label className={labelClass}>Line Items</label>
-        <div className="bg-[#F8F9FA] rounded-xl border border-zinc-200 p-4 sm:p-5 shadow-sm">
-          <div className="hidden md:flex text-[12px] font-semibold text-zinc-500 mb-2 px-1">
+        {/* Line Items Table */}
+        <div className="mb-12">
+          <div className="flex border-b-2 border-zinc-100 pb-3 mb-3 px-2 text-[12px] font-bold uppercase tracking-widest text-zinc-400">
             <div className="flex-1">Description</div>
-            <div className="w-[110px] text-left ml-3">Rate</div>
-            <div className="w-[70px] text-left ml-3">Qty</div>
-            <div className="w-[110px] text-left ml-3">Amount</div>
-            <div className="w-8 ml-3"></div>
+            <div className="w-24 text-right">Rate</div>
+            <div className="w-20 text-right">Qty</div>
+            <div className="w-28 text-right">Amount</div>
+            <div className="w-8 ml-2 hide-on-print"></div>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-1">
             {items.map((item, idx) => (
-              <div key={idx} className="flex flex-col md:flex-row gap-3 items-center">
-                 <div className="w-full md:flex-1">
-                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Description</span>
+              <div key={idx} className="flex gap-2 items-center group">
+                 <div className="flex-1">
                    <input 
                      value={item.description} 
                      onChange={e => handleItemChange(idx, 'description', e.target.value)} 
                      placeholder="Item description" 
-                     className={inputClass} 
+                     className={`${inputStyles} text-[15px] font-medium`} 
                    />
                  </div>
                  
-                 <div className="w-full md:w-[110px] relative">
-                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Rate</span>
-                   <span className="absolute left-3 top-[32px] md:top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                 <div className="w-24 relative">
                    <input 
                      type="number" 
                      placeholder="0.00" 
                      value={item.unit_price} 
                      onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
-                     className={`${inputClass} pl-6`} 
+                     className={`${rightInputStyles} text-[15px]`} 
                    />
                  </div>
                  
-                 <div className="w-full md:w-[70px]">
-                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Qty</span>
+                 <div className="w-20">
                    <input 
                      type="number" 
                      placeholder="1" 
                      value={item.quantity} 
                      onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
-                     className={inputClass} 
+                     className={`${rightInputStyles} text-[15px]`} 
                    />
                  </div>
                  
-                 <div className="w-full md:w-[110px] relative">
-                   <span className="md:hidden block text-[11px] font-semibold text-zinc-500 mb-1">Amount</span>
-                   <span className="absolute left-3 top-[32px] md:top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                 <div className="w-28">
                    <input 
                      value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
                      readOnly 
                      placeholder="0.00" 
-                     className={`${inputClass} pl-6 bg-zinc-100 cursor-default focus:ring-0 focus:border-zinc-200`} 
+                     className="w-full bg-transparent text-right py-1 px-2 text-[15px] font-semibold text-zinc-900 cursor-default" 
                    />
                  </div>
 
-                 <div className="w-full md:w-8 flex justify-end md:justify-center mt-2 md:mt-0">
+                 <div className="w-8 flex justify-center hide-on-print opacity-0 group-hover:opacity-100 transition-opacity">
                    <button 
                      onClick={() => removeRow(idx)} 
                      disabled={items.length === 1} 
-                     className="text-zinc-400 hover:text-red-500 p-1.5 rounded-md disabled:opacity-0 transition-all bg-white shadow-sm border border-zinc-200 hover:border-red-200 hover:bg-red-50"
+                     className="text-zinc-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded disabled:opacity-0 transition-colors"
                    >
-                     <X size={16} strokeWidth={2} />
+                     <X size={16} strokeWidth={2.5} />
                    </button>
                  </div>
               </div>
@@ -411,78 +289,84 @@ export function FreeInvoiceBuilder() {
           
           <button 
             onClick={addRow} 
-            className="mt-5 flex items-center gap-1.5 text-blue-600 font-medium text-[13px] hover:text-blue-700 transition-colors"
+            className="mt-4 flex items-center gap-2 text-blue-500 font-semibold text-[13px] hover:text-blue-600 transition-colors px-2 hide-on-print"
           >
-            <div className="h-6 w-6 rounded-full bg-blue-50 flex items-center justify-center transition-colors">
-              <Plus size={14} strokeWidth={2.5} />
+            <div className="h-5 w-5 rounded-full bg-blue-50 flex items-center justify-center transition-colors">
+              <Plus size={14} strokeWidth={3} />
             </div>
             Add Line Item
           </button>
         </div>
-      </div>
 
-      {/* 4. Footer (Notes & Totals) */}
-      <div className="flex flex-col md:flex-row justify-between gap-10">
-        
-        {/* Notes */}
-        <div className="flex-1">
-          <label className={labelClass}>Notes / Terms</label>
-          <textarea 
-            value={notes} 
-            onChange={e => setNotes(e.target.value)} 
-            placeholder="Thank you for your business! Payment is due within 15 days." 
-            rows={3} 
-            className={`${inputClass} resize-y`} 
-          />
-        </div>
-        
-        {/* Totals */}
-        <div className="w-full md:w-[320px]">
-          <div className="space-y-3 mb-6 pt-1">
-            <div className="flex justify-between items-center px-1">
-              <span className="text-[13px] font-medium text-zinc-500">Subtotal</span>
-              <span className="text-[15px] font-semibold text-zinc-900">{fmtSummary(subtotal)}</span>
-            </div>
-            
-            <div className="flex justify-between items-center gap-4">
-              <span className="text-[13px] font-medium text-zinc-500 pl-1">Tax</span>
-              <div className="relative w-28">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center gap-4">
-              <span className="text-[13px] font-medium text-zinc-500 pl-1">Discount</span>
-              <div className="relative w-28">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
-              </div>
-            </div>
-            
-            <div className="flex justify-between items-center gap-4">
-              <span className="text-[13px] font-medium text-zinc-500 pl-1">Shipping</span>
-              <div className="relative w-28">
-                <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
-                <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${inputClass} pl-6 py-1.5 h-auto min-h-[34px]`} />
-              </div>
-            </div>
+        {/* Footer: Notes & Totals */}
+        <div className="flex flex-col md:flex-row justify-between gap-16 mt-auto">
+          {/* Notes */}
+          <div className="flex-1">
+            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 px-2">Notes</h3>
+            <textarea 
+              value={notes} 
+              onChange={e => setNotes(e.target.value)} 
+              placeholder="Thank you for your business! Payment is due within 15 days." 
+              rows={4} 
+              className={`${textStyles} text-[14px] leading-relaxed`} 
+            />
           </div>
           
-          {/* Hero Total */}
-          <div className="bg-[#f8fafc] border border-blue-100 rounded-xl p-4 flex justify-between items-center mb-5">
-            <span className="text-[15px] font-bold text-blue-900">Total</span>
-            <span className="text-[22px] font-black text-blue-600">{fmtSummary(total)}</span>
+          {/* Totals */}
+          <div className="w-full md:w-[280px]">
+            <div className="space-y-2 mb-4 px-2">
+              <div className="flex justify-between items-center py-1">
+                <span className="text-[14px] font-semibold text-zinc-500">Subtotal</span>
+                <span className="text-[15px] font-semibold text-zinc-900">{fmtSummary(subtotal)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-[14px] font-semibold text-zinc-500">Tax</span>
+                <div className="w-24 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
+                  <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-[14px] font-semibold text-zinc-500">Discount</span>
+                <div className="w-24 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
+                  <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center">
+                <span className="text-[14px] font-semibold text-zinc-500">Shipping</span>
+                <div className="w-24 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
+                  <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
+                </div>
+              </div>
+            </div>
+            
+            {/* Grand Total */}
+            <div className="border-t-2 border-zinc-900 pt-4 px-2 flex justify-between items-end">
+              <span className="text-[16px] font-bold text-zinc-900 mb-1">Total</span>
+              <span className="text-[32px] font-black text-zinc-900 tracking-tight">{fmtSummary(total)}</span>
+            </div>
           </div>
-
-          <button 
-            onClick={() => setShowPreview(true)}
-            className="w-full px-5 py-3 bg-[#18181B] hover:bg-black text-white font-semibold text-[14px] rounded-lg shadow-sm transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            Preview & Download
-            <ArrowRight size={16} />
-          </button>
         </div>
+      </div>
+
+      {/* Floating Action Button for Download */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button 
+          onClick={handleDownloadPDF}
+          disabled={isDownloading}
+          className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[15px] rounded-full shadow-[0_10px_40px_-10px_rgba(37,99,235,0.6)] hover:shadow-[0_10px_40px_-10px_rgba(37,99,235,0.8)] transition-all active:scale-[0.95] flex items-center gap-3 disabled:opacity-50"
+        >
+          {isDownloading ? (
+            <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+          ) : (
+            <><Download size={20} /> Download PDF</>
+          )}
+        </button>
       </div>
 
     </div>
