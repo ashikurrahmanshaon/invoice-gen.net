@@ -67,8 +67,8 @@ export interface Payment {
 }
 
 // Config Check
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
 export const isSupabaseConfigured = (() => {
   if (!supabaseUrl || !supabaseAnonKey) return false;
