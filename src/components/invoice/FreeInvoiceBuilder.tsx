@@ -16,25 +16,22 @@ export function FreeInvoiceBuilder() {
 
   // --- State ---
   const [logoUrl, setLogoUrl] = useState('');
-  const [invoiceNumber, setInvoiceNumber] = useState('#002121');
-  const [companyDetails, setCompanyDetails] = useState('Musemind, Road 3, Block B, Banasree,\nDhaka,');
-  const [clientDetails, setClientDetails] = useState('Panther, Brooklyn, NY 11207');
+  const [invoiceNumber, setInvoiceNumber] = useState('');
+  const [companyDetails, setCompanyDetails] = useState('');
+  const [clientDetails, setClientDetails] = useState('');
   
-  const [issueDate, setIssueDate] = useState('10/04/2023');
-  const [dueDate, setDueDate] = useState('20/06/2023');
+  const [issueDate, setIssueDate] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: 'Ecommerce website redesign', quantity: 5, unit_price: 4000, amount: 20000 },
-    { description: 'Logo design', quantity: 1, unit_price: 8000, amount: 8000 },
-    { description: 'Dashboard design', quantity: 15, unit_price: 1000, amount: 15000 },
-    { description: 'Mobile app design', quantity: 10, unit_price: 500, amount: 10000 },
+    { description: '', quantity: 1, unit_price: 0, amount: 0 },
   ]);
 
-  const [notes, setNotes] = useState('Pay within 15 days, Thank you for your business');
+  const [notes, setNotes] = useState('');
   
-  const [taxAmount, setTaxAmount] = useState<number>(200);
-  const [discountAmount, setDiscountAmount] = useState<number>(100);
-  const [shippingAmount, setShippingAmount] = useState<number>(80);
+  const [taxAmount, setTaxAmount] = useState<number>(0);
+  const [discountAmount, setDiscountAmount] = useState<number>(0);
+  const [shippingAmount, setShippingAmount] = useState<number>(0);
 
   const [showPreview, setShowPreview] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -228,7 +225,7 @@ export function FreeInvoiceBuilder() {
   const labelClass = "block text-[14px] font-medium text-[#9CA3AF] mb-1.5";
 
   return (
-    <div className="w-full max-w-[850px] mx-auto font-sans bg-white pb-20">
+    <div className="w-full max-w-[850px] mx-auto font-sans bg-white sm:p-12 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E5E7EB] mt-8 mb-20">
       
       {/* 1. Logo & Invoice Number */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
@@ -266,7 +263,7 @@ export function FreeInvoiceBuilder() {
         </div>
         <div>
           <label className={labelClass}>Invoice number</label>
-          <input value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} className={inputClass} />
+          <input value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} placeholder="#000001" className={inputClass} />
         </div>
       </div>
 
@@ -275,14 +272,14 @@ export function FreeInvoiceBuilder() {
         <div>
           <label className={labelClass}>Your company details</label>
           <div className="relative">
-            <textarea value={companyDetails} onChange={e => setCompanyDetails(e.target.value)} rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
+            <textarea value={companyDetails} onChange={e => setCompanyDetails(e.target.value)} placeholder="Company Name&#10;123 Business Rd&#10;City, State 12345" rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
             <RefreshCw size={14} className="absolute top-3 right-3 text-[#60A5FA] cursor-pointer" />
           </div>
         </div>
         <div>
           <label className={labelClass}>Bill to</label>
           <div className="relative">
-            <textarea value={clientDetails} onChange={e => setClientDetails(e.target.value)} rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
+            <textarea value={clientDetails} onChange={e => setClientDetails(e.target.value)} placeholder="Client Name&#10;456 Client St&#10;City, State 67890" rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
           </div>
         </div>
       </div>
@@ -292,21 +289,21 @@ export function FreeInvoiceBuilder() {
         <div>
           <label className={labelClass}>Date issued</label>
           <div className="relative">
-            <input type="text" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={inputClass} />
+            <input type="text" value={issueDate} onChange={e => setIssueDate(e.target.value)} placeholder="DD/MM/YYYY" className={inputClass} />
             <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none" />
           </div>
         </div>
         <div>
           <label className={labelClass}>Due date</label>
           <div className="relative">
-            <input type="text" value={dueDate} onChange={e => setDueDate(e.target.value)} className={inputClass} />
+            <input type="text" value={dueDate} onChange={e => setDueDate(e.target.value)} placeholder="DD/MM/YYYY" className={inputClass} />
             <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none" />
           </div>
         </div>
       </div>
 
       {/* 4. Line Items Table */}
-      <div className="bg-[#F8F9FA] rounded-xl p-5 sm:p-7 mb-8">
+      <div className="bg-[#F8F9FA] rounded-xl p-5 sm:p-7 mb-8 border border-[#E5E7EB]">
         <div className="flex text-[14px] font-medium text-[#9CA3AF] mb-3 px-1">
           <div className="flex-1">Item</div>
           <div className="w-[100px] text-center">Rate</div>
@@ -318,17 +315,17 @@ export function FreeInvoiceBuilder() {
         {items.map((item, idx) => (
           <div key={idx} className="flex gap-3 items-center mb-3">
              <div className="flex-1 relative">
-               <input value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className={`${inputClass} font-medium text-[#111827] pr-10`} />
+               <input value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} placeholder="Description of service or product" className={`${inputClass} font-medium text-[#111827] pr-10`} />
                <RefreshCw size={14} className="absolute top-1/2 -translate-y-1/2 right-3 text-[#60A5FA] cursor-pointer" />
              </div>
              <div className="w-[100px]">
-               <input type="text" value={item.unit_price > 0 ? fmt(item.unit_price) : ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827]`} />
+               <input type="text" placeholder="$0.00" value={item.unit_price > 0 ? fmt(item.unit_price) : ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827]`} />
              </div>
              <div className="w-[70px]">
-               <input type="number" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827] px-1`} />
+               <input type="number" placeholder="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827] px-1`} />
              </div>
              <div className="w-[110px]">
-               <input value={fmt(item.amount)} readOnly className={`${inputClass} text-center font-medium text-[#111827] bg-white cursor-default`} />
+               <input value={fmt(item.amount)} readOnly placeholder="$0.00" className={`${inputClass} text-center font-medium text-[#111827] bg-[#F3F4F6] cursor-default`} />
              </div>
              <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 flex justify-center text-[#9CA3AF] hover:text-[#111827] disabled:opacity-0 transition-colors">
                <X size={20} strokeWidth={1.5} />
@@ -338,7 +335,7 @@ export function FreeInvoiceBuilder() {
         
         <div className="flex justify-center mt-6">
           <button onClick={addRow} className="flex flex-col items-center gap-1.5 text-[#3b82f6] hover:text-blue-700 transition-colors">
-            <div className="h-[34px] w-[34px] rounded-full bg-[#3b82f6] text-white flex items-center justify-center hover:bg-blue-700 transition-colors">
+            <div className="h-[34px] w-[34px] rounded-full bg-[#3b82f6] text-white flex items-center justify-center hover:bg-blue-700 shadow-sm transition-colors">
               <Plus size={20} strokeWidth={2} />
             </div>
             <span className="text-[14px] font-semibold tracking-wide">Add Item</span>
@@ -351,7 +348,7 @@ export function FreeInvoiceBuilder() {
         <div className="flex-1">
           <label className={labelClass}>Notes</label>
           <div className="relative">
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} className={`${inputClass} resize-y pr-10 font-medium text-[#111827]`} />
+            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Payment terms, thank you message, etc." rows={4} className={`${inputClass} resize-y pr-10 font-medium text-[#111827]`} />
             <RefreshCw size={14} className="absolute top-3 right-3 text-[#60A5FA] cursor-pointer" />
           </div>
         </div>
@@ -365,17 +362,17 @@ export function FreeInvoiceBuilder() {
           <div className="space-y-3 mb-6">
             <div className="flex justify-between items-center text-[14px]">
               <span className="text-[#6B7280] font-medium">Tax</span>
-              <input type="text" value={fmtSummary(taxAmount)} onChange={e => setTaxAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
+              <input type="text" placeholder="$0.00" value={taxAmount > 0 ? fmtSummary(taxAmount) : ''} onChange={e => setTaxAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
             </div>
             
             <div className="flex justify-between items-center text-[14px]">
               <span className="text-[#6B7280] font-medium">Discount</span>
-              <input type="text" value={fmtSummary(discountAmount)} onChange={e => setDiscountAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
+              <input type="text" placeholder="$0.00" value={discountAmount > 0 ? fmtSummary(discountAmount) : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
             </div>
             
             <div className="flex justify-between items-center text-[14px]">
               <span className="text-[#6B7280] font-medium">Shipping free</span>
-              <input type="text" value={fmtSummary(shippingAmount)} onChange={e => setShippingAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
+              <input type="text" placeholder="$0.00" value={shippingAmount > 0 ? fmtSummary(shippingAmount) : ''} onChange={e => setShippingAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
             </div>
           </div>
           
@@ -386,10 +383,10 @@ export function FreeInvoiceBuilder() {
         </div>
       </div>
 
-      <div className="flex justify-end pt-4 pb-12">
+      <div className="flex justify-end pt-4">
          <button 
            onClick={() => setShowPreview(true)}
-           className="px-8 py-3.5 bg-[#3b82f6] hover:bg-blue-700 text-white font-medium text-[15px] rounded-xl shadow-md transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+           className="px-8 py-3.5 bg-[#3b82f6] hover:bg-blue-700 text-white font-medium text-[15px] rounded-xl shadow-md shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
          >
            Preview & Download
            <ArrowRight size={18} />
