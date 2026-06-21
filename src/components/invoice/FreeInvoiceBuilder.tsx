@@ -659,9 +659,15 @@ export function FreeInvoiceBuilder() {
 
       {/* --- TOTALS & NOTES --- */}
       <div className="flex flex-col md:flex-row gap-12 mb-12">
-        <div className="flex-1">
-          <Label>Notes</Label>
-          <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} className="h-32 resize-none" placeholder="Thank you for your business." />
+        <div className="flex-1 space-y-6">
+          <div>
+            <Label>Notes</Label>
+            <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} className="h-[88px] resize-none" placeholder="Thank you for your business." />
+          </div>
+          <div>
+            <Label>Payment Instructions</Label>
+            <CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={3} className="h-[88px] resize-none" placeholder="Bank details, payment links, etc." />
+          </div>
         </div>
         
         <div className="w-full md:w-80 space-y-4">
