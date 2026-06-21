@@ -3,13 +3,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Modal } from '@/components/ui/modal';
+import { useAuth } from '@/context/auth';
+import { useRouter } from 'next/navigation';
+import { dbService } from '@/services/db';
 import { Button } from '@/components/ui/button';
-import {
-  Plus, Trash2, Download, ChevronDown,
-  Image as ImageIcon, CreditCard,
-  Check, DollarSign, Building2, User, FileText,
-  Calendar, Layers, Paintbrush, FileBadge, Settings2, ArrowRight
-} from 'lucide-react';
+import { Plus, Trash2, Calendar as CalIcon, ChevronDown, Check, Type, ArrowRight, Save, Download, Image as ImageIcon } from 'lucide-react';
 
 // --- Types ---
 interface InvoiceItem {
@@ -124,6 +122,63 @@ export function FreeInvoiceBuilder() {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // Auth & Router
+  const { user } = useAuth();
+  const router = useRouter();
+
+  const handleSave = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    try {
+      const invoiceData = {
+        user_id: user.id,
+        client_id: '',
+        invoice_number: invoiceNumber || 'INV-DRAFT',
+        status: 'draft' as const,
+        issue_date: issueDate,
+        due_date: dueDate,
+        currency: currency,
+        tax_rate: Number(taxRate) || 0,
+        tax_amount: taxAmount,
+        discount_rate: Number(discountRate) || 0,
+        discount_amount: discountAmount,
+        subtotal: subtotal,
+        total: total,
+        notes: notes,
+        items: items.map(item => ({
+          description: item.description,
+          quantity: Number(item.quantity) || 1,
+          unit_price: Number(item.unit_price) || 0,
+          amount: item.amount,
+        })),
+      };
+
+      const clients = await dbService.getClients(user.id);
+      let clientId = clients.length > 0 ? clients[0].id : null;
+      if (!clientId) {
+         const newClient = await dbService.createClient({
+           user_id: user.id,
+           name: clientName || 'Unknown Client',
+           email: clientEmail || '',
+           phone: '',
+           address: clientAddress || '',
+         });
+         clientId = newClient.id;
+      }
+      
+      invoiceData.client_id = clientId;
+
+      await dbService.createInvoice(invoiceData);
+      router.push('/dashboard/invoices');
+    } catch (error) {
+      console.error('Failed to save invoice:', error);
+      alert('Failed to save invoice. Please try again.');
+    }
+  };
+
   // --- State ---
   const [template, setTemplate] = useState<typeof TEMPLATES[number]>('modern');
   const [themeColor, setThemeColor] = useState(THEME_COLORS[0]);
@@ -166,11 +221,10 @@ export function FreeInvoiceBuilder() {
     const handleResize = () => {
       if (containerRef.current) {
         const w = containerRef.current.clientWidth;
-        const h = containerRef.current.clientHeight || window.innerHeight;
         if (w === 0) return;
-        const padding = 64; // nice padding
-        const scaleW = (w - padding) / 800; // 800 is approx A4 width
-        setScale(Math.min(scaleW, 1)); // We only care about width scaling so it doesn't overflow horizontally on mobile
+        const padding = 64;
+        const scaleW = (w - padding) / 800;
+        setScale(Math.min(scaleW, 1));
       }
     };
     handleResize();
@@ -208,7 +262,6 @@ export function FreeInvoiceBuilder() {
     if (!invoiceRef.current) return;
     setIsDownloading(true);
     
-    // Temporarily reset scale for accurate html2canvas capture
     const currentScale = scale;
     if (scale !== 1) {
       setScale(1);
@@ -241,7 +294,7 @@ export function FreeInvoiceBuilder() {
   };
 
   // ---------------------------------------------------------------------------
-  // PROFESSIONAL TEMPLATES (Unchanged designs, beautifully rendered)
+  // PROFESSIONAL TEMPLATES
   // ---------------------------------------------------------------------------
 
   const renderModernTemplate = () => (
@@ -774,12 +827,23 @@ export function FreeInvoiceBuilder() {
             </div>
           </div>
           
-          <button 
-            onClick={() => setShowPreview(true)}
-            className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
-          >
-            Preview & Download PDF
-          </button>
+          {/* Actions */}
+          <div className="mt-8 flex flex-col sm:flex-row justify-end items-center gap-4">
+            <button 
+              onClick={handleSave}
+              className="w-full md:w-auto px-10 py-4 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-900 font-medium text-base rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+            >
+              <Save size={18} className="text-zinc-500" />
+              Save to Dashboard
+            </button>
+
+            <button 
+              onClick={() => setShowPreview(true)}
+              className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
+            >
+              Preview & Download PDF
+            </button>
+          </div>
         </div>
       </section>
     </div>
