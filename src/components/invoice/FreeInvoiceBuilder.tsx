@@ -533,10 +533,21 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto bg-white sm:p-10 p-5 rounded-3xl shadow-xl border border-zinc-100 my-12 font-sans text-zinc-900">
-      <div className="text-center mb-12">
-        <h2 className="text-3xl font-black text-zinc-900 tracking-tight">Invoice Details</h2>
-        <p className="text-zinc-500 mt-2">Fill in the details below to generate your professional invoice.</p>
+    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 my-4 font-sans text-zinc-900">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 border-b border-zinc-100 pb-8">
+        <div>
+          <h2 className="text-3xl font-medium tracking-tight text-zinc-900">New Invoice</h2>
+          <p className="text-sm text-zinc-500 mt-1">Fill out the details below to generate a PDF.</p>
+        </div>
+        <div className="mt-6 md:mt-0">
+          <button 
+            onClick={() => setShowPreview(true)}
+            className="w-full md:w-auto px-8 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm rounded-xl shadow-lg shadow-zinc-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+          >
+            Preview & Download
+            <ArrowRight size={16} />
+          </button>
+        </div>
       </div>
 
       <div className="space-y-12">
@@ -636,10 +647,10 @@ export function FreeInvoiceBuilder() {
         </section>
 
         {/* --- TOTALS & NOTES --- */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-zinc-200">
-           <div className="space-y-4">
-              <div><Label>Payment Details</Label><CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={4} /></div>
-              <div><Label>Footer Notes</Label><CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} /></div>
+        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-10 border-t border-zinc-100">
+           <div className="space-y-6">
+              <div><Label>Payment Instructions</Label><CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={3} placeholder="Bank details, payment links, etc." /></div>
+              <div><Label>Notes / Terms</Label><CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Thank you for your business." /></div>
            </div>
            
            <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100 space-y-4 h-fit">
@@ -667,54 +678,37 @@ export function FreeInvoiceBuilder() {
            </div>
         </section>
 
-        {/* --- TEMPLATE SELECTION & PREVIEW --- */}
-        <section className="bg-zinc-900 rounded-3xl p-8 md:p-12 text-white flex flex-col md:flex-row items-center justify-between gap-8 mt-12 shadow-2xl relative overflow-hidden">
-           <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none" />
-           
-           <div className="relative z-10 w-full md:w-auto flex-1">
-             <h3 className="text-2xl font-black mb-4">Ready to generate?</h3>
-             <div className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Choose Template</label>
-                  <div className="flex flex-wrap gap-2">
-                    {TEMPLATES.map(t => (
-                      <button
-                        key={t}
-                        type="button"
-                        onClick={() => setTemplate(t)}
-                        className={`px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${template === t ? 'bg-white text-zinc-900 shadow-lg scale-105' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-white'}`}
-                      >
-                        {t}
-                      </button>
-                    ))}
-                  </div>
+        {/* --- TEMPLATE SELECTION (Minimalist) --- */}
+        <section className="pt-10 border-t border-zinc-100 mt-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-8">
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Design Style</label>
+                <div className="flex gap-2">
+                  {TEMPLATES.map(t => (
+                    <button key={t} type="button" onClick={() => setTemplate(t)} className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${template === t ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
+                      {t}
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <label className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-2 block mt-6">Choose Color</label>
-                  <div className="flex gap-3">
-                    {THEME_COLORS.map(c => (
-                      <button
-                        key={c.value}
-                        type="button"
-                        onClick={() => setThemeColor(c)}
-                        className={`w-8 h-8 rounded-full border-2 transition-all ${themeColor.value === c.value ? 'border-white scale-125 shadow-lg' : 'border-transparent hover:scale-110 opacity-70 hover:opacity-100'}`}
-                        style={{ backgroundColor: c.value }}
-                        title={c.name}
-                      />
-                    ))}
-                  </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Accent Color</label>
+                <div className="flex gap-2">
+                  {THEME_COLORS.map(c => (
+                    <button key={c.value} type="button" onClick={() => setThemeColor(c)} className={`w-6 h-6 rounded-full transition-all ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900' : 'hover:scale-110'}`} style={{ backgroundColor: c.value }} title={c.name} />
+                  ))}
                 </div>
-             </div>
-           </div>
-
-           <div className="relative z-10 w-full md:w-auto">
-              <button 
-                onClick={() => setShowPreview(true)}
-                className="w-full md:w-auto px-10 py-5 bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-black text-lg rounded-2xl shadow-xl hover:shadow-emerald-500/20 transition-all hover:-translate-y-1"
-              >
-                Preview & Download PDF
-              </button>
-           </div>
+              </div>
+            </div>
+            
+            <button 
+              onClick={() => setShowPreview(true)}
+              className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
+            >
+              Preview & Download PDF
+            </button>
+          </div>
         </section>
 
       </div>
