@@ -5,8 +5,8 @@ import { Download, Plus, X, Upload, Calendar, RefreshCw, ArrowRight } from 'luci
 
 interface InvoiceItem {
   description: string;
-  quantity: number;
-  unit_price: number;
+  quantity: string | number;
+  unit_price: string | number;
   amount: number;
 }
 
@@ -24,8 +24,10 @@ export function FreeInvoiceBuilder() {
   const [dueDate, setDueDate] = useState('');
 
   const [items, setItems] = useState<InvoiceItem[]>([
-    { description: '', quantity: 1, unit_price: 0, amount: 0 },
+    { description: '', quantity: 1, unit_price: '', amount: 0 },
   ]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [notes, setNotes] = useState('');
   
@@ -60,8 +62,9 @@ export function FreeInvoiceBuilder() {
   const subtotal = items.reduce((s, i) => s + i.amount, 0);
   const total = subtotal + (taxAmount || 0) - (discountAmount || 0) + (shippingAmount || 0);
 
-  const fmt = (v: number) => {
-    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+  const fmt = (v: number | string) => {
+    const num = typeof v === 'string' ? parseFloat(v) || 0 : v;
+    return '$' + num.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
   };
   const fmtSummary = (v: number) => {
     return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -69,14 +72,17 @@ export function FreeInvoiceBuilder() {
 
   const handleItemChange = (i: number, field: keyof Omit<InvoiceItem, 'amount'>, v: any) => {
     const u = [...items];
-    if (field === 'quantity')        u[i].quantity   = parseInt(v, 10) || 0;
-    else if (field === 'unit_price') u[i].unit_price = parseFloat(v.toString().replace(/[^0-9.]/g, ''))  || 0;
-    else                             u[i].description = v;
-    u[i].amount = u[i].quantity * u[i].unit_price;
+    u[i][field] = v;
+    
+    // Calculate amount
+    const qty = parseFloat(u[i].quantity.toString()) || 0;
+    const price = parseFloat(u[i].unit_price.toString()) || 0;
+    u[i].amount = qty * price;
+    
     setItems(u);
   };
 
-  const addRow    = () => setItems([...items, { description: '', quantity: 1, unit_price: 0, amount: 0 }]);
+  const addRow    = () => setItems([...items, { description: '', quantity: 1, unit_price: '', amount: 0 }]);
   const removeRow = (i: number) => { if (items.length > 1) setItems(items.filter((_, idx) => idx !== i)); };
 
   const handleDownloadPDF = async () => {
@@ -231,10 +237,14 @@ export function FreeInvoiceBuilder() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
         <div>
           <label className={labelClass}>Logo</label>
-          <div className="relative h-[72px] w-full border border-[#E5E7EB] rounded-lg flex items-center px-4 hover:bg-zinc-50 transition-colors cursor-pointer group bg-white">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="relative h-[72px] w-full border border-[#E5E7EB] rounded-lg flex items-center px-4 hover:bg-zinc-50 transition-colors cursor-pointer group bg-white"
+          >
             <input
               type="file"
               accept="image/*"
+              ref={fileInputRef}
               onChange={(e) => {
                 const file = e.target.files?.[0];
                 if (file) {
@@ -242,13 +252,14 @@ export function FreeInvoiceBuilder() {
                   reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
                   reader.readAsDataURL(file);
                 } else { setLogoUrl(''); }
+                e.target.value = ''; // reset so same file can be selected again
               }}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              className="hidden"
             />
             {logoUrl ? (
               <div className="flex items-center justify-between w-full z-20">
                 <img src={logoUrl} alt="Logo" className="h-12 object-contain" />
-                <button type="button" onClick={() => setLogoUrl('')} className="text-zinc-400 hover:text-red-500 z-30 relative px-2 text-sm font-medium">Clear</button>
+                <button type="button" onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} className="text-zinc-400 hover:text-red-500 z-30 relative px-2 text-sm font-medium">Clear</button>
               </div>
             ) : (
               <div className="flex items-center gap-3 text-zinc-600">
@@ -289,15 +300,15 @@ export function FreeInvoiceBuilder() {
         <div>
           <label className={labelClass}>Date issued</label>
           <div className="relative">
-            <input type="text" value={issueDate} onChange={e => setIssueDate(e.target.value)} placeholder="DD/MM/YYYY" className={inputClass} />
-            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none" />
+            <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
+            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none z-0" />
           </div>
         </div>
         <div>
           <label className={labelClass}>Due date</label>
           <div className="relative">
-            <input type="text" value={dueDate} onChange={e => setDueDate(e.target.value)} placeholder="DD/MM/YYYY" className={inputClass} />
-            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none" />
+            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
+            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none z-0" />
           </div>
         </div>
       </div>
@@ -306,10 +317,10 @@ export function FreeInvoiceBuilder() {
       <div className="bg-[#F8F9FA] rounded-xl p-5 sm:p-7 mb-8 border border-[#E5E7EB]">
         <div className="flex text-[14px] font-medium text-[#9CA3AF] mb-3 px-1">
           <div className="flex-1">Item</div>
-          <div className="w-[100px] text-center">Rate</div>
-          <div className="w-[70px] text-center">Qty</div>
-          <div className="w-[110px] text-center">Amount</div>
-          <div className="w-8"></div>
+          <div className="w-[100px] text-center ml-3">Rate</div>
+          <div className="w-[70px] text-center ml-3">Qty</div>
+          <div className="w-[110px] text-center ml-3">Amount</div>
+          <div className="w-8 ml-3"></div>
         </div>
         
         {items.map((item, idx) => (
@@ -318,14 +329,16 @@ export function FreeInvoiceBuilder() {
                <input value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} placeholder="Description of service or product" className={`${inputClass} font-medium text-[#111827] pr-10`} />
                <RefreshCw size={14} className="absolute top-1/2 -translate-y-1/2 right-3 text-[#60A5FA] cursor-pointer" />
              </div>
-             <div className="w-[100px]">
-               <input type="text" placeholder="$0.00" value={item.unit_price > 0 ? fmt(item.unit_price) : ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827]`} />
+             <div className="w-[100px] relative">
+               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-medium">$</span>
+               <input type="number" placeholder="0.00" value={item.unit_price} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className={`${inputClass} pl-7 text-center font-medium text-[#111827]`} />
              </div>
              <div className="w-[70px]">
-               <input type="number" placeholder="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827] px-1`} />
+               <input type="number" placeholder="1" value={item.quantity} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827] px-1`} />
              </div>
-             <div className="w-[110px]">
-               <input value={fmt(item.amount)} readOnly placeholder="$0.00" className={`${inputClass} text-center font-medium text-[#111827] bg-[#F3F4F6] cursor-default`} />
+             <div className="w-[110px] relative">
+               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-medium">$</span>
+               <input value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} readOnly placeholder="0.00" className={`${inputClass} pl-7 text-center font-medium text-[#111827] bg-[#F3F4F6] cursor-default`} />
              </div>
              <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 flex justify-center text-[#9CA3AF] hover:text-[#111827] disabled:opacity-0 transition-colors">
                <X size={20} strokeWidth={1.5} />
