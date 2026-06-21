@@ -149,6 +149,7 @@ export function FreeInvoiceBuilder() {
         total: total,
         notes: notes,
         items: items.map(item => ({
+          id: item.id,
           description: item.description,
           quantity: Number(item.quantity) || 1,
           unit_price: Number(item.unit_price) || 0,
