@@ -30,16 +30,12 @@ export function FreeInvoiceBuilder() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [notes, setNotes] = useState('');
-  
-  const [taxAmount, setTaxAmount] = useState<number>(0);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [shippingAmount, setShippingAmount] = useState<number>(0);
 
   const [isDownloading, setIsDownloading] = useState(false);
 
   // --- Calcs ---
   const subtotal = items.reduce((s, i) => s + i.amount, 0);
-  const total = subtotal + (taxAmount || 0) - (discountAmount || 0) + (shippingAmount || 0);
+  const total = subtotal;
 
   const fmtSummary = (v: number) => {
     return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -75,11 +71,13 @@ export function FreeInvoiceBuilder() {
       const uiElements = invoiceRef.current.querySelectorAll('.hide-on-print');
       uiElements.forEach(el => (el as HTMLElement).style.opacity = '0');
       
-      // Remove hover backgrounds temporarily
+      // Remove borders and backgrounds temporarily for a clean print
       const inputs = invoiceRef.current.querySelectorAll('input, textarea');
       inputs.forEach(el => {
         (el as HTMLElement).style.background = 'transparent';
+        (el as HTMLElement).style.border = 'none';
         (el as HTMLElement).style.boxShadow = 'none';
+        (el as HTMLElement).style.padding = '0';
       });
 
       const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
@@ -88,7 +86,9 @@ export function FreeInvoiceBuilder() {
       uiElements.forEach(el => (el as HTMLElement).style.opacity = '1');
       inputs.forEach(el => {
         (el as HTMLElement).style.background = '';
+        (el as HTMLElement).style.border = '';
         (el as HTMLElement).style.boxShadow = '';
+        (el as HTMLElement).style.padding = '';
       });
 
       const pdf = new JsPDFClass('p', 'mm', 'a4');
@@ -105,9 +105,9 @@ export function FreeInvoiceBuilder() {
     }
   };
 
-  const inputStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -ml-2 text-zinc-900 placeholder:text-zinc-400";
-  const textStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -ml-2 resize-none text-zinc-900 placeholder:text-zinc-400";
-  const rightInputStyles = "w-full bg-transparent hover:bg-zinc-100 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none transition-all rounded py-1 px-2 -mr-2 text-right text-zinc-900 placeholder:text-zinc-400";
+  const inputStyles = "w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all rounded-lg py-2 px-3 text-zinc-900 placeholder:text-zinc-400 shadow-[0_1px_2px_rgba(0,0,0,0.02)]";
+  const textStyles = "w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all rounded-lg py-2 px-3 resize-none text-zinc-900 placeholder:text-zinc-400 shadow-[0_1px_2px_rgba(0,0,0,0.02)]";
+  const rightInputStyles = "w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all rounded-lg py-2 px-3 text-right text-zinc-900 placeholder:text-zinc-400 shadow-[0_1px_2px_rgba(0,0,0,0.02)]";
 
   return (
     <div className="w-full flex flex-col items-center justify-center font-sans pb-24">
@@ -270,7 +270,7 @@ export function FreeInvoiceBuilder() {
                      value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
                      readOnly 
                      placeholder="0.00" 
-                     className="w-full bg-transparent text-right py-1 px-2 text-[15px] font-semibold text-zinc-900 cursor-default" 
+                     className="w-full bg-slate-50 border border-transparent text-right py-2 px-3 rounded-lg text-[15px] font-semibold text-zinc-900 cursor-default" 
                    />
                  </div>
 
@@ -313,42 +313,18 @@ export function FreeInvoiceBuilder() {
           </div>
           
           {/* Totals */}
-          <div className="w-full md:w-[280px]">
-            <div className="space-y-2 mb-4 px-2">
-              <div className="flex justify-between items-center py-1">
-                <span className="text-[14px] font-semibold text-zinc-500">Subtotal</span>
-                <span className="text-[15px] font-semibold text-zinc-900">{fmtSummary(subtotal)}</span>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-[14px] font-semibold text-zinc-500">Tax</span>
-                <div className="w-24 relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
-                  <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-[14px] font-semibold text-zinc-500">Discount</span>
-                <div className="w-24 relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
-                  <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
-                </div>
-              </div>
-              
-              <div className="flex justify-between items-center">
-                <span className="text-[14px] font-semibold text-zinc-500">Shipping</span>
-                <div className="w-24 relative">
-                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">$</span>
-                  <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className={`${rightInputStyles} pl-5 text-[14px]`} />
-                </div>
+          <div className="w-full md:w-[320px]">
+            <div className="space-y-3 mb-6 px-2">
+              <div className="flex justify-between items-center py-2 border-b border-slate-100">
+                <span className="text-[15px] font-semibold text-slate-500">Subtotal</span>
+                <span className="text-[16px] font-semibold text-slate-900">{fmtSummary(subtotal)}</span>
               </div>
             </div>
             
             {/* Grand Total */}
-            <div className="border-t-2 border-zinc-900 pt-4 px-2 flex justify-between items-end">
-              <span className="text-[16px] font-bold text-zinc-900 mb-1">Total</span>
-              <span className="text-[32px] font-black text-zinc-900 tracking-tight">{fmtSummary(total)}</span>
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex justify-between items-center shadow-sm">
+              <span className="text-[16px] font-bold text-slate-800">Total</span>
+              <span className="text-[32px] font-black text-blue-600 tracking-tight">{fmtSummary(total)}</span>
             </div>
           </div>
         </div>
