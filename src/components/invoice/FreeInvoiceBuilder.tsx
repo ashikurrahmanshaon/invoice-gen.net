@@ -665,25 +665,29 @@ export function FreeInvoiceBuilder() {
           <div className="w-8"></div>
         </div>
         
-        <div className="space-y-3 mb-8">
+        <div className="space-y-4 mb-8">
           <AnimatePresence>
             {items.map((item, idx) => (
-              <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col md:flex-row gap-4 items-center">
+              <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col md:flex-row gap-4 items-start md:items-center bg-white md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border border-zinc-100 md:border-none shadow-sm md:shadow-none relative group">
                 <div className="flex-1 w-full">
-                  <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className="bg-white border-zinc-200 h-12 shadow-sm" />
+                  <span className="md:hidden text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1 block ml-1">Item Description</span>
+                  <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className="bg-zinc-50/50 md:bg-white border-zinc-200 h-12 shadow-sm" placeholder="Item description" />
                 </div>
                 <div className="w-full md:w-24 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">{currentSymbol}</span>
-                  <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="pl-7 bg-white border-zinc-200 text-center h-12 shadow-sm" />
+                  <span className="md:hidden text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1 block ml-1">Rate</span>
+                  <span className="absolute left-3 top-1/2 md:top-1/2 md:-translate-y-1/2 translate-y-1 text-zinc-400 font-medium">{currentSymbol}</span>
+                  <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="pl-7 bg-zinc-50/50 md:bg-white border-zinc-200 text-center h-12 shadow-sm" placeholder="0.00" />
                 </div>
                 <div className="w-full md:w-20">
-                  <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="bg-white border-zinc-200 text-center h-12 shadow-sm" />
+                  <span className="md:hidden text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1 block ml-1">Quantity</span>
+                  <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="bg-zinc-50/50 md:bg-white border-zinc-200 text-center h-12 shadow-sm" placeholder="1" />
                 </div>
                 <div className="w-full md:w-32 relative">
-                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">{currentSymbol}</span>
-                   <CleanInput disabled value={item.amount} className="pl-7 bg-white border-zinc-200 text-center font-semibold h-12 shadow-sm bg-zinc-50/50" />
+                   <span className="md:hidden text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1 block ml-1">Amount</span>
+                   <span className="absolute left-3 top-1/2 md:top-1/2 md:-translate-y-1/2 translate-y-1 text-zinc-400 font-medium">{currentSymbol}</span>
+                   <CleanInput disabled value={item.amount} className="pl-7 bg-zinc-100 md:bg-zinc-50/50 border-zinc-200 text-center font-semibold h-12 shadow-sm" />
                 </div>
-                <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-0"><Trash2 size={18} /></button>
+                <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="absolute right-2 top-2 md:relative md:right-0 md:top-0 w-8 h-8 flex items-center justify-center text-zinc-300 md:text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-0"><Trash2 size={18} /></button>
               </motion.div>
             ))}
           </AnimatePresence>
