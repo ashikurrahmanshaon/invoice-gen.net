@@ -1,57 +1,17 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Modal } from '@/components/ui/modal';
-import { Button } from '@/components/ui/button';
-import {
-  Plus, Trash2, Download, ChevronDown,
-  Image as ImageIcon, CreditCard,
-  Check, DollarSign, Building2, User, FileText,
-  Calendar, Layers, Paintbrush, FileBadge, Settings2, ArrowRight
-} from 'lucide-react';
+import { Download, Plus, X, UploadCloud, ArrowRight } from 'lucide-react';
 
-// --- Types ---
 interface InvoiceItem {
   description: string;
   quantity: number;
   unit_price: number;
   amount: number;
 }
-interface Client {
-  id: string;
-  name: string;
-  email: string;
-  address: string;
-}
-
-// --- Constants ---
-const THEME_COLORS = [
-  { name: 'Emerald', value: '#10b981' },
-  { name: 'Blue',    value: '#3b82f6' },
-  { name: 'Violet',  value: '#8b5cf6' },
-  { name: 'Rose',    value: '#f43f5e' },
-  { name: 'Amber',   value: '#f59e0b' },
-  { name: 'Zinc',    value: '#18181b' },
-];
-
-const TEMPLATES = ['modern', 'classic', 'creative', 'enterprise'] as const;
-
-// --- Design Tool UI Components ---
-const SidebarPanel = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
-  <div className="mb-6 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
-    <div className="flex items-center gap-2 mb-4 text-zinc-800">
-      <Icon size={16} className="text-emerald-500" />
-      <h3 className="text-[13px] font-bold uppercase tracking-widest">{title}</h3>
-    </div>
-    <div className="space-y-4">
-      {children}
-    </div>
-  </div>
-);
 
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-[11px] font-bold text-zinc-500 mb-1.5 uppercase tracking-wider">
+  <label className="block text-[13px] font-medium text-zinc-500 mb-2">
     {children}
   </label>
 );
@@ -59,81 +19,61 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 const CleanInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
-    className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 px-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all ${props.className || ''}`}
+    className={`w-full h-11 rounded-lg bg-white border border-zinc-200 px-3 text-[14px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all ${props.className || ''}`}
   />
-);
-
-const CleanSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
-  <div className="relative group">
-    <select
-      {...props}
-      className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 pl-3 pr-8 text-[13px] text-zinc-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer ${props.className || ''}`}
-    >
-      {props.children}
-    </select>
-    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
-  </div>
 );
 
 const CleanTextarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
     {...props}
-    className={`w-full rounded-lg bg-zinc-50 border border-zinc-200 p-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none ${props.className || ''}`}
+    className={`w-full rounded-lg bg-white border border-zinc-200 p-3 text-[14px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all resize-none ${props.className || ''}`}
   />
 );
-
 
 export function FreeInvoiceBuilder() {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   // --- State ---
-  const [template, setTemplate] = useState<typeof TEMPLATES[number]>('modern');
-  const [themeColor, setThemeColor] = useState(THEME_COLORS[0]);
   const [logoUrl, setLogoUrl] = useState('');
-
-  const [companyName, setCompanyName]       = useState('Acme Corp');
-  const [companyAddress, setCompanyAddress] = useState('123 Innovation Way\nSan Francisco, CA 94103');
-  const [companyEmail, setCompanyEmail]     = useState('billing@acme.com');
-
-  const [clientName, setClientName]       = useState('John Doe');
-  const [clientEmail, setClientEmail]     = useState('john@example.com');
-  const [clientAddress, setClientAddress] = useState('456 Client St\nNew York, NY 10001');
-
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-001');
-  const [issueDate, setIssueDate]         = useState('');
-  const [dueDate, setDueDate]             = useState('');
+  const [invoiceNumber, setInvoiceNumber] = useState('#002121');
+  const [companyDetails, setCompanyDetails] = useState('Musemind, Road 3, Block B, Banasree,\nDhaka,');
+  const [clientDetails, setClientDetails] = useState('Panther, Brooklyn, NY 11207');
+  
+  const [issueDate, setIssueDate] = useState('');
+  const [dueDate, setDueDate] = useState('');
 
   useEffect(() => {
+    // Format YYYY-MM-DD for input type="date"
     setIssueDate(new Date().toISOString().split('T')[0]);
     setDueDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
   }, []);
-  const [currency, setCurrency]         = useState('USD');
-  const [taxRate, setTaxRate]           = useState(0);
-  const [discountType, setDiscountType] = useState<'percent' | 'flat'>('percent');
-  const [discountRate, setDiscountRate] = useState(0);
-  const [discountVal, setDiscountVal]   = useState(0);
-  const [paymentDetails, setPaymentDetails] = useState('Bank Transfer\nAcct: 987654321\nRouting: 123456789');
-  const [notes, setNotes]               = useState('Thank you for your business. Payment is due within 14 days.');
-  const [items, setItems]               = useState<InvoiceItem[]>([
-    { description: 'Premium Web Design', quantity: 1, unit_price: 3500, amount: 3500 },
-    { description: 'Hosting & Maintenance', quantity: 1, unit_price: 600, amount: 600 },
+
+  const [items, setItems] = useState<InvoiceItem[]>([
+    { description: 'Ecommerce website redesign', quantity: 5, unit_price: 4000, amount: 20000 },
+    { description: 'Logo design', quantity: 1, unit_price: 8000, amount: 8000 },
+    { description: 'Dashboard design', quantity: 15, unit_price: 1000, amount: 15000 },
+    { description: 'Mobile app design', quantity: 10, unit_price: 500, amount: 5000 },
   ]);
 
+  const [notes, setNotes] = useState('Pay within 15 days, Thank you for your business');
+  
+  const [taxAmount, setTaxAmount] = useState<number>(200);
+  const [discountAmount, setDiscountAmount] = useState<number>(100);
+  const [shippingAmount, setShippingAmount] = useState<number>(80);
+
   const [showPreview, setShowPreview] = useState(false);
-  const [isDownloading, setIsDownloading]         = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // --- Scale Logic to Fit Screen ---
+  // --- Scale Logic ---
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         const w = containerRef.current.clientWidth;
-        const h = containerRef.current.clientHeight || window.innerHeight;
         if (w === 0) return;
-        const padding = 64; // nice padding
-        const scaleW = (w - padding) / 800; // 800 is approx A4 width
-        setScale(Math.min(scaleW, 1)); // We only care about width scaling so it doesn't overflow horizontally on mobile
+        const scaleW = (w - 64) / 800; 
+        setScale(Math.min(scaleW, 1)); 
       }
     };
     handleResize();
@@ -146,13 +86,10 @@ export function FreeInvoiceBuilder() {
   }, [showPreview]);
 
   // --- Calcs ---
-  const subtotal       = items.reduce((s, i) => s + i.quantity * i.unit_price, 0);
-  const discountAmount = discountType === 'percent' ? subtotal * (discountRate / 100) : discountVal;
-  const taxableAmount  = Math.max(0, subtotal - discountAmount);
-  const taxAmount      = taxableAmount * (taxRate / 100);
-  const total          = taxableAmount + taxAmount;
+  const subtotal = items.reduce((s, i) => s + i.amount, 0);
+  const total = subtotal + (taxAmount || 0) - (discountAmount || 0) + (shippingAmount || 0);
 
-  const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(v);
+  const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v);
 
   const handleItemChange = (i: number, field: keyof Omit<InvoiceItem, 'amount'>, v: any) => {
     const u = [...items];
@@ -170,7 +107,6 @@ export function FreeInvoiceBuilder() {
     if (!invoiceRef.current) return;
     setIsDownloading(true);
     
-    // Temporarily reset scale for accurate html2canvas capture
     const currentScale = scale;
     if (scale !== 1) {
       setScale(1);
@@ -187,9 +123,9 @@ export function FreeInvoiceBuilder() {
       const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 3 });
       
       const node = invoiceRef.current;
-      const pdf     = new JsPDFClass('p', 'mm', 'a4');
-      const pw      = pdf.internal.pageSize.getWidth();
-      const ph      = (node.offsetHeight * pw) / node.offsetWidth;
+      const pdf = new JsPDFClass('p', 'mm', 'a4');
+      const pw = pdf.internal.pageSize.getWidth();
+      const ph = (node.offsetHeight * pw) / node.offsetWidth;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
       pdf.save(`${invoiceNumber || 'Invoice'}.pdf`);
@@ -203,327 +139,106 @@ export function FreeInvoiceBuilder() {
   };
 
   // ---------------------------------------------------------------------------
-  // PROFESSIONAL TEMPLATES (Unchanged designs, beautifully rendered)
+  // PDF PREVIEW TEMPLATE (Minimalist to match the vibe)
   // ---------------------------------------------------------------------------
+  const renderPreviewTemplate = () => {
+    const [cName, ...cAddr] = companyDetails.split('\n');
+    const [clName, ...clAddr] = clientDetails.split('\n');
 
-  const renderModernTemplate = () => (
-    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-800 font-sans p-16 relative flex flex-col shadow-2xl">
-      <div className="absolute top-0 left-0 w-full h-3" style={{ backgroundColor: themeColor.value }} />
-      <div className="flex justify-between items-start mb-16 mt-4">
-        <div>
-          {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-16 mb-4 object-contain" /> : <h1 className="text-3xl font-bold tracking-tight mb-2 text-zinc-900">{companyName || 'Your Company'}</h1>}
-          <p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
-          <p className="text-zinc-500 mt-1">{companyEmail}</p>
-        </div>
-        <div className="text-right">
-          <h2 className="text-5xl font-light tracking-tight text-zinc-200 uppercase mb-2">Invoice</h2>
-          <p className="font-medium text-zinc-900 text-xl">{invoiceNumber}</p>
-        </div>
-      </div>
-      <div className="flex justify-between items-end mb-16">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Billed To</p>
-          <p className="font-semibold text-lg text-zinc-900">{clientName}</p>
-          <p className="text-zinc-600 whitespace-pre-wrap mt-1 leading-relaxed">{clientAddress}</p>
-          <p className="text-zinc-500 mt-1">{clientEmail}</p>
-        </div>
-        <div className="flex gap-16 text-right">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Issue Date</p>
-            <p className="font-semibold text-zinc-900">{issueDate}</p>
-          </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Due Date</p>
-            <p className="font-semibold text-zinc-900">{dueDate}</p>
-          </div>
-        </div>
-      </div>
-      <table className="w-full text-left mb-16">
-        <thead>
-          <tr className="border-b-2 border-zinc-100">
-            <th className="py-4 text-[11px] font-semibold text-zinc-500">Description</th>
-            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-center w-24">Qty</th>
-            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-right w-32">Price</th>
-            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-right w-32">Total</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-zinc-50">
-          {items.map((item, idx) => (
-            <tr key={idx}>
-              <td className="py-5 text-zinc-900 font-medium text-sm">{item.description || 'Item'}</td>
-              <td className="py-5 text-zinc-500 text-center">{item.quantity}</td>
-              <td className="py-5 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
-              <td className="py-5 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-auto flex justify-between items-start gap-12">
-        <div className="flex-1 space-y-8">
-          {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Instructions</p><p className="text-zinc-600 leading-relaxed whitespace-pre-wrap">{paymentDetails}</p></div>)}
-          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
-        </div>
-        <div className="w-80 bg-zinc-50 rounded-2xl p-8 border border-zinc-100">
-          <div className="space-y-4 mb-6">
-            <div className="flex justify-between text-zinc-500"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
-            {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmt(discountAmount)}</span></div>}
-            {taxRate > 0 && <div className="flex justify-between text-zinc-500"><span>Tax ({taxRate}%)</span><span>{fmt(taxAmount)}</span></div>}
-          </div>
-          <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
-            <span className="text-base font-bold text-zinc-900">Total Due</span>
-            <span className="text-3xl font-bold" style={{ color: themeColor.value }}>{fmt(total)}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderClassicTemplate = () => (
-    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-900 font-serif p-16 flex flex-col shadow-2xl border-[1px] border-zinc-200">
-      <div className="flex justify-between items-start mb-16">
-        <div className="w-1/2">
-          {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 mb-8 object-contain" />}
-          <h1 className="text-3xl font-bold text-zinc-900 mb-2">{companyName || 'Your Company'}</h1>
-          <p className="text-zinc-600 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
-          <p className="text-zinc-600 mt-1">{companyEmail}</p>
-        </div>
-        <div className="text-right">
-          <h2 className="text-6xl uppercase tracking-widest text-zinc-900 mb-8 font-light">Invoice</h2>
-          <table className="ml-auto text-right text-[12px] font-sans">
-            <tbody>
-              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Invoice No.</td><td className="font-semibold text-zinc-900">{invoiceNumber}</td></tr>
-              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Date</td><td>{issueDate}</td></tr>
-              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Due Date</td><td>{dueDate}</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div className="mb-12 font-sans">
-        <div className="border-b border-zinc-800 pb-2 mb-4 w-1/2"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Bill To</p></div>
-        <p className="font-bold text-lg text-zinc-900">{clientName}</p>
-        <p className="text-zinc-600 whitespace-pre-wrap mt-2 leading-relaxed">{clientAddress}</p>
-        <p className="text-zinc-600 mt-1">{clientEmail}</p>
-      </div>
-      <table className="w-full text-left mb-12 border-collapse font-sans">
-        <thead>
-          <tr className="border-y-2 border-zinc-900 bg-zinc-50">
-            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800">Description</th>
-            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-center w-24">Qty</th>
-            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-right w-32">Price</th>
-            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-right w-32">Amount</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, idx) => (
-            <tr key={idx} className="border-b border-zinc-200">
-              <td className="py-5 px-6 text-zinc-900">{item.description || 'Item'}</td>
-              <td className="py-5 px-6 text-zinc-600 text-center">{item.quantity}</td>
-              <td className="py-5 px-6 text-zinc-600 text-right">{fmt(item.unit_price)}</td>
-              <td className="py-5 px-6 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-auto flex justify-between items-start gap-12 font-sans">
-        <div className="flex-1 space-y-8">
-          {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-1 mb-2">Payment Terms</p><p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{paymentDetails}</p></div>)}
-          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-1 mb-2">Remarks</p><p className="text-zinc-600 whitespace-pre-wrap italic leading-relaxed">{notes}</p></div>)}
-        </div>
-        <div className="w-80">
-          <table className="w-full text-right text-[13px]">
-            <tbody>
-              <tr><td className="py-2 text-zinc-600">Subtotal</td><td className="py-2 font-medium">{fmt(subtotal)}</td></tr>
-              {discountAmount > 0 && <tr><td className="py-2 text-zinc-600">Discount</td><td className="py-2 text-red-600 font-medium">−{fmt(discountAmount)}</td></tr>}
-              {taxRate > 0 && <tr><td className="py-2 text-zinc-600">Tax ({taxRate}%)</td><td className="py-2 font-medium">{fmt(taxAmount)}</td></tr>}
-              <tr className="border-t-2 border-zinc-900 text-[18px] font-bold">
-                <td className="py-6 uppercase tracking-widest">Total Due</td>
-                <td className="py-6" style={{ color: themeColor.value }}>{fmt(total)}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderCreativeTemplate = () => (
-    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-900 font-sans flex flex-col overflow-hidden shadow-2xl">
-      <div className="p-16 flex justify-between items-end" style={{ backgroundColor: themeColor.value }}>
-        <div className="text-white">
-          <h2 className="text-[60px] font-black tracking-tighter leading-none mb-4">INVOICE</h2>
-          <p className="text-white/80 font-medium tracking-widest uppercase text-base">#{invoiceNumber}</p>
-        </div>
-        <div className="text-right text-white">
-          {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-20 object-contain bg-white rounded-2xl p-3 mb-6 ml-auto" /> : <h1 className="text-3xl font-bold mb-4">{companyName || 'Your Company'}</h1>}
-          <p className="text-white/80 whitespace-pre-wrap leading-relaxed text-right">{companyAddress}</p>
-          <p className="text-white/80 mt-1">{companyEmail}</p>
-        </div>
-      </div>
-      <div className="p-16 flex-1 flex flex-col">
+    return (
+      <div className="bg-white min-h-[1130px] w-full text-[13px] text-zinc-800 font-sans p-16 relative flex flex-col shadow-2xl">
         <div className="flex justify-between items-start mb-16">
-          <div className="bg-zinc-50 p-8 rounded-3xl border border-zinc-100 flex-1 mr-12">
-            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-4">Bill To</p>
-            <p className="font-bold text-2xl text-zinc-900 mb-2">{clientName}</p>
-            <p className="text-zinc-500 mb-1">{clientEmail}</p>
-            <p className="text-zinc-600 whitespace-pre-wrap mt-3 leading-relaxed">{clientAddress}</p>
+          <div>
+            {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-16 mb-4 object-contain" /> : null}
+            <h1 className="text-2xl font-bold tracking-tight mb-1 text-zinc-900">{cName || 'Your Company'}</h1>
+            <p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{cAddr.join('\n')}</p>
           </div>
-          <div className="w-72 space-y-5 pt-4">
-            <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
-              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Issue Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
+          <div className="text-right">
+            <h2 className="text-4xl font-black tracking-tight text-zinc-200 uppercase mb-2">Invoice</h2>
+            <p className="font-semibold text-zinc-900 text-lg">{invoiceNumber}</p>
+          </div>
+        </div>
+        <div className="flex justify-between items-end mb-16">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Bill To</p>
+            <p className="font-bold text-base text-zinc-900">{clName}</p>
+            <p className="text-zinc-600 whitespace-pre-wrap mt-1 leading-relaxed">{clAddr.join('\n')}</p>
+          </div>
+          <div className="flex gap-16 text-right">
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Date Issued</p>
+              <p className="font-semibold text-zinc-900">{issueDate}</p>
             </div>
-            <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
-              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Due Date</span><span className="font-bold text-zinc-900">{dueDate}</span>
+            <div>
+              <p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Due Date</p>
+              <p className="font-semibold text-zinc-900">{dueDate}</p>
             </div>
           </div>
         </div>
         <table className="w-full text-left mb-16">
           <thead>
-            <tr>
-              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900">Description</th>
-              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-center w-24">Qty</th>
-              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-right w-32">Price</th>
-              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-right w-32">Total</th>
+            <tr className="border-b-2 border-zinc-100">
+              <th className="py-4 text-[12px] font-semibold text-zinc-500">Item</th>
+              <th className="py-4 text-[12px] font-semibold text-zinc-500 text-center w-24">Rate</th>
+              <th className="py-4 text-[12px] font-semibold text-zinc-500 text-center w-24">Qty</th>
+              <th className="py-4 text-[12px] font-semibold text-zinc-500 text-right w-32">Amount</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-zinc-100">
+          <tbody className="divide-y divide-zinc-50">
             {items.map((item, idx) => (
               <tr key={idx}>
-                <td className="py-6 text-zinc-900 font-semibold text-sm">{item.description || 'Item'}</td>
-                <td className="py-6 text-zinc-500 text-center">{item.quantity}</td>
-                <td className="py-6 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
-                <td className="py-6 text-zinc-900 font-bold text-right text-sm">{fmt(item.amount)}</td>
+                <td className="py-5 text-zinc-900 font-medium text-sm">{item.description || 'Item'}</td>
+                <td className="py-5 text-zinc-500 text-center">{fmt(item.unit_price)}</td>
+                <td className="py-5 text-zinc-500 text-center">{item.quantity}</td>
+                <td className="py-5 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
               </tr>
             ))}
           </tbody>
         </table>
-        <div className="mt-auto flex justify-between items-end gap-12">
+        <div className="mt-auto flex justify-between items-start gap-12">
           <div className="flex-1 space-y-8">
-            {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Details</p><p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{paymentDetails}</p></div>)}
-            {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{notes}</p></div>)}
+            {notes && (<div><p className="text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-600 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
           </div>
-          <div className="w-96 bg-zinc-900 text-white p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
-            <div className="space-y-4 mb-8 text-sm">
-              <div className="flex justify-between text-zinc-400"><span>Subtotal</span><span className="text-white">{fmt(subtotal)}</span></div>
-              {discountAmount > 0 && <div className="flex justify-between text-zinc-400"><span>Discount</span><span className="text-white">−{fmt(discountAmount)}</span></div>}
-              {taxRate > 0 && <div className="flex justify-between text-zinc-400"><span>Tax ({taxRate}%)</span><span className="text-white">{fmt(taxAmount)}</span></div>}
+          <div className="w-80">
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between text-zinc-600 font-medium"><span>Subtotal</span><span className="text-zinc-900">{fmt(subtotal)}</span></div>
+              {taxAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Tax</span><span>{fmt(taxAmount)}</span></div>}
+              {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmt(discountAmount)}</span></div>}
+              {shippingAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Shipping</span><span>{fmt(shippingAmount)}</span></div>}
             </div>
-            <div className="pt-8 border-t border-zinc-800 flex justify-between items-end">
-              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Total</span>
-              <span className="text-4xl font-black leading-none" style={{ color: themeColor.value }}>{fmt(total)}</span>
+            <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
+              <span className="text-base font-bold text-blue-600">Total</span>
+              <span className="text-2xl font-bold text-blue-600">{fmt(total)}</span>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
-
-  const renderEnterpriseTemplate = () => (
-    <div className="bg-white min-h-[1130px] w-full text-[11px] text-zinc-800 font-sans p-16 border-[12px] border-zinc-50 flex flex-col shadow-2xl">
-      <div className="flex justify-between items-start border-b-2 border-zinc-200 pb-10 mb-10">
-        <div className="flex items-center gap-8">
-          {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 object-contain" />}
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900 uppercase tracking-wide">{companyName || 'Your Company'}</h1>
-            <p className="text-zinc-500 mt-1">{companyEmail}</p>
-          </div>
-        </div>
-        <div className="text-right">
-          <h2 className="text-4xl font-black tracking-tight text-zinc-900 uppercase">Invoice</h2>
-          <p className="font-bold text-zinc-500 mt-2 text-lg">{invoiceNumber}</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-3 gap-10 mb-10">
-        <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">From</p>
-          <p className="font-bold text-zinc-900 text-sm">{companyName}</p>
-          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{companyAddress}</p>
-        </div>
-        <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">Bill To</p>
-          <p className="font-bold text-zinc-900 text-sm">{clientName}</p>
-          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{clientAddress}</p>
-          <p className="text-zinc-600 mt-1">{clientEmail}</p>
-        </div>
-        <div className="col-span-1 border border-zinc-200 rounded-xl overflow-hidden flex flex-col">
-          <div className="flex-1 border-b border-zinc-200 p-5 flex justify-between items-center bg-white">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
-          </div>
-          <div className="flex-1 p-5 flex justify-between items-center bg-white">
-            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Due</span><span className="font-bold text-zinc-900">{dueDate}</span>
-          </div>
-        </div>
-      </div>
-      <table className="w-full text-left mb-10 border border-zinc-200">
-        <thead>
-          <tr className="bg-zinc-100 border-b border-zinc-200">
-            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 border-r border-zinc-200">Description</th>
-            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-center w-24 border-r border-zinc-200">Qty</th>
-            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-right w-32 border-r border-zinc-200">Price</th>
-            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-right w-36">Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item, idx) => (
-            <tr key={idx} className="border-b border-zinc-200 last:border-0">
-              <td className="p-4 text-zinc-900 font-medium border-r border-zinc-200">{item.description || 'Item'}</td>
-              <td className="p-4 text-zinc-600 text-center border-r border-zinc-200">{item.quantity}</td>
-              <td className="p-4 text-zinc-600 text-right border-r border-zinc-200">{fmt(item.unit_price)}</td>
-              <td className="p-4 text-zinc-900 font-bold text-right">{fmt(item.amount)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-auto flex gap-10">
-        <div className="flex-1 space-y-6">
-          {paymentDetails && (<div className="border border-zinc-200 p-5 rounded-xl"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Details</p><p className="text-zinc-700 whitespace-pre-wrap">{paymentDetails}</p></div>)}
-          {notes && (<div className="border border-zinc-200 p-5 rounded-xl bg-zinc-50"><p className="text-zinc-600 whitespace-pre-wrap italic">{notes}</p></div>)}
-        </div>
-        <div className="w-96 border border-zinc-200 rounded-xl overflow-hidden self-end">
-          <div className="p-6 space-y-4 bg-white text-sm">
-            <div className="flex justify-between text-zinc-600"><span>Subtotal</span><span className="font-medium">{fmt(subtotal)}</span></div>
-            {discountAmount > 0 && <div className="flex justify-between text-zinc-600"><span>Discount</span><span className="font-medium">−{fmt(discountAmount)}</span></div>}
-            {taxRate > 0 && <div className="flex justify-between text-zinc-600"><span>Tax ({taxRate}%)</span><span className="font-medium">{fmt(taxAmount)}</span></div>}
-          </div>
-          <div className="p-6 border-t border-zinc-200 flex justify-between items-center transition-colors duration-500" style={{ backgroundColor: themeColor.value }}>
-            <span className="text-sm font-bold text-white uppercase tracking-widest">Total Due</span>
-            <span className="text-2xl font-bold text-white">{fmt(total)}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  };
 
   if (showPreview) {
     return (
-      <div className="w-full flex flex-col items-center bg-zinc-100 py-12 px-4 min-h-screen font-sans">
+      <div className="w-full flex flex-col items-center bg-zinc-50 py-12 px-4 min-h-screen font-sans">
         <div className="w-full max-w-4xl flex justify-between items-center mb-8">
           <button 
             onClick={() => setShowPreview(false)}
-            className="px-6 py-3 bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-700 font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all"
+            className="px-6 py-2.5 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 font-medium rounded-lg transition-all"
           >
-            ← Back to Editor
+            Back to Editor
           </button>
           <button
             onClick={handleDownloadPDF}
             disabled={isDownloading}
-            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all disabled:opacity-50"
+            className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50"
           >
-            {isDownloading ? <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={18} strokeWidth={2.5} /> Download PDF</>}
+            {isDownloading ? <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={16} /> Download PDF</>}
           </button>
         </div>
         <div ref={containerRef} className="w-full flex justify-center overflow-x-auto pb-24">
-          <div 
-            className="relative transition-all duration-300 ease-out origin-top"
-            style={{ transform: `scale(${scale})` }}
-          >
-            <div className="absolute inset-0 bg-black/5 blur-2xl rounded-[20px] scale-105 pointer-events-none -z-10" />
-            <div className="relative w-[800px] bg-white text-black shadow-2xl rounded-sm overflow-hidden select-text pointer-events-auto border border-zinc-200">
+          <div className="relative transition-all duration-300 ease-out origin-top" style={{ transform: `scale(${scale})` }}>
+            <div className="relative w-[800px] bg-white text-black shadow-2xl rounded-md overflow-hidden select-text pointer-events-auto border border-zinc-200">
               <div ref={invoiceRef}>
-                {template === 'modern' && renderModernTemplate()}
-                {template === 'classic' && renderClassicTemplate()}
-                {template === 'creative' && renderCreativeTemplate()}
-                {template === 'enterprise' && renderEnterpriseTemplate()}
+                {renderPreviewTemplate()}
               </div>
             </div>
           </div>
@@ -533,169 +248,169 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 font-sans text-zinc-900">
-      <div className="space-y-12">
-        {/* --- DATES & SETTINGS --- */}
-        <section className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
-          <div className="flex items-center gap-2 mb-6 text-zinc-800">
-             <Settings2 size={20} className="text-emerald-600" />
-             <h3 className="text-lg font-bold">Document Settings</h3>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div><Label>Invoice #</Label><CleanInput value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} /></div>
-            <div><Label>Issue Date</Label><CleanInput type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} /></div>
-            <div><Label>Due Date</Label><CleanInput type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} /></div>
-            <div>
-              <Label>Currency</Label>
-              <CleanSelect value={currency} onChange={e => setCurrency(e.target.value)}>
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="BDT">BDT (৳)</option>
-              </CleanSelect>
-            </div>
-          </div>
-        </section>
-
-        {/* --- PARTIES --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <section className="space-y-4">
-             <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2">
-               <Building2 size={20} className="text-emerald-600" />
-               <h3 className="text-lg font-bold">Your Business</h3>
-             </div>
-             <div><Label>Business Name</Label><CleanInput value={companyName} onChange={e => setCompanyName(e.target.value)} /></div>
-             <div><Label>Email</Label><CleanInput type="email" value={companyEmail} onChange={e => setCompanyEmail(e.target.value)} /></div>
-             <div><Label>Address</Label><CleanTextarea value={companyAddress} onChange={e => setCompanyAddress(e.target.value)} rows={3} /></div>
-             <div>
-              <Label>Logo <span className="opacity-50 lowercase tracking-normal">(optional)</span></Label>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
-                      reader.readAsDataURL(file);
-                    } else { setLogoUrl(''); }
-                  }}
-                  className="w-full h-11 rounded-xl bg-zinc-50 border border-zinc-200 px-3 py-2.5 text-[13px] text-zinc-500 file:mr-3 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-bold file:bg-zinc-200 file:text-zinc-700 hover:file:bg-zinc-300 transition-all cursor-pointer focus:outline-none"
-                />
-                {logoUrl && <button type="button" onClick={() => setLogoUrl('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-rose-500 text-xs font-bold">Clear</button>}
+    <div className="w-full max-w-[900px] mx-auto font-sans text-zinc-900">
+      
+      {/* 1. Top Section */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+        <div>
+          <Label>Logo</Label>
+          <div className="relative h-[84px] w-full border border-zinc-200 rounded-lg flex items-center px-4 hover:bg-zinc-50 transition-colors cursor-pointer group bg-white">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  const reader = new FileReader();
+                  reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
+                  reader.readAsDataURL(file);
+                } else { setLogoUrl(''); }
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            />
+            {logoUrl ? (
+              <div className="flex items-center justify-between w-full z-20">
+                <img src={logoUrl} alt="Logo" className="h-12 object-contain" />
+                <button type="button" onClick={() => setLogoUrl('')} className="text-zinc-400 hover:text-red-500 z-30 relative px-2">Clear</button>
               </div>
-            </div>
-          </section>
-
-          <section className="space-y-4">
-             <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2">
-               <User size={20} className="text-emerald-600" />
-               <h3 className="text-lg font-bold">Billed To</h3>
-             </div>
-             <div><Label>Client Name</Label><CleanInput value={clientName} onChange={e => setClientName(e.target.value)} /></div>
-             <div><Label>Email</Label><CleanInput type="email" value={clientEmail} onChange={e => setClientEmail(e.target.value)} /></div>
-             <div><Label>Address</Label><CleanTextarea value={clientAddress} onChange={e => setClientAddress(e.target.value)} rows={3} /></div>
-          </section>
+            ) : (
+              <div className="flex items-center gap-4 text-zinc-600">
+                <UploadCloud size={24} className="text-zinc-400 group-hover:text-zinc-600 transition-colors" />
+                <div>
+                  <p className="text-[14px] font-semibold text-zinc-800 underline decoration-zinc-300 underline-offset-2">Upload file</p>
+                  <p className="text-[12px] text-zinc-500 mt-0.5">JPG, JPEG, PNG, less than 5MB</p>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-
-        {/* --- LINE ITEMS --- */}
-        <section>
-           <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-100 pb-2 mb-6">
-             <Layers size={20} className="text-emerald-600" />
-             <h3 className="text-lg font-bold">Line Items</h3>
-           </div>
-           
-           <div className="space-y-4">
-             <AnimatePresence>
-               {items.map((item, idx) => (
-                 <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="p-4 bg-zinc-50 rounded-2xl border border-zinc-200 relative group flex flex-col md:flex-row gap-4 items-start md:items-center">
-                   <div className="flex-1 w-full">
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1 mb-1 block">Item Name</span>
-                     <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} placeholder="e.g. Website Design" className="bg-white" />
-                   </div>
-                   <div className="w-full md:w-32">
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1 mb-1 block">Qty</span>
-                     <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="text-center bg-white" />
-                   </div>
-                   <div className="w-full md:w-40">
-                     <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 ml-1 mb-1 block">Price</span>
-                     <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="text-right bg-white" />
-                   </div>
-                   <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="md:mt-5 absolute right-3 top-3 md:relative md:right-0 md:top-0 opacity-0 group-hover:opacity-100 text-zinc-400 hover:text-rose-500 transition-opacity disabled:hidden p-2"><Trash2 size={18} /></button>
-                 </motion.div>
-               ))}
-             </AnimatePresence>
-             <button onClick={addRow} className="w-full h-12 mt-2 rounded-xl border-2 border-dashed border-zinc-300 text-zinc-500 hover:text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50 transition-all flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest"><Plus size={16} /> Add New Item</button>
-           </div>
-        </section>
-
-        {/* --- TOTALS & NOTES --- */}
-        <section className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-10 border-t border-zinc-100">
-           <div className="space-y-6">
-              <div><Label>Payment Instructions</Label><CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={3} placeholder="Bank details, payment links, etc." /></div>
-              <div><Label>Notes / Terms</Label><CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Thank you for your business." /></div>
-           </div>
-           
-           <div className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100 space-y-4 h-fit">
-              <div className="flex items-center gap-2 text-zinc-800 border-b border-zinc-200 pb-4 mb-4">
-                <CreditCard size={20} className="text-emerald-600" />
-                <h3 className="text-lg font-bold">Totals & Discounts</h3>
-              </div>
-              <div className="flex justify-between items-center text-zinc-600 font-medium"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
-              <div className="flex justify-between items-center gap-4">
-                <span className="text-zinc-600 font-medium whitespace-nowrap">Tax (%)</span>
-                <CleanInput type="number" min="0" max="100" step="0.01" value={taxRate || ''} onChange={e => setTaxRate(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0.0" className="w-24 text-right" />
-              </div>
-              <div className="flex justify-between items-center gap-4">
-                <span className="text-zinc-600 font-medium">Discount</span>
-                <div className="flex h-11 w-48 rounded-xl bg-white border border-zinc-200 overflow-hidden focus-within:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-500/20 transition-all">
-                  <button type="button" onClick={() => setDiscountType('percent')} className={`px-4 text-xs font-bold transition-colors ${discountType === 'percent' ? 'bg-zinc-200 text-zinc-900' : 'text-zinc-500 hover:bg-zinc-100'}`}>%</button>
-                  <button type="button" onClick={() => setDiscountType('flat')} className={`px-4 text-xs font-bold transition-colors border-l border-zinc-200 ${discountType === 'flat' ? 'bg-zinc-200 text-zinc-900' : 'text-zinc-500 hover:bg-zinc-100'}`}>$</button>
-                  <input type="number" value={discountType === 'percent' ? (discountRate || '') : (discountVal || '')} onChange={e => discountType === 'percent' ? setDiscountRate(Math.max(0, parseFloat(e.target.value) || 0)) : setDiscountVal(Math.max(0, parseFloat(e.target.value) || 0))} className="flex-1 bg-transparent px-3 text-sm text-zinc-900 focus:outline-none w-full text-right" placeholder="0" />
-                </div>
-              </div>
-              <div className="pt-4 border-t border-zinc-200 flex justify-between items-center mt-4">
-                <span className="text-xl font-black text-zinc-900 uppercase">Total Due</span>
-                <span className="text-2xl font-black text-emerald-600">{fmt(total)}</span>
-              </div>
-           </div>
-        </section>
-
-        {/* --- TEMPLATE SELECTION (Minimalist) --- */}
-        <section className="pt-10 border-t border-zinc-100 mt-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-            <div className="flex items-center gap-8">
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Design Style</label>
-                <div className="flex gap-2">
-                  {TEMPLATES.map(t => (
-                    <button key={t} type="button" onClick={() => setTemplate(t)} className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${template === t ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Accent Color</label>
-                <div className="flex gap-2">
-                  {THEME_COLORS.map(c => (
-                    <button key={c.value} type="button" onClick={() => setThemeColor(c)} className={`w-6 h-6 rounded-full transition-all ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900' : 'hover:scale-110'}`} style={{ backgroundColor: c.value }} title={c.name} />
-                  ))}
-                </div>
-              </div>
-            </div>
-            
-            <button 
-              onClick={() => setShowPreview(true)}
-              className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
-            >
-              Preview & Download PDF
-            </button>
-          </div>
-        </section>
-
+        <div>
+          <Label>Invoice number</Label>
+          <CleanInput value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} className="h-[84px] text-lg px-4" />
+        </div>
       </div>
+
+      {/* 2. Addresses */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-6">
+        <div>
+          <Label>Your company details</Label>
+          <CleanTextarea value={companyDetails} onChange={e => setCompanyDetails(e.target.value)} rows={3} className="h-28" />
+        </div>
+        <div>
+          <Label>Bill to</Label>
+          <CleanTextarea value={clientDetails} onChange={e => setClientDetails(e.target.value)} rows={3} className="h-28" />
+        </div>
+      </div>
+
+      {/* 3. Dates */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mb-10">
+        <div>
+          <Label>Date issued</Label>
+          <CleanInput type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} />
+        </div>
+        <div>
+          <Label>Due date</Label>
+          <CleanInput type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+        </div>
+      </div>
+
+      {/* 4. Line Items Table */}
+      <div className="bg-[#F8F9FA] rounded-xl p-6 sm:p-8 mb-10">
+        <div className="flex text-[13px] font-semibold text-zinc-500 mb-3 px-1">
+          <div className="flex-1">Item</div>
+          <div className="w-24 text-center">Rate</div>
+          <div className="w-20 text-center">Qty</div>
+          <div className="w-28 text-center md:text-right">Amount</div>
+          <div className="w-8"></div>
+        </div>
+        
+        {items.map((item, idx) => (
+          <div key={idx} className="flex flex-wrap md:flex-nowrap gap-2 md:gap-4 items-center mb-3">
+             <div className="w-full md:flex-1">
+               <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} />
+             </div>
+             <div className="w-[calc(33%-0.5rem)] md:w-24">
+               <div className="relative">
+                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">$</span>
+                 <CleanInput type="number" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="text-center pl-6" />
+               </div>
+             </div>
+             <div className="w-[calc(33%-0.5rem)] md:w-20">
+               <CleanInput type="number" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="text-center" />
+             </div>
+             <div className="w-[calc(33%-0.5rem)] md:w-28">
+               <CleanInput value={`$${item.amount.toLocaleString()}`} readOnly className="text-center md:text-right font-medium text-zinc-900 bg-white" />
+             </div>
+             <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 flex justify-center text-zinc-400 hover:text-zinc-700 disabled:opacity-0 transition-colors">
+               <X size={20} />
+             </button>
+          </div>
+        ))}
+        
+        <div className="flex justify-center mt-8">
+          <button onClick={addRow} className="flex flex-col items-center gap-2 text-[#3b82f6] hover:text-blue-700 transition-colors group">
+            <div className="h-10 w-10 rounded-full bg-[#3b82f6] text-white flex items-center justify-center shadow-md group-hover:bg-blue-700 transition-colors">
+              <Plus size={20} />
+            </div>
+            <span className="text-[14px] font-semibold">Add Item</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 5. Notes & Totals */}
+      <div className="flex flex-col md:flex-row justify-between gap-12 mb-12">
+        <div className="flex-1">
+          <Label>Notes</Label>
+          <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} className="h-32" />
+        </div>
+        
+        <div className="w-full md:w-[320px] space-y-4 pt-4 md:pt-0">
+          <div className="flex justify-between items-center">
+            <span className="text-[15px] font-semibold text-zinc-800">Subtotal</span>
+            <span className="text-[20px] font-bold text-zinc-900">{fmt(subtotal)}</span>
+          </div>
+          
+          <div className="flex justify-between items-center text-[14px]">
+            <span className="text-zinc-500 font-medium">Tax</span>
+            <div className="relative w-32">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
+              <CleanInput type="number" value={taxAmount || ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className="text-right pl-6 h-10" />
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center text-[14px]">
+            <span className="text-zinc-500 font-medium">Discount</span>
+            <div className="relative w-32">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
+              <CleanInput type="number" value={discountAmount || ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className="text-right pl-6 h-10" />
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center text-[14px]">
+            <span className="text-zinc-500 font-medium">Shipping free</span>
+            <div className="relative w-32">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500">$</span>
+              <CleanInput type="number" value={shippingAmount || ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className="text-right pl-6 h-10" />
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center pt-6 mt-4">
+            <span className="text-[16px] font-bold text-[#3b82f6]">Total</span>
+            <span className="text-[20px] font-bold text-[#3b82f6]">{fmt(total)}</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex justify-end border-t border-zinc-100 pt-8 pb-20">
+         <button 
+           onClick={() => setShowPreview(true)}
+           className="px-8 py-3.5 bg-[#3b82f6] hover:bg-blue-700 text-white font-medium text-[15px] rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+         >
+           Preview & Download
+           <ArrowRight size={18} />
+         </button>
+      </div>
+
     </div>
   );
 }
