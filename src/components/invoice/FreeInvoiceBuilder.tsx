@@ -533,23 +533,7 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 my-4 font-sans text-zinc-900">
-      <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 border-b border-zinc-100 pb-8">
-        <div>
-          <h2 className="text-3xl font-medium tracking-tight text-zinc-900">New Invoice</h2>
-          <p className="text-sm text-zinc-500 mt-1">Fill out the details below to generate a PDF.</p>
-        </div>
-        <div className="mt-6 md:mt-0">
-          <button 
-            onClick={() => setShowPreview(true)}
-            className="w-full md:w-auto px-8 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-sm rounded-xl shadow-lg shadow-zinc-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-          >
-            Preview & Download
-            <ArrowRight size={16} />
-          </button>
-        </div>
-      </div>
-
+    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[2rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-zinc-100 font-sans text-zinc-900">
       <div className="space-y-12">
         {/* --- DATES & SETTINGS --- */}
         <section className="bg-zinc-50 p-6 rounded-2xl border border-zinc-100">
