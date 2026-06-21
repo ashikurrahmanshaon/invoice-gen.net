@@ -1,411 +1,731 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { Download, Plus, X, UploadCloud, Calendar, Building2, UserCircle2, Sparkles, Hash, FileText, CheckCircle2 } from 'lucide-react';
-import { InvoiceData, InvoiceItem } from './types';
-import { ModernTemplate } from './templates/ModernTemplate';
-import { MinimalTemplate } from './templates/MinimalTemplate';
-import { ClassicTemplate } from './templates/ClassicTemplate';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Modal } from '@/components/ui/modal';
+import { Button } from '@/components/ui/button';
+import {
+  Plus, Trash2, Download, ChevronDown,
+  Image as ImageIcon, CreditCard,
+  Check, DollarSign, Building2, User, FileText,
+  Calendar, Layers, Paintbrush, FileBadge, Settings2, ArrowRight
+} from 'lucide-react';
 
-type TemplateType = 'modern' | 'minimal' | 'classic';
+// --- Types ---
+interface InvoiceItem {
+  description: string;
+  quantity: number;
+  unit_price: number;
+  amount: number;
+}
+interface Client {
+  id: string;
+  name: string;
+  email: string;
+  address: string;
+}
+
+// --- Constants ---
+const THEME_COLORS = [
+  { name: 'Emerald', value: '#10b981' },
+  { name: 'Blue',    value: '#3b82f6' },
+  { name: 'Violet',  value: '#8b5cf6' },
+  { name: 'Rose',    value: '#f43f5e' },
+  { name: 'Amber',   value: '#f59e0b' },
+  { name: 'Zinc',    value: '#18181b' },
+];
+
+const TEMPLATES = ['modern', 'classic', 'creative', 'enterprise'] as const;
+
+// --- Design Tool UI Components ---
+const SidebarPanel = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
+  <div className="mb-6 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
+    <div className="flex items-center gap-2 mb-4 text-zinc-800">
+      <Icon size={16} className="text-emerald-500" />
+      <h3 className="text-[13px] font-bold uppercase tracking-widest">{title}</h3>
+    </div>
+    <div className="space-y-4">
+      {children}
+    </div>
+  </div>
+);
+
+const Label = ({ children }: { children: React.ReactNode }) => (
+  <label className="block text-[11px] font-bold text-zinc-500 mb-1.5 uppercase tracking-wider">
+    {children}
+  </label>
+);
+
+const CleanInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
+  <input
+    {...props}
+    className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 px-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all ${props.className || ''}`}
+  />
+);
+
+const CleanSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
+  <div className="relative group">
+    <select
+      {...props}
+      className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 pl-3 pr-8 text-[13px] text-zinc-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer ${props.className || ''}`}
+    >
+      {props.children}
+    </select>
+    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
+  </div>
+);
+
+const CleanTextarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
+  <textarea
+    {...props}
+    className={`w-full rounded-lg bg-zinc-50 border border-zinc-200 p-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none ${props.className || ''}`}
+  />
+);
+
 
 export function FreeInvoiceBuilder() {
-  const printRef = useRef<HTMLDivElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const invoiceRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // --- State ---
+  const [template, setTemplate] = useState<typeof TEMPLATES[number]>('modern');
+  const [themeColor, setThemeColor] = useState(THEME_COLORS[0]);
   const [logoUrl, setLogoUrl] = useState('');
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-001');
-  const [companyDetails, setCompanyDetails] = useState('');
-  const [clientDetails, setClientDetails] = useState('');
-  
-  const [issueDate, setIssueDate] = useState('');
-  const [dueDate, setDueDate] = useState('');
 
-  const [items, setItems] = useState<InvoiceItem[]>([
-    { description: '', quantity: 1, unit_price: '', amount: 0 },
+  const [companyName, setCompanyName]       = useState('Acme Corp');
+  const [companyAddress, setCompanyAddress] = useState('123 Innovation Way\nSan Francisco, CA 94103');
+  const [companyEmail, setCompanyEmail]     = useState('billing@acme.com');
+
+  const [clientName, setClientName]       = useState('John Doe');
+  const [clientEmail, setClientEmail]     = useState('john@example.com');
+  const [clientAddress, setClientAddress] = useState('456 Client St\nNew York, NY 10001');
+
+  const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-001');
+  const [issueDate, setIssueDate]         = useState('');
+  const [dueDate, setDueDate]             = useState('');
+
+  useEffect(() => {
+    setIssueDate(new Date().toISOString().split('T')[0]);
+    setDueDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
+  }, []);
+  const [currency, setCurrency]         = useState('USD');
+  const [taxRate, setTaxRate]           = useState(0);
+  const [discountType, setDiscountType] = useState<'percent' | 'flat'>('percent');
+  const [discountRate, setDiscountRate] = useState(0);
+  const [discountVal, setDiscountVal]   = useState(0);
+  const [paymentDetails, setPaymentDetails] = useState('Bank Transfer\nAcct: 987654321\nRouting: 123456789');
+  const [notes, setNotes]               = useState('Thank you for your business. Payment is due within 14 days.');
+  const [items, setItems]               = useState<InvoiceItem[]>([
+    { description: 'Premium Web Design', quantity: 1, unit_price: 3500, amount: 3500 },
+    { description: 'Hosting & Maintenance', quantity: 1, unit_price: 600, amount: 600 },
   ]);
 
-  const [notes, setNotes] = useState('');
-  const [taxRate, setTaxRate] = useState<number>(0);
-  const [discountAmount, setDiscountAmount] = useState<number>(0);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
+  const [showPreview, setShowPreview] = useState(false);
+  const [isDownloading, setIsDownloading]         = useState(false);
+  const [scale, setScale] = useState(1);
+
+  // --- Scale Logic to Fit Screen ---
+  useEffect(() => {
+    const handleResize = () => {
+      if (containerRef.current) {
+        const w = containerRef.current.clientWidth;
+        const h = containerRef.current.clientHeight || window.innerHeight;
+        if (w === 0) return;
+        const padding = 64; // nice padding
+        const scaleW = (w - padding) / 800; // 800 is approx A4 width
+        setScale(Math.min(scaleW, 1)); // We only care about width scaling so it doesn't overflow horizontally on mobile
+      }
+    };
+    handleResize();
+    const timer = setTimeout(handleResize, 100);
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(timer);
+    };
+  }, [showPreview]);
 
   // --- Calcs ---
-  const subtotal = items.reduce((s, i) => s + i.amount, 0);
-  const taxAmount = subtotal * (taxRate / 100);
-  const total = subtotal + taxAmount - discountAmount;
+  const subtotal       = items.reduce((s, i) => s + i.quantity * i.unit_price, 0);
+  const discountAmount = discountType === 'percent' ? subtotal * (discountRate / 100) : discountVal;
+  const taxableAmount  = Math.max(0, subtotal - discountAmount);
+  const taxAmount      = taxableAmount * (taxRate / 100);
+  const total          = taxableAmount + taxAmount;
 
-  const invoiceData: InvoiceData = {
-    logoUrl, invoiceNumber, companyDetails, clientDetails, issueDate, dueDate,
-    items, notes, taxRate, discountAmount, subtotal, taxAmount, total
-  };
-
-  const fmtSummary = (v: number) => {
-    return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
+  const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(v);
 
   const handleItemChange = (i: number, field: keyof Omit<InvoiceItem, 'amount'>, v: any) => {
     const u = [...items];
-    u[i][field] = v;
-    
-    const qty = parseFloat(u[i].quantity.toString()) || 0;
-    const price = parseFloat(u[i].unit_price.toString()) || 0;
-    u[i].amount = qty * price;
-    
+    if (field === 'quantity')        u[i].quantity   = parseInt(v, 10) || 0;
+    else if (field === 'unit_price') u[i].unit_price = parseFloat(v)  || 0;
+    else                             u[i].description = v;
+    u[i].amount = u[i].quantity * u[i].unit_price;
     setItems(u);
   };
 
-  const addRow = () => setItems([...items, { description: '', quantity: 1, unit_price: '', amount: 0 }]);
+  const addRow    = () => setItems([...items, { description: '', quantity: 1, unit_price: 0, amount: 0 }]);
   const removeRow = (i: number) => { if (items.length > 1) setItems(items.filter((_, idx) => idx !== i)); };
 
   const handleDownloadPDF = async () => {
-    if (!printRef.current) return;
+    if (!invoiceRef.current) return;
     setIsDownloading(true);
+    
+    // Temporarily reset scale for accurate html2canvas capture
+    const currentScale = scale;
+    if (scale !== 1) {
+      setScale(1);
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
 
     try {
       const htmlToImageModule = await import('html-to-image');
       const toPng = htmlToImageModule.toPng;
+      
       const jsPDFModule = await import('jspdf') as any;
       const JsPDFClass = jsPDFModule.default?.jsPDF || (typeof jsPDFModule.default === 'function' ? jsPDFModule.default : jsPDFModule.jsPDF);
       
-      // We capture the hidden printRef directly. It is already perfectly formatted!
-      // We need to briefly ensure it's visible in the DOM (though offscreen) for html2image to work properly
-      printRef.current.style.display = 'block';
+      const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 3 });
       
-      const imgData = await toPng(printRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
-      
-      printRef.current.style.display = 'none';
-
-      const pdf = new JsPDFClass('p', 'mm', 'a4');
-      const pw = pdf.internal.pageSize.getWidth();
-      const ph = (printRef.current.offsetHeight * pw) / printRef.current.offsetWidth;
+      const node = invoiceRef.current;
+      const pdf     = new JsPDFClass('p', 'mm', 'a4');
+      const pw      = pdf.internal.pageSize.getWidth();
+      const ph      = (node.offsetHeight * pw) / node.offsetWidth;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
       pdf.save(`${invoiceNumber || 'Invoice'}.pdf`);
     } catch (err: any) {
-      console.error('PDF Error:', err);
-      alert('Failed to generate PDF');
-      if (printRef.current) printRef.current.style.display = 'none';
+      console.error('PDF Generation Error:', err);
+      alert('Failed to generate PDF: ' + (err?.message || err));
     } finally {
+      if (scale !== 1) setScale(currentScale);
       setIsDownloading(false);
     }
   };
 
-  // Modern, premium styling for the dashboard
-  const boxStyle = "w-full bg-white border border-indigo-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/20 rounded-2xl px-4 py-3 text-[15px] font-medium text-slate-800 placeholder:text-slate-400 transition-all duration-300 shadow-sm outline-none";
-  const labelStyle = "flex items-center gap-2 text-[13px] font-bold text-indigo-900/70 mb-2 uppercase tracking-wide";
-  const cardStyle = "bg-white/80 backdrop-blur-xl border border-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.1)] rounded-[2rem] p-6 sm:p-10 relative overflow-hidden";
+  // ---------------------------------------------------------------------------
+  // PROFESSIONAL TEMPLATES (Unchanged designs, beautifully rendered)
+  // ---------------------------------------------------------------------------
+
+  const renderModernTemplate = () => (
+    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-800 font-sans p-16 relative flex flex-col shadow-2xl">
+      <div className="absolute top-0 left-0 w-full h-3" style={{ backgroundColor: themeColor.value }} />
+      <div className="flex justify-between items-start mb-16 mt-4">
+        <div>
+          {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-16 mb-4 object-contain" /> : <h1 className="text-3xl font-bold tracking-tight mb-2 text-zinc-900">{companyName || 'Your Company'}</h1>}
+          <p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
+          <p className="text-zinc-500 mt-1">{companyEmail}</p>
+        </div>
+        <div className="text-right">
+          <h2 className="text-5xl font-light tracking-tight text-zinc-200 uppercase mb-2">Invoice</h2>
+          <p className="font-medium text-zinc-900 text-xl">{invoiceNumber}</p>
+        </div>
+      </div>
+      <div className="flex justify-between items-end mb-16">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Billed To</p>
+          <p className="font-semibold text-lg text-zinc-900">{clientName}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap mt-1 leading-relaxed">{clientAddress}</p>
+          <p className="text-zinc-500 mt-1">{clientEmail}</p>
+        </div>
+        <div className="flex gap-16 text-right">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Issue Date</p>
+            <p className="font-semibold text-zinc-900">{issueDate}</p>
+          </div>
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Due Date</p>
+            <p className="font-semibold text-zinc-900">{dueDate}</p>
+          </div>
+        </div>
+      </div>
+      <table className="w-full text-left mb-16">
+        <thead>
+          <tr className="border-b-2 border-zinc-100">
+            <th className="py-4 text-[11px] font-semibold text-zinc-500">Description</th>
+            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-center w-24">Qty</th>
+            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-right w-32">Price</th>
+            <th className="py-4 text-[11px] font-semibold text-zinc-500 text-right w-32">Total</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-50">
+          {items.map((item, idx) => (
+            <tr key={idx}>
+              <td className="py-5 text-zinc-900 font-medium text-sm">{item.description || 'Item'}</td>
+              <td className="py-5 text-zinc-500 text-center">{item.quantity}</td>
+              <td className="py-5 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
+              <td className="py-5 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-auto flex justify-between items-start gap-12">
+        <div className="flex-1 space-y-8">
+          {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Instructions</p><p className="text-zinc-600 leading-relaxed whitespace-pre-wrap">{paymentDetails}</p></div>)}
+          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
+        </div>
+        <div className="w-80 bg-zinc-50 rounded-2xl p-8 border border-zinc-100">
+          <div className="space-y-4 mb-6">
+            <div className="flex justify-between text-zinc-500"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
+            {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmt(discountAmount)}</span></div>}
+            {taxRate > 0 && <div className="flex justify-between text-zinc-500"><span>Tax ({taxRate}%)</span><span>{fmt(taxAmount)}</span></div>}
+          </div>
+          <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
+            <span className="text-base font-bold text-zinc-900">Total Due</span>
+            <span className="text-3xl font-bold" style={{ color: themeColor.value }}>{fmt(total)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderClassicTemplate = () => (
+    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-900 font-serif p-16 flex flex-col shadow-2xl border-[1px] border-zinc-200">
+      <div className="flex justify-between items-start mb-16">
+        <div className="w-1/2">
+          {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 mb-8 object-contain" />}
+          <h1 className="text-3xl font-bold text-zinc-900 mb-2">{companyName || 'Your Company'}</h1>
+          <p className="text-zinc-600 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
+          <p className="text-zinc-600 mt-1">{companyEmail}</p>
+        </div>
+        <div className="text-right">
+          <h2 className="text-6xl uppercase tracking-widest text-zinc-900 mb-8 font-light">Invoice</h2>
+          <table className="ml-auto text-right text-[12px] font-sans">
+            <tbody>
+              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Invoice No.</td><td className="font-semibold text-zinc-900">{invoiceNumber}</td></tr>
+              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Date</td><td>{issueDate}</td></tr>
+              <tr><td className="pr-6 py-2 text-zinc-500 uppercase tracking-wider font-semibold">Due Date</td><td>{dueDate}</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="mb-12 font-sans">
+        <div className="border-b border-zinc-800 pb-2 mb-4 w-1/2"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">Bill To</p></div>
+        <p className="font-bold text-lg text-zinc-900">{clientName}</p>
+        <p className="text-zinc-600 whitespace-pre-wrap mt-2 leading-relaxed">{clientAddress}</p>
+        <p className="text-zinc-600 mt-1">{clientEmail}</p>
+      </div>
+      <table className="w-full text-left mb-12 border-collapse font-sans">
+        <thead>
+          <tr className="border-y-2 border-zinc-900 bg-zinc-50">
+            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800">Description</th>
+            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-center w-24">Qty</th>
+            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-right w-32">Price</th>
+            <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-right w-32">Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, idx) => (
+            <tr key={idx} className="border-b border-zinc-200">
+              <td className="py-5 px-6 text-zinc-900">{item.description || 'Item'}</td>
+              <td className="py-5 px-6 text-zinc-600 text-center">{item.quantity}</td>
+              <td className="py-5 px-6 text-zinc-600 text-right">{fmt(item.unit_price)}</td>
+              <td className="py-5 px-6 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-auto flex justify-between items-start gap-12 font-sans">
+        <div className="flex-1 space-y-8">
+          {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-1 mb-2">Payment Terms</p><p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{paymentDetails}</p></div>)}
+          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 border-b border-zinc-200 pb-1 mb-2">Remarks</p><p className="text-zinc-600 whitespace-pre-wrap italic leading-relaxed">{notes}</p></div>)}
+        </div>
+        <div className="w-80">
+          <table className="w-full text-right text-[13px]">
+            <tbody>
+              <tr><td className="py-2 text-zinc-600">Subtotal</td><td className="py-2 font-medium">{fmt(subtotal)}</td></tr>
+              {discountAmount > 0 && <tr><td className="py-2 text-zinc-600">Discount</td><td className="py-2 text-red-600 font-medium">−{fmt(discountAmount)}</td></tr>}
+              {taxRate > 0 && <tr><td className="py-2 text-zinc-600">Tax ({taxRate}%)</td><td className="py-2 font-medium">{fmt(taxAmount)}</td></tr>}
+              <tr className="border-t-2 border-zinc-900 text-[18px] font-bold">
+                <td className="py-6 uppercase tracking-widest">Total Due</td>
+                <td className="py-6" style={{ color: themeColor.value }}>{fmt(total)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderCreativeTemplate = () => (
+    <div className="bg-white min-h-[1130px] w-full text-[12px] text-zinc-900 font-sans flex flex-col overflow-hidden shadow-2xl">
+      <div className="p-16 flex justify-between items-end" style={{ backgroundColor: themeColor.value }}>
+        <div className="text-white">
+          <h2 className="text-[60px] font-black tracking-tighter leading-none mb-4">INVOICE</h2>
+          <p className="text-white/80 font-medium tracking-widest uppercase text-base">#{invoiceNumber}</p>
+        </div>
+        <div className="text-right text-white">
+          {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-20 object-contain bg-white rounded-2xl p-3 mb-6 ml-auto" /> : <h1 className="text-3xl font-bold mb-4">{companyName || 'Your Company'}</h1>}
+          <p className="text-white/80 whitespace-pre-wrap leading-relaxed text-right">{companyAddress}</p>
+          <p className="text-white/80 mt-1">{companyEmail}</p>
+        </div>
+      </div>
+      <div className="p-16 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-16">
+          <div className="bg-zinc-50 p-8 rounded-3xl border border-zinc-100 flex-1 mr-12">
+            <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-4">Bill To</p>
+            <p className="font-bold text-2xl text-zinc-900 mb-2">{clientName}</p>
+            <p className="text-zinc-500 mb-1">{clientEmail}</p>
+            <p className="text-zinc-600 whitespace-pre-wrap mt-3 leading-relaxed">{clientAddress}</p>
+          </div>
+          <div className="w-72 space-y-5 pt-4">
+            <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
+              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Issue Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
+            </div>
+            <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
+              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Due Date</span><span className="font-bold text-zinc-900">{dueDate}</span>
+            </div>
+          </div>
+        </div>
+        <table className="w-full text-left mb-16">
+          <thead>
+            <tr>
+              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900">Description</th>
+              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-center w-24">Qty</th>
+              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-right w-32">Price</th>
+              <th className="py-5 border-b-2 border-zinc-900 text-[12px] font-bold uppercase tracking-widest text-zinc-900 text-right w-32">Total</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-zinc-100">
+            {items.map((item, idx) => (
+              <tr key={idx}>
+                <td className="py-6 text-zinc-900 font-semibold text-sm">{item.description || 'Item'}</td>
+                <td className="py-6 text-zinc-500 text-center">{item.quantity}</td>
+                <td className="py-6 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
+                <td className="py-6 text-zinc-900 font-bold text-right text-sm">{fmt(item.amount)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div className="mt-auto flex justify-between items-end gap-12">
+          <div className="flex-1 space-y-8">
+            {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Details</p><p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{paymentDetails}</p></div>)}
+            {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{notes}</p></div>)}
+          </div>
+          <div className="w-96 bg-zinc-900 text-white p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
+            <div className="space-y-4 mb-8 text-sm">
+              <div className="flex justify-between text-zinc-400"><span>Subtotal</span><span className="text-white">{fmt(subtotal)}</span></div>
+              {discountAmount > 0 && <div className="flex justify-between text-zinc-400"><span>Discount</span><span className="text-white">−{fmt(discountAmount)}</span></div>}
+              {taxRate > 0 && <div className="flex justify-between text-zinc-400"><span>Tax ({taxRate}%)</span><span className="text-white">{fmt(taxAmount)}</span></div>}
+            </div>
+            <div className="pt-8 border-t border-zinc-800 flex justify-between items-end">
+              <span className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Total</span>
+              <span className="text-4xl font-black leading-none" style={{ color: themeColor.value }}>{fmt(total)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderEnterpriseTemplate = () => (
+    <div className="bg-white min-h-[1130px] w-full text-[11px] text-zinc-800 font-sans p-16 border-[12px] border-zinc-50 flex flex-col shadow-2xl">
+      <div className="flex justify-between items-start border-b-2 border-zinc-200 pb-10 mb-10">
+        <div className="flex items-center gap-8">
+          {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 object-contain" />}
+          <div>
+            <h1 className="text-2xl font-bold text-zinc-900 uppercase tracking-wide">{companyName || 'Your Company'}</h1>
+            <p className="text-zinc-500 mt-1">{companyEmail}</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <h2 className="text-4xl font-black tracking-tight text-zinc-900 uppercase">Invoice</h2>
+          <p className="font-bold text-zinc-500 mt-2 text-lg">{invoiceNumber}</p>
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-10 mb-10">
+        <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">From</p>
+          <p className="font-bold text-zinc-900 text-sm">{companyName}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{companyAddress}</p>
+        </div>
+        <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">Bill To</p>
+          <p className="font-bold text-zinc-900 text-sm">{clientName}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{clientAddress}</p>
+          <p className="text-zinc-600 mt-1">{clientEmail}</p>
+        </div>
+        <div className="col-span-1 border border-zinc-200 rounded-xl overflow-hidden flex flex-col">
+          <div className="flex-1 border-b border-zinc-200 p-5 flex justify-between items-center bg-white">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
+          </div>
+          <div className="flex-1 p-5 flex justify-between items-center bg-white">
+            <span className="text-[11px] font-bold uppercase tracking-widest text-zinc-500">Due</span><span className="font-bold text-zinc-900">{dueDate}</span>
+          </div>
+        </div>
+      </div>
+      <table className="w-full text-left mb-10 border border-zinc-200">
+        <thead>
+          <tr className="bg-zinc-100 border-b border-zinc-200">
+            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 border-r border-zinc-200">Description</th>
+            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-center w-24 border-r border-zinc-200">Qty</th>
+            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-right w-32 border-r border-zinc-200">Price</th>
+            <th className="p-4 text-[11px] font-bold uppercase tracking-widest text-zinc-600 text-right w-36">Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, idx) => (
+            <tr key={idx} className="border-b border-zinc-200 last:border-0">
+              <td className="p-4 text-zinc-900 font-medium border-r border-zinc-200">{item.description || 'Item'}</td>
+              <td className="p-4 text-zinc-600 text-center border-r border-zinc-200">{item.quantity}</td>
+              <td className="p-4 text-zinc-600 text-right border-r border-zinc-200">{fmt(item.unit_price)}</td>
+              <td className="p-4 text-zinc-900 font-bold text-right">{fmt(item.amount)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-auto flex gap-10">
+        <div className="flex-1 space-y-6">
+          {paymentDetails && (<div className="border border-zinc-200 p-5 rounded-xl"><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Details</p><p className="text-zinc-700 whitespace-pre-wrap">{paymentDetails}</p></div>)}
+          {notes && (<div className="border border-zinc-200 p-5 rounded-xl bg-zinc-50"><p className="text-zinc-600 whitespace-pre-wrap italic">{notes}</p></div>)}
+        </div>
+        <div className="w-96 border border-zinc-200 rounded-xl overflow-hidden self-end">
+          <div className="p-6 space-y-4 bg-white text-sm">
+            <div className="flex justify-between text-zinc-600"><span>Subtotal</span><span className="font-medium">{fmt(subtotal)}</span></div>
+            {discountAmount > 0 && <div className="flex justify-between text-zinc-600"><span>Discount</span><span className="font-medium">−{fmt(discountAmount)}</span></div>}
+            {taxRate > 0 && <div className="flex justify-between text-zinc-600"><span>Tax ({taxRate}%)</span><span className="font-medium">{fmt(taxAmount)}</span></div>}
+          </div>
+          <div className="p-6 border-t border-zinc-200 flex justify-between items-center transition-colors duration-500" style={{ backgroundColor: themeColor.value }}>
+            <span className="text-sm font-bold text-white uppercase tracking-widest">Total Due</span>
+            <span className="text-2xl font-bold text-white">{fmt(total)}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  if (showPreview) {
+    return (
+      <div className="w-full flex flex-col items-center bg-zinc-100 py-12 px-4 min-h-screen font-sans">
+        <div className="w-full max-w-4xl flex justify-between items-center mb-8">
+          <button 
+            onClick={() => setShowPreview(false)}
+            className="px-6 py-3 bg-white hover:bg-zinc-50 border border-zinc-200 text-zinc-700 font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all"
+          >
+            ← Back to Editor
+          </button>
+          <button
+            onClick={handleDownloadPDF}
+            disabled={isDownloading}
+            className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-sm flex items-center gap-2 transition-all disabled:opacity-50"
+          >
+            {isDownloading ? <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={18} strokeWidth={2.5} /> Download PDF</>}
+          </button>
+        </div>
+        <div ref={containerRef} className="w-full flex justify-center overflow-x-auto pb-24">
+          <div 
+            className="relative transition-all duration-300 ease-out origin-top"
+            style={{ transform: `scale(${scale})` }}
+          >
+            <div className="absolute inset-0 bg-black/5 blur-2xl rounded-[20px] scale-105 pointer-events-none -z-10" />
+            <div className="relative w-[800px] bg-white text-black shadow-2xl rounded-sm overflow-hidden select-text pointer-events-auto border border-zinc-200">
+              <div ref={invoiceRef}>
+                {template === 'modern' && renderModernTemplate()}
+                {template === 'classic' && renderClassicTemplate()}
+                {template === 'creative' && renderCreativeTemplate()}
+                {template === 'enterprise' && renderEnterpriseTemplate()}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-white to-blue-50 py-12 px-2 sm:px-6 flex justify-center font-sans">
+    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[1.5rem] border border-zinc-200 shadow-sm font-sans text-zinc-900">
       
-      {/* Hidden Print Container - Always perfectly 794px wide for A4 */}
-      <div className="absolute top-0 left-[-9999px] overflow-hidden" style={{ width: '794px' }}>
-         <div ref={printRef} style={{ display: 'none' }}>
-           {selectedTemplate === 'modern' && <ModernTemplate data={invoiceData} renderRef={null as any} />}
-           {selectedTemplate === 'minimal' && <MinimalTemplate data={invoiceData} renderRef={null as any} />}
-           {selectedTemplate === 'classic' && <ClassicTemplate data={invoiceData} renderRef={null as any} />}
-         </div>
-      </div>
-
-      {/* Master Container */}
-      <div className="w-full max-w-[900px] mb-24">
-        
-        {/* Template Selector */}
-        <div className="mb-8 flex flex-col sm:flex-row items-center gap-4 bg-white/60 backdrop-blur-xl border border-white p-2 rounded-full shadow-sm mx-auto max-w-fit">
-           {(['modern', 'minimal', 'classic'] as TemplateType[]).map((t) => (
-             <button
-               key={t}
-               onClick={() => setSelectedTemplate(t)}
-               className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all capitalize ${selectedTemplate === t ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-white'}`}
-             >
-               {selectedTemplate === t && <CheckCircle2 size={16} />}
-               {t} Design
-             </button>
-           ))}
-        </div>
-
-        <div className={cardStyle}>
-          {/* Subtle decorative blob */}
-          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-          {/* Header Row */}
-          <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-8 mb-10 relative z-10">
-            {/* Logo */}
-            <div className="w-full md:w-1/2">
-              <div className="mb-2">
-                <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={(e) => {
+      {/* --- TOP SECTION (2 COLUMNS) --- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10">
+        {/* Left Column */}
+        <div className="space-y-6">
+          <div>
+            <Label>Logo</Label>
+            <div className="relative border border-zinc-200 rounded-xl p-4 flex items-center gap-4 hover:bg-zinc-50 cursor-pointer transition-colors h-[76px]">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
                   const file = e.target.files?.[0];
                   if (file) {
                     const reader = new FileReader();
                     reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
                     reader.readAsDataURL(file);
                   } else { setLogoUrl(''); }
-                  e.target.value = '';
-                }} />
-                {logoUrl ? (
-                  <div className="relative inline-block border-2 border-indigo-50 rounded-2xl p-2 bg-white shadow-sm group">
-                    <img src={logoUrl} alt="Logo" className="h-20 object-contain" />
-                    <button onClick={() => setLogoUrl('')} className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110">
-                      <X size={14} strokeWidth={3} />
-                    </button>
-                  </div>
-                ) : (
-                  <button onClick={() => fileInputRef.current?.click()} className="group w-[180px] h-[80px] border-2 border-dashed border-indigo-200 rounded-2xl flex flex-col items-center justify-center text-indigo-400 hover:text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all bg-white/50">
-                    <UploadCloud size={24} className="mb-1 group-hover:-translate-y-1 transition-transform" />
-                    <span className="text-[12px] font-bold">Upload Logo</span>
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Title & Number */}
-            <div className="w-full md:w-1/2 flex flex-col md:items-end">
-              <h1 className="text-5xl sm:text-6xl font-black bg-gradient-to-br from-indigo-900 to-indigo-600 bg-clip-text text-transparent tracking-tighter mb-4">
-                INVOICE
-              </h1>
-              <div className="flex items-center w-full md:max-w-[240px] bg-white border border-indigo-100 rounded-2xl shadow-sm overflow-hidden focus-within:border-indigo-500 focus-within:ring-[3px] focus-within:ring-indigo-500/20 transition-all">
-                <div className="bg-indigo-50 text-indigo-400 font-bold px-4 py-3 border-r border-indigo-100 flex items-center justify-center">
-                  <Hash size={16} strokeWidth={3} />
-                </div>
-                <input 
-                  value={invoiceNumber} 
-                  onChange={e => setInvoiceNumber(e.target.value)} 
-                  placeholder="INV-2026-001" 
-                  className="w-full bg-transparent border-none outline-none px-3 py-3 text-[15px] font-bold text-slate-800" 
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-100 to-transparent mb-10"></div>
-
-          {/* Details Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 relative z-10">
-            <div className="bg-indigo-50/30 rounded-3xl p-5 sm:p-6 border border-indigo-50">
-              <label className={labelStyle}><Building2 size={16} className="text-indigo-500" /> From</label>
-              <textarea 
-                value={companyDetails} 
-                onChange={e => setCompanyDetails(e.target.value)} 
-                placeholder="Your Company Name&#10;123 Business Rd.&#10;City, State, Zip" 
-                rows={3} 
-                className={`${boxStyle} bg-white/80`} 
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-            </div>
-            
-            <div className="bg-blue-50/30 rounded-3xl p-5 sm:p-6 border border-blue-50">
-              <label className={labelStyle}><UserCircle2 size={16} className="text-blue-500" /> Bill To</label>
-              <textarea 
-                value={clientDetails} 
-                onChange={e => setClientDetails(e.target.value)} 
-                placeholder="Client Name&#10;456 Client St.&#10;City, State, Zip" 
-                rows={3} 
-                className={`${boxStyle} bg-white/80`} 
-              />
-            </div>
-          </div>
-
-          {/* Dates Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12 relative z-10">
-            <div>
-              <label className={labelStyle}><Calendar size={16} className="text-indigo-400" /> Date Issued</label>
-              <div className="relative">
-                <input 
-                  type="date" 
-                  value={issueDate} 
-                  onChange={e => setIssueDate(e.target.value)} 
-                  className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-white cursor-pointer`} 
-                />
-                <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-300 z-0 pointer-events-none" />
+              <div className="w-8 h-8 rounded border border-zinc-200 flex items-center justify-center bg-white text-zinc-500">
+                <ImageIcon size={14} />
               </div>
-            </div>
-            <div>
-              <label className={labelStyle}><Calendar size={16} className="text-indigo-400" /> Due Date</label>
-              <div className="relative">
-                <input 
-                  type="date" 
-                  value={dueDate} 
-                  onChange={e => setDueDate(e.target.value)} 
-                  className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-white cursor-pointer`} 
-                />
-                <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-300 z-0 pointer-events-none" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-zinc-800 underline decoration-zinc-300 underline-offset-4">Upload file</p>
+                <p className="text-[11px] text-zinc-400 mt-1 uppercase tracking-wide">JPG, JPEG, PNG, less than 5MB</p>
               </div>
+              {logoUrl && <button type="button" onClick={(e) => { e.preventDefault(); setLogoUrl(''); }} className="absolute right-4 text-xs font-bold text-rose-500 z-20 hover:underline">Clear</button>}
             </div>
           </div>
-
-          {/* Line Items Section */}
-          <div className="mb-10 relative z-10">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="bg-indigo-100 p-2 rounded-xl"><FileText size={18} className="text-indigo-600" /></div>
-              <h2 className="text-xl font-bold text-slate-800">Invoice Items</h2>
-            </div>
-            
-            <div className="hidden sm:flex bg-indigo-900 text-indigo-50 rounded-2xl p-4 text-[12px] font-bold uppercase tracking-widest shadow-md mb-4">
-              <div className="flex-1 pl-2">Description</div>
-              <div className="w-[120px] text-right pr-2">Rate</div>
-              <div className="w-[100px] text-right pr-2">Qty</div>
-              <div className="w-[140px] text-right pr-2">Amount</div>
-              <div className="w-10"></div>
-            </div>
-            
-            <div className="space-y-4">
-              {items.map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-white p-5 sm:p-2 border border-indigo-50 rounded-3xl sm:rounded-2xl shadow-sm hover:shadow-md transition-shadow group">
-                   <div className="w-full sm:flex-1 sm:pl-2">
-                     <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Description</label>
-                     <input 
-                       value={item.description} 
-                       onChange={e => handleItemChange(idx, 'description', e.target.value)} 
-                       placeholder="Service or product description" 
-                       className={boxStyle} 
-                     />
-                   </div>
-                   
-                   <div className="flex w-full sm:w-auto gap-4">
-                     <div className="flex-1 sm:w-[120px]">
-                       <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Rate</label>
-                       <input 
-                         type="number" placeholder="0.00" 
-                         value={item.unit_price} 
-                         onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
-                         className={`${boxStyle} sm:text-right`} 
-                       />
-                     </div>
-                     
-                     <div className="flex-1 sm:w-[100px]">
-                       <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Qty</label>
-                       <input 
-                         type="number" placeholder="1" 
-                         value={item.quantity} 
-                         onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
-                         className={`${boxStyle} sm:text-right`} 
-                       />
-                     </div>
-                   </div>
-                   
-                   <div className="w-full sm:w-[140px]">
-                     <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Amount</label>
-                     <input 
-                       value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
-                       readOnly placeholder="0.00" 
-                       className="w-full bg-indigo-50/50 border border-transparent rounded-2xl py-3 px-4 text-right text-[15px] font-bold text-indigo-950 cursor-default" 
-                     />
-                   </div>
-
-                   <div className="w-full sm:w-10 flex justify-end sm:justify-center mt-2 sm:mt-0">
-                     <button 
-                       onClick={() => removeRow(idx)} disabled={items.length === 1} 
-                       className="text-slate-300 hover:text-red-500 hover:bg-red-50 bg-white border border-slate-200 sm:border-transparent p-2.5 rounded-xl transition-all disabled:opacity-0"
-                     >
-                       <X size={18} strokeWidth={3} />
-                     </button>
-                   </div>
-                </div>
-              ))}
-            </div>
-            
-            <button 
-              onClick={addRow} 
-              className="mt-6 flex items-center gap-2 px-5 py-3 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-bold text-[14px] rounded-2xl transition-all shadow-sm"
-            >
-              <Plus size={18} strokeWidth={3} /> Add Another Item
-            </button>
+          <div>
+            <Label>Your company details</Label>
+            <CleanTextarea 
+              value={companyName + (companyAddress ? '\n' + companyAddress : '')} 
+              onChange={e => {
+                const lines = e.target.value.split('\n');
+                setCompanyName(lines[0] || '');
+                setCompanyAddress(lines.slice(1).join('\n'));
+              }} 
+              rows={3} 
+              className="resize-none h-[88px]"
+            />
           </div>
-
-          <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-100 to-transparent mb-10"></div>
-
-          {/* Footer Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 relative z-10">
-            
-            <div className="lg:col-span-7">
-              <label className={labelStyle}><Sparkles size={16} className="text-amber-500" /> Notes & Payment Terms</label>
-              <textarea 
-                value={notes} 
-                onChange={e => setNotes(e.target.value)} 
-                placeholder="Thank you for your business! Please make payment within 15 days." 
-                rows={5} 
-                className={`${boxStyle} bg-amber-50/30 border-amber-100 focus:border-amber-400 focus:ring-amber-400/20`} 
-              />
-            </div>
-            
-            <div className="lg:col-span-5">
-              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
-
-                <div className="relative z-10">
-                  <div className="space-y-4 mb-6">
-                    <div className="flex justify-between items-center text-[15px]">
-                      <span className="font-medium text-slate-300">Subtotal</span>
-                      <span className="font-bold">{fmtSummary(subtotal)}</span>
-                    </div>
-                    
-                    <div className="flex justify-between items-center text-[15px]">
-                      <span className="font-medium text-slate-300">Tax (%)</span>
-                      <input 
-                        type="number" 
-                        value={taxRate || ''} 
-                        onChange={e => setTaxRate(parseFloat(e.target.value) || 0)} 
-                        placeholder="0" 
-                        className="w-20 bg-slate-700/50 border border-slate-600 rounded-xl text-right px-3 py-1.5 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
-                      />
-                    </div>
-                    {taxAmount > 0 && (
-                      <div className="flex justify-between items-center text-[15px]">
-                        <span className="font-medium text-slate-300">Tax</span>
-                        <span className="font-bold">{fmtSummary(taxAmount)}</span>
-                      </div>
-                    )}
-                    
-                    <div className="flex justify-between items-center text-[15px]">
-                      <span className="font-medium text-slate-300">Discount ($)</span>
-                      <input 
-                        type="number" 
-                        value={discountAmount || ''} 
-                        onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} 
-                        placeholder="0" 
-                        className="w-24 bg-slate-700/50 border border-slate-600 rounded-xl text-right px-3 py-1.5 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
-                      />
-                    </div>
-                    {discountAmount > 0 && (
-                      <div className="flex justify-between items-center text-[15px] text-emerald-400">
-                        <span className="font-medium">Discount</span>
-                        <span className="font-bold">-{fmtSummary(discountAmount)}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-6 border-t border-slate-700/50 flex flex-col items-end">
-                    <span className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</span>
-                    <span className="text-[40px] font-black text-white tracking-tight">{fmtSummary(total)}</span>
-                  </div>
-                </div>
-              </div>
+          <div>
+            <Label>Date issued</Label>
+            <div className="relative">
+              <CleanInput type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className="appearance-none" />
             </div>
           </div>
+        </div>
 
+        {/* Right Column */}
+        <div className="space-y-6">
+          <div>
+            <Label>Invoice number</Label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">#</span>
+              <CleanInput value={invoiceNumber.replace('#', '')} onChange={e => setInvoiceNumber(e.target.value)} className="pl-7 h-[76px] text-lg font-medium" />
+            </div>
+          </div>
+          <div>
+            <Label>Bill to</Label>
+            <CleanTextarea 
+              value={clientName + (clientAddress ? '\n' + clientAddress : '')} 
+              onChange={e => {
+                const lines = e.target.value.split('\n');
+                setClientName(lines[0] || '');
+                setClientAddress(lines.slice(1).join('\n'));
+              }} 
+              rows={3}
+              className="resize-none h-[88px]" 
+            />
+          </div>
+          <div>
+            <Label>Due date</Label>
+            <div className="relative">
+              <CleanInput type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="appearance-none" />
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Floating Action Button */}
-      <div className="fixed bottom-8 right-8 z-50">
-        <button 
-          onClick={handleDownloadPDF}
-          disabled={isDownloading}
-          className="group px-8 py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[16px] rounded-full shadow-[0_20px_40px_-10px_rgba(79,70,229,0.8)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3 disabled:opacity-50 border border-indigo-400/30 overflow-hidden relative"
-        >
-          <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
-          
-          {isDownloading ? (
-            <span className="h-5 w-5 rounded-full border-4 border-white/30 border-t-white animate-spin relative z-10" />
-          ) : (
-            <><Download size={22} className="relative z-10" /> <span className="relative z-10">Download PDF</span></>
-          )}
-        </button>
+      {/* --- LINE ITEMS --- */}
+      <div className="bg-zinc-50/50 rounded-[1.5rem] p-6 mb-10 border border-zinc-100">
+        <div className="hidden md:flex items-center gap-4 px-2 pb-3">
+          <div className="flex-1 text-xs font-bold text-zinc-400 uppercase tracking-widest">Item</div>
+          <div className="w-24 text-xs font-bold text-zinc-400 uppercase tracking-widest text-center">Rate</div>
+          <div className="w-20 text-xs font-bold text-zinc-400 uppercase tracking-widest text-center">Qty</div>
+          <div className="w-32 text-xs font-bold text-zinc-400 uppercase tracking-widest text-center">Amount</div>
+          <div className="w-8"></div>
+        </div>
+        
+        <div className="space-y-3 mb-8">
+          <AnimatePresence>
+            {items.map((item, idx) => (
+              <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="flex-1 w-full">
+                  <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className="bg-white border-zinc-200 h-12 shadow-sm" />
+                </div>
+                <div className="w-full md:w-24 relative">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                  <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="pl-7 bg-white border-zinc-200 text-center h-12 shadow-sm" />
+                </div>
+                <div className="w-full md:w-20">
+                  <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="bg-white border-zinc-200 text-center h-12 shadow-sm" />
+                </div>
+                <div className="w-full md:w-32 relative">
+                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                   <CleanInput disabled value={item.amount} className="pl-7 bg-white border-zinc-200 text-center font-semibold h-12 shadow-sm bg-zinc-50/50" />
+                </div>
+                <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-0"><Trash2 size={18} /></button>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+        
+        <div className="flex flex-col items-center justify-center">
+          <button onClick={addRow} className="w-11 h-11 bg-[#2563EB] hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-all shadow-lg shadow-blue-500/30 hover:scale-105 active:scale-95"><Plus size={22} /></button>
+          <span className="text-[#2563EB] text-sm font-bold mt-3">Add Item</span>
+        </div>
       </div>
 
+      {/* --- TOTALS & NOTES --- */}
+      <div className="flex flex-col md:flex-row gap-12 mb-12">
+        <div className="flex-1">
+          <Label>Notes</Label>
+          <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={4} className="h-32 resize-none" placeholder="Thank you for your business." />
+        </div>
+        
+        <div className="w-full md:w-80 space-y-4">
+          <div className="flex justify-between items-center text-sm px-2">
+            <span className="font-bold text-zinc-700">Subtotal</span>
+            <span className="font-bold text-zinc-900 text-xl">{fmt(subtotal)}</span>
+          </div>
+          
+          <div className="flex justify-between items-center gap-4 text-sm mt-6">
+            <span className="font-medium text-zinc-500 pl-2">Tax</span>
+            <div className="relative w-36">
+               <CleanInput type="number" min="0" value={taxRate || ''} onChange={e => setTaxRate(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0.00" className="pr-8 text-right h-11 rounded-xl border-zinc-200 shadow-sm" />
+               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">%</span>
+            </div>
+          </div>
+          
+          <div className="flex justify-between items-center gap-4 text-sm">
+            <span className="font-medium text-zinc-500 pl-2">Discount</span>
+            <div className="relative w-36 flex">
+              <button type="button" onClick={() => setDiscountType('percent')} className={`px-3 text-xs font-bold rounded-l-xl border-y border-l transition-colors ${discountType === 'percent' ? 'bg-zinc-200 border-zinc-300 text-zinc-900' : 'bg-zinc-50 border-zinc-200 text-zinc-400 hover:bg-zinc-100'}`}>%</button>
+              <button type="button" onClick={() => setDiscountType('flat')} className={`px-3 text-xs font-bold border-y border-l transition-colors ${discountType === 'flat' ? 'bg-zinc-200 border-zinc-300 text-zinc-900' : 'bg-zinc-50 border-zinc-200 text-zinc-400 hover:bg-zinc-100'}`}>$</button>
+              <CleanInput type="number" value={discountType === 'percent' ? (discountRate || '') : (discountVal || '')} onChange={e => discountType === 'percent' ? setDiscountRate(Math.max(0, parseFloat(e.target.value) || 0)) : setDiscountVal(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0.00" className="flex-1 rounded-none rounded-r-xl border-zinc-200 text-right h-11 shadow-sm" />
+            </div>
+          </div>
+          
+          <div className="pt-6 mt-4 flex justify-between items-center px-2">
+            <span className="font-bold text-[#2563EB] text-base">Total</span>
+            <span className="font-bold text-[#2563EB] text-2xl">{fmt(total)}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* --- TEMPLATE SELECTION (Minimalist) --- */}
+      <section className="pt-8 border-t border-zinc-100">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-8">
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Design Style</label>
+              <div className="flex gap-2">
+                {TEMPLATES.map(t => (
+                  <button key={t} type="button" onClick={() => setTemplate(t)} className={`px-3 py-1.5 rounded-md text-xs font-medium capitalize transition-all ${template === t ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Accent Color</label>
+              <div className="flex gap-2">
+                {THEME_COLORS.map(c => (
+                  <button key={c.value} type="button" onClick={() => setThemeColor(c)} className={`w-6 h-6 rounded-full transition-all ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900' : 'hover:scale-110'}`} style={{ backgroundColor: c.value }} title={c.name} />
+                ))}
+              </div>
+            </div>
+          </div>
+          
+          <button 
+            onClick={() => setShowPreview(true)}
+            className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
+          >
+            Preview & Download PDF
+          </button>
+        </div>
+      </section>
     </div>
   );
 }
