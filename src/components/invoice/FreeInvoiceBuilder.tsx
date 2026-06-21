@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Download, Plus, X, Upload, Calendar, RefreshCw, ArrowRight } from 'lucide-react';
+import { Download, Plus, X, UploadCloud, Calendar, FileText, Sparkles, ArrowRight } from 'lucide-react';
 
 interface InvoiceItem {
   description: string;
@@ -183,11 +183,11 @@ export function FreeInvoiceBuilder() {
               <div className="flex justify-between text-zinc-600 font-medium"><span>Subtotal</span><span className="text-zinc-900">{fmtSummary(subtotal)}</span></div>
               {taxAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Tax</span><span>{fmtSummary(taxAmount)}</span></div>}
               {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmtSummary(discountAmount)}</span></div>}
-              {shippingAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Shipping free</span><span>{fmtSummary(shippingAmount)}</span></div>}
+              {shippingAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Shipping</span><span>{fmtSummary(shippingAmount)}</span></div>}
             </div>
             <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
-              <span className="text-lg font-bold text-[#3b82f6]">Total</span>
-              <span className="text-3xl font-bold text-[#3b82f6]">{fmtSummary(total)}</span>
+              <span className="text-lg font-bold text-[#111827]">Total</span>
+              <span className="text-3xl font-bold text-[#111827]">{fmtSummary(total)}</span>
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function FreeInvoiceBuilder() {
           <button
             onClick={handleDownloadPDF}
             disabled={isDownloading}
-            className="px-6 py-2.5 bg-[#3b82f6] hover:bg-blue-700 text-white font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50"
+            className="px-6 py-2.5 bg-[#111827] hover:bg-black text-white font-medium rounded-lg flex items-center gap-2 transition-all disabled:opacity-50"
           >
             {isDownloading ? <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={16} /> Download PDF</>}
           </button>
@@ -226,20 +226,39 @@ export function FreeInvoiceBuilder() {
     );
   }
 
-  // Common input styles matching the screenshot
-  const inputClass = "w-full min-h-[44px] rounded-lg bg-white border border-[#E5E7EB] px-3.5 py-2.5 text-[14px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-[#3b82f6] focus:ring-1 focus:ring-[#3b82f6] transition-all";
-  const labelClass = "block text-[14px] font-medium text-[#9CA3AF] mb-1.5";
+  // Common premium input styles
+  const premiumInput = "w-full bg-transparent border-b-2 border-transparent hover:border-zinc-200 focus:border-zinc-900 focus:outline-none transition-all py-2 text-zinc-900 placeholder:text-zinc-300";
+  const labelClass = "block text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-1";
 
   return (
-    <div className="w-full max-w-[850px] mx-auto font-sans bg-white sm:p-12 p-6 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-[#E5E7EB] mt-8 mb-20">
+    <div className="w-full max-w-5xl mx-auto font-sans bg-white sm:p-14 p-6 rounded-[2.5rem] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] border border-zinc-100 mt-8 mb-24 relative overflow-hidden">
       
-      {/* 1. Logo & Invoice Number */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
-        <div>
-          <label className={labelClass}>Logo</label>
+      {/* Decorative Blur */}
+      <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-zinc-100 to-transparent rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none" />
+
+      {/* 1. Header Area */}
+      <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-8 mb-16 relative z-10">
+        <div className="flex-1">
+          <h1 className="text-5xl font-black tracking-tighter text-zinc-900 mb-4 flex items-center gap-3">
+            Invoice <Sparkles className="text-zinc-300" size={32} />
+          </h1>
+          <div className="max-w-xs">
+            <label className={labelClass}>Invoice Number</label>
+            <input 
+              value={invoiceNumber} 
+              onChange={e => setInvoiceNumber(e.target.value)} 
+              placeholder="#INV-001" 
+              className="w-full text-xl font-semibold text-zinc-900 bg-transparent border-b-2 border-zinc-100 focus:border-zinc-900 focus:outline-none transition-all py-2 placeholder:text-zinc-200" 
+            />
+          </div>
+        </div>
+        
+        {/* Premium Logo Upload */}
+        <div className="w-full md:w-64">
+          <label className={labelClass}>Company Logo</label>
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="relative h-[72px] w-full border border-[#E5E7EB] rounded-lg flex items-center px-4 hover:bg-zinc-50 transition-colors cursor-pointer group bg-white"
+            className="relative h-28 w-full border-2 border-dashed border-zinc-200 rounded-2xl flex items-center justify-center hover:bg-zinc-50 hover:border-zinc-300 transition-all cursor-pointer group bg-white overflow-hidden"
           >
             <input
               type="file"
@@ -252,158 +271,229 @@ export function FreeInvoiceBuilder() {
                   reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
                   reader.readAsDataURL(file);
                 } else { setLogoUrl(''); }
-                e.target.value = ''; // reset so same file can be selected again
+                e.target.value = '';
               }}
               className="hidden"
             />
             {logoUrl ? (
-              <div className="flex items-center justify-between w-full z-20">
-                <img src={logoUrl} alt="Logo" className="h-12 object-contain" />
-                <button type="button" onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} className="text-zinc-400 hover:text-red-500 z-30 relative px-2 text-sm font-medium">Clear</button>
+              <div className="absolute inset-0 p-4 bg-white flex flex-col items-center justify-center group">
+                <img src={logoUrl} alt="Logo" className="h-16 w-full object-contain mb-2" />
+                <button 
+                  type="button" 
+                  onClick={(e) => { e.stopPropagation(); setLogoUrl(''); }} 
+                  className="absolute inset-0 bg-black/50 text-white font-medium opacity-0 group-hover:opacity-100 flex items-center justify-center transition-all"
+                >
+                  Remove Logo
+                </button>
               </div>
             ) : (
-              <div className="flex items-center gap-3 text-zinc-600">
-                <Upload size={20} className="text-[#374151]" strokeWidth={1.5} />
-                <div className="mt-0.5">
-                  <p className="text-[14px] font-bold text-[#111827] underline decoration-zinc-300 underline-offset-2 mb-0.5">Upload file</p>
-                  <p className="text-[13px] font-medium text-[#9CA3AF]">JPG, JPEG, PNG, less than 5MB</p>
-                </div>
+              <div className="flex flex-col items-center gap-2 text-zinc-400 group-hover:text-zinc-600 transition-colors">
+                <UploadCloud size={24} strokeWidth={1.5} />
+                <span className="text-xs font-semibold">Upload Image</span>
               </div>
             )}
           </div>
         </div>
-        <div>
-          <label className={labelClass}>Invoice number</label>
-          <input value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} placeholder="#000001" className={inputClass} />
-        </div>
       </div>
 
-      {/* 2. Addresses */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-5">
-        <div>
-          <label className={labelClass}>Your company details</label>
-          <div className="relative">
-            <textarea value={companyDetails} onChange={e => setCompanyDetails(e.target.value)} placeholder="Company Name&#10;123 Business Rd&#10;City, State 12345" rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
-            <RefreshCw size={14} className="absolute top-3 right-3 text-[#60A5FA] cursor-pointer" />
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Bill to</label>
-          <div className="relative">
-            <textarea value={clientDetails} onChange={e => setClientDetails(e.target.value)} placeholder="Client Name&#10;456 Client St&#10;City, State 67890" rows={3} className={`${inputClass} resize-y pr-10 leading-relaxed`} />
-          </div>
-        </div>
-      </div>
-
-      {/* 3. Dates */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 mb-8">
-        <div>
-          <label className={labelClass}>Date issued</label>
-          <div className="relative">
-            <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
-            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none z-0" />
-          </div>
-        </div>
-        <div>
-          <label className={labelClass}>Due date</label>
-          <div className="relative">
-            <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${inputClass} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent`} />
-            <Calendar size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9CA3AF] pointer-events-none z-0" />
-          </div>
-        </div>
-      </div>
-
-      {/* 4. Line Items Table */}
-      <div className="bg-[#F8F9FA] rounded-xl p-5 sm:p-7 mb-8 border border-[#E5E7EB]">
-        <div className="flex text-[14px] font-medium text-[#9CA3AF] mb-3 px-1">
-          <div className="flex-1">Item</div>
-          <div className="w-[100px] text-center ml-3">Rate</div>
-          <div className="w-[70px] text-center ml-3">Qty</div>
-          <div className="w-[110px] text-center ml-3">Amount</div>
-          <div className="w-8 ml-3"></div>
+      {/* 2. From / To & Dates Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16 relative z-10">
+        {/* From */}
+        <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:shadow-zinc-100 transition-all duration-300">
+          <label className={labelClass}>Your Details (From)</label>
+          <textarea 
+            value={companyDetails} 
+            onChange={e => setCompanyDetails(e.target.value)} 
+            placeholder="Your Company Name&#10;123 Business Avenue&#10;City, State, Zip" 
+            rows={4} 
+            className="w-full bg-transparent resize-y text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-[15px] leading-relaxed mt-2" 
+          />
         </div>
         
-        {items.map((item, idx) => (
-          <div key={idx} className="flex gap-3 items-center mb-3">
-             <div className="flex-1 relative">
-               <input value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} placeholder="Description of service or product" className={`${inputClass} font-medium text-[#111827] pr-10`} />
-               <RefreshCw size={14} className="absolute top-1/2 -translate-y-1/2 right-3 text-[#60A5FA] cursor-pointer" />
-             </div>
-             <div className="w-[100px] relative">
-               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-medium">$</span>
-               <input type="number" placeholder="0.00" value={item.unit_price} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className={`${inputClass} pl-7 text-center font-medium text-[#111827]`} />
-             </div>
-             <div className="w-[70px]">
-               <input type="number" placeholder="1" value={item.quantity} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className={`${inputClass} text-center font-medium text-[#111827] px-1`} />
-             </div>
-             <div className="w-[110px] relative">
-               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500 text-sm font-medium">$</span>
-               <input value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} readOnly placeholder="0.00" className={`${inputClass} pl-7 text-center font-medium text-[#111827] bg-[#F3F4F6] cursor-default`} />
-             </div>
-             <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 flex justify-center text-[#9CA3AF] hover:text-[#111827] disabled:opacity-0 transition-colors">
-               <X size={20} strokeWidth={1.5} />
-             </button>
-          </div>
-        ))}
-        
-        <div className="flex justify-center mt-6">
-          <button onClick={addRow} className="flex flex-col items-center gap-1.5 text-[#3b82f6] hover:text-blue-700 transition-colors">
-            <div className="h-[34px] w-[34px] rounded-full bg-[#3b82f6] text-white flex items-center justify-center hover:bg-blue-700 shadow-sm transition-colors">
-              <Plus size={20} strokeWidth={2} />
+        {/* To */}
+        <div className="bg-zinc-50 rounded-2xl p-6 border border-zinc-100 hover:shadow-lg hover:shadow-zinc-100 transition-all duration-300">
+          <label className={labelClass}>Client Details (Bill To)</label>
+          <textarea 
+            value={clientDetails} 
+            onChange={e => setClientDetails(e.target.value)} 
+            placeholder="Client Name&#10;456 Client Street&#10;City, State, Zip" 
+            rows={4} 
+            className="w-full bg-transparent resize-y text-zinc-900 placeholder:text-zinc-400 focus:outline-none text-[15px] leading-relaxed mt-2" 
+          />
+        </div>
+
+        {/* Dates */}
+        <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div>
+            <label className={labelClass}>Date Issued</label>
+            <div className="relative group">
+              <input type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className={`${premiumInput} text-lg [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} />
+              <Calendar size={20} className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-hover:text-zinc-500 transition-colors pointer-events-none z-0" />
             </div>
-            <span className="text-[14px] font-semibold tracking-wide">Add Item</span>
+          </div>
+          <div>
+            <label className={labelClass}>Due Date</label>
+            <div className="relative group">
+              <input type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className={`${premiumInput} text-lg [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} />
+              <Calendar size={20} className="absolute right-0 top-1/2 -translate-y-1/2 text-zinc-300 group-hover:text-zinc-500 transition-colors pointer-events-none z-0" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Line Items (Borderless premium table) */}
+      <div className="mb-16 relative z-10">
+        <h2 className="text-xl font-bold tracking-tight text-zinc-900 mb-6">Line Items</h2>
+        
+        <div className="hidden md:flex text-[11px] font-bold uppercase tracking-widest text-zinc-400 mb-4 px-2">
+          <div className="flex-1">Description</div>
+          <div className="w-[120px] text-right">Rate</div>
+          <div className="w-[100px] text-right">Qty</div>
+          <div className="w-[140px] text-right">Amount</div>
+          <div className="w-10"></div>
+        </div>
+        
+        <div className="space-y-4">
+          {items.map((item, idx) => (
+            <div key={idx} className="group flex flex-col md:flex-row gap-4 items-center bg-white border border-zinc-100 hover:border-zinc-300 hover:shadow-md rounded-2xl p-4 transition-all duration-300">
+               <div className="w-full md:flex-1 relative">
+                 <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Description</span>
+                 <input 
+                   value={item.description} 
+                   onChange={e => handleItemChange(idx, 'description', e.target.value)} 
+                   placeholder="Item description" 
+                   className="w-full bg-transparent text-zinc-900 font-medium text-[15px] focus:outline-none placeholder:text-zinc-300" 
+                 />
+               </div>
+               
+               <div className="flex w-full md:w-auto gap-4 md:gap-4">
+                 <div className="flex-1 md:w-[120px] relative">
+                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Rate</span>
+                   <div className="relative">
+                     <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                     <input 
+                       type="number" 
+                       placeholder="0.00" 
+                       value={item.unit_price} 
+                       onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
+                       className="w-full pl-5 bg-transparent text-left md:text-right text-zinc-900 font-medium focus:outline-none placeholder:text-zinc-300" 
+                     />
+                   </div>
+                 </div>
+                 
+                 <div className="flex-1 md:w-[100px]">
+                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Qty</span>
+                   <input 
+                     type="number" 
+                     placeholder="1" 
+                     value={item.quantity} 
+                     onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
+                     className="w-full bg-transparent text-left md:text-right text-zinc-900 font-medium focus:outline-none placeholder:text-zinc-300" 
+                   />
+                 </div>
+                 
+                 <div className="flex-1 md:w-[140px] relative">
+                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-1">Amount</span>
+                   <div className="relative">
+                     <span className="absolute left-0 md:left-auto md:right-24 top-1/2 -translate-y-1/2 text-zinc-400 font-medium opacity-0 md:opacity-100">$</span>
+                     <input 
+                       value={item.amount > 0 ? '$' + item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
+                       readOnly 
+                       placeholder="$0.00" 
+                       className="w-full bg-transparent text-left md:text-right font-bold text-zinc-900 focus:outline-none placeholder:text-zinc-200 cursor-default" 
+                     />
+                   </div>
+                 </div>
+               </div>
+
+               <div className="w-full md:w-10 flex justify-end md:justify-center mt-2 md:mt-0">
+                 <button 
+                   onClick={() => removeRow(idx)} 
+                   disabled={items.length === 1} 
+                   className="text-zinc-300 hover:text-red-500 hover:bg-red-50 p-2 rounded-full disabled:opacity-0 transition-all"
+                 >
+                   <X size={18} strokeWidth={2} />
+                 </button>
+               </div>
+            </div>
+          ))}
+        </div>
+        
+        <button 
+          onClick={addRow} 
+          className="mt-6 flex items-center gap-2 text-zinc-900 font-semibold text-sm hover:text-zinc-600 transition-colors group"
+        >
+          <div className="h-8 w-8 rounded-full bg-zinc-100 group-hover:bg-zinc-200 text-zinc-900 flex items-center justify-center transition-colors">
+            <Plus size={16} strokeWidth={2.5} />
+          </div>
+          Add new item
+        </button>
+      </div>
+
+      {/* 4. Footer (Notes & Totals) */}
+      <div className="flex flex-col md:flex-row justify-between gap-12 relative z-10">
+        
+        {/* Notes */}
+        <div className="flex-1">
+          <label className={labelClass}>Notes / Terms</label>
+          <textarea 
+            value={notes} 
+            onChange={e => setNotes(e.target.value)} 
+            placeholder="Thank you for your business! Payment is due within 15 days." 
+            rows={5} 
+            className="w-full bg-transparent border-2 border-zinc-100 hover:border-zinc-200 focus:border-zinc-900 rounded-2xl p-4 text-[15px] text-zinc-900 placeholder:text-zinc-300 focus:outline-none transition-all resize-y" 
+          />
+        </div>
+        
+        {/* Totals */}
+        <div className="w-full md:w-[380px]">
+          <div className="bg-zinc-50 rounded-3xl p-8 border border-zinc-100">
+            <div className="space-y-4 mb-8">
+              <div className="flex justify-between items-center">
+                <span className="text-[15px] font-semibold text-zinc-500">Subtotal</span>
+                <span className="text-[16px] font-bold text-zinc-900">{fmtSummary(subtotal)}</span>
+              </div>
+              
+              <div className="flex justify-between items-center group">
+                <span className="text-[15px] font-semibold text-zinc-500">Tax</span>
+                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                  <input type="number" placeholder="0.00" value={taxAmount > 0 ? taxAmount : ''} onChange={e => setTaxAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center group">
+                <span className="text-[15px] font-semibold text-zinc-500">Discount</span>
+                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                  <input type="number" placeholder="0.00" value={discountAmount > 0 ? discountAmount : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center group">
+                <span className="text-[15px] font-semibold text-zinc-500">Shipping</span>
+                <div className="relative w-32 border-b-2 border-zinc-200 group-focus-within:border-zinc-900 transition-colors">
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                  <input type="number" placeholder="0.00" value={shippingAmount > 0 ? shippingAmount : ''} onChange={e => setShippingAmount(parseFloat(e.target.value) || 0)} className="w-full bg-transparent text-right font-semibold text-zinc-900 focus:outline-none py-1" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Hero Total */}
+            <div className="bg-zinc-900 rounded-2xl p-6 flex justify-between items-center shadow-xl shadow-zinc-900/10">
+              <span className="text-[18px] font-bold text-white">Total</span>
+              <span className="text-[28px] font-black text-white">{fmtSummary(total)}</span>
+            </div>
+          </div>
+
+          <button 
+            onClick={() => setShowPreview(true)}
+            className="w-full mt-6 px-8 py-5 bg-zinc-900 hover:bg-black text-white font-bold text-[16px] rounded-2xl shadow-xl shadow-zinc-900/20 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group"
+          >
+            Preview & Download
+            <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </button>
         </div>
-      </div>
-
-      {/* 5. Notes & Totals */}
-      <div className="flex flex-col md:flex-row justify-between gap-8 mb-12">
-        <div className="flex-1">
-          <label className={labelClass}>Notes</label>
-          <div className="relative">
-            <textarea value={notes} onChange={e => setNotes(e.target.value)} placeholder="Payment terms, thank you message, etc." rows={4} className={`${inputClass} resize-y pr-10 font-medium text-[#111827]`} />
-            <RefreshCw size={14} className="absolute top-3 right-3 text-[#60A5FA] cursor-pointer" />
-          </div>
-        </div>
-        
-        <div className="w-full md:w-[320px] pt-1">
-          <div className="flex justify-between items-center mb-5">
-            <span className="text-[15px] font-bold text-[#111827]">Subtotal</span>
-            <span className="text-[18px] font-bold text-[#111827]">{fmtSummary(subtotal)}</span>
-          </div>
-          
-          <div className="space-y-3 mb-6">
-            <div className="flex justify-between items-center text-[14px]">
-              <span className="text-[#6B7280] font-medium">Tax</span>
-              <input type="text" placeholder="$0.00" value={taxAmount > 0 ? fmtSummary(taxAmount) : ''} onChange={e => setTaxAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
-            </div>
-            
-            <div className="flex justify-between items-center text-[14px]">
-              <span className="text-[#6B7280] font-medium">Discount</span>
-              <input type="text" placeholder="$0.00" value={discountAmount > 0 ? fmtSummary(discountAmount) : ''} onChange={e => setDiscountAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
-            </div>
-            
-            <div className="flex justify-between items-center text-[14px]">
-              <span className="text-[#6B7280] font-medium">Shipping free</span>
-              <input type="text" placeholder="$0.00" value={shippingAmount > 0 ? fmtSummary(shippingAmount) : ''} onChange={e => setShippingAmount(parseFloat(e.target.value.replace(/[^0-9.]/g, '')) || 0)} className={`${inputClass} w-[130px] h-[38px] text-right font-medium text-[#111827]`} />
-            </div>
-          </div>
-          
-          <div className="flex justify-between items-center">
-            <span className="text-[16px] font-bold text-[#3b82f6]">Total</span>
-            <span className="text-[20px] font-bold text-[#3b82f6]">{fmtSummary(total)}</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end pt-4">
-         <button 
-           onClick={() => setShowPreview(true)}
-           className="px-8 py-3.5 bg-[#3b82f6] hover:bg-blue-700 text-white font-medium text-[15px] rounded-xl shadow-md shadow-blue-500/20 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-         >
-           Preview & Download
-           <ArrowRight size={18} />
-         </button>
       </div>
 
     </div>
