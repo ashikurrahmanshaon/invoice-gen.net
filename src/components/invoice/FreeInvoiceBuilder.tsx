@@ -37,6 +37,43 @@ const THEME_COLORS = [
 
 const TEMPLATES = ['modern', 'classic', 'creative', 'enterprise'] as const;
 
+const CURRENCIES = [
+  { code: 'USD', symbol: '$', name: 'US Dollar' },
+  { code: 'EUR', symbol: '€', name: 'Euro' },
+  { code: 'GBP', symbol: '£', name: 'British Pound' },
+  { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
+  { code: 'BDT', symbol: '৳', name: 'Bangladeshi Taka' },
+  { code: 'AUD', symbol: 'A$', name: 'Australian Dollar' },
+  { code: 'CAD', symbol: 'C$', name: 'Canadian Dollar' },
+  { code: 'SGD', symbol: 'S$', name: 'Singapore Dollar' },
+  { code: 'AED', symbol: 'د.إ', name: 'UAE Dirham' },
+  { code: 'SAR', symbol: '﷼', name: 'Saudi Riyal' },
+  { code: 'JPY', symbol: '¥', name: 'Japanese Yen' },
+  { code: 'CNY', symbol: '¥', name: 'Chinese Yuan' },
+  { code: 'RUB', symbol: '₽', name: 'Russian Ruble' },
+  { code: 'BRL', symbol: 'R$', name: 'Brazilian Real' },
+  { code: 'ZAR', symbol: 'R', name: 'South African Rand' },
+  { code: 'NZD', symbol: 'NZ$', name: 'New Zealand Dollar' },
+  { code: 'CHF', symbol: 'CHF', name: 'Swiss Franc' },
+  { code: 'MXN', symbol: '$', name: 'Mexican Peso' },
+  { code: 'HKD', symbol: 'HK$', name: 'Hong Kong Dollar' },
+  { code: 'SEK', symbol: 'kr', name: 'Swedish Krona' },
+  { code: 'NOK', symbol: 'kr', name: 'Norwegian Krone' },
+  { code: 'DKK', symbol: 'kr', name: 'Danish Krone' },
+  { code: 'TRY', symbol: '₺', name: 'Turkish Lira' },
+  { code: 'KRW', symbol: '₩', name: 'South Korean Won' },
+  { code: 'IDR', symbol: 'Rp', name: 'Indonesian Rupiah' },
+  { code: 'MYR', symbol: 'RM', name: 'Malaysian Ringgit' },
+  { code: 'PHP', symbol: '₱', name: 'Philippine Peso' },
+  { code: 'THB', symbol: '฿', name: 'Thai Baht' },
+  { code: 'VND', symbol: '₫', name: 'Vietnamese Dong' },
+  { code: 'PKR', symbol: '₨', name: 'Pakistani Rupee' },
+  { code: 'EGP', symbol: 'E£', name: 'Egyptian Pound' },
+  { code: 'NGN', symbol: '₦', name: 'Nigerian Naira' },
+  { code: 'KES', symbol: 'KSh', name: 'Kenyan Shilling' },
+  { code: 'GHS', symbol: 'GH₵', name: 'Ghanaian Cedi' },
+];
+
 // --- Design Tool UI Components ---
 const SidebarPanel = ({ title, icon: Icon, children }: { title: string, icon: any, children: React.ReactNode }) => (
   <div className="mb-6 bg-white border border-zinc-200 rounded-xl p-5 shadow-sm">
@@ -152,6 +189,7 @@ export function FreeInvoiceBuilder() {
   const taxAmount      = taxableAmount * (taxRate / 100);
   const total          = taxableAmount + taxAmount;
 
+  const currentSymbol  = CURRENCIES.find(c => c.code === currency)?.symbol || '$';
   const fmt = (v: number) => new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(v);
 
   const handleItemChange = (i: number, field: keyof Omit<InvoiceItem, 'amount'>, v: any) => {
@@ -635,14 +673,14 @@ export function FreeInvoiceBuilder() {
                   <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className="bg-white border-zinc-200 h-12 shadow-sm" />
                 </div>
                 <div className="w-full md:w-24 relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">{currentSymbol}</span>
                   <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="pl-7 bg-white border-zinc-200 text-center h-12 shadow-sm" />
                 </div>
                 <div className="w-full md:w-20">
                   <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="bg-white border-zinc-200 text-center h-12 shadow-sm" />
                 </div>
                 <div className="w-full md:w-32 relative">
-                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">$</span>
+                   <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-medium">{currentSymbol}</span>
                    <CleanInput disabled value={item.amount} className="pl-7 bg-white border-zinc-200 text-center font-semibold h-12 shadow-sm bg-zinc-50/50" />
                 </div>
                 <button onClick={() => removeRow(idx)} disabled={items.length === 1} className="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-rose-500 transition-colors disabled:opacity-0"><Trash2 size={18} /></button>
@@ -700,7 +738,7 @@ export function FreeInvoiceBuilder() {
         </div>
       </div>
 
-      {/* --- TEMPLATE SELECTION (Minimalist) --- */}
+      {/* --- TEMPLATE & SETTINGS SELECTION --- */}
       <section className="pt-8 border-t border-zinc-100">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-8">
@@ -721,6 +759,14 @@ export function FreeInvoiceBuilder() {
                   <button key={c.value} type="button" onClick={() => setThemeColor(c)} className={`w-6 h-6 rounded-full transition-all ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900' : 'hover:scale-110'}`} style={{ backgroundColor: c.value }} title={c.name} />
                 ))}
               </div>
+            </div>
+            <div>
+              <label className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2 block">Currency</label>
+              <CleanSelect value={currency} onChange={e => setCurrency(e.target.value)} className="h-[30px] text-xs py-1">
+                {CURRENCIES.map(c => (
+                  <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+                ))}
+              </CleanSelect>
             </div>
           </div>
           
