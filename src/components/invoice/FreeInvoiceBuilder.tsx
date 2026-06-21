@@ -1,21 +1,21 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { Download, Plus, X, UploadCloud, Calendar, Building, User, FileText, FileSignature, Calculator, LayoutList } from 'lucide-react';
+import { Download, Plus, X, UploadCloud, Calendar, Building2, UserCircle2, Sparkles, Hash, FileText, CheckCircle2 } from 'lucide-react';
+import { InvoiceData, InvoiceItem } from './types';
+import { ModernTemplate } from './templates/ModernTemplate';
+import { MinimalTemplate } from './templates/MinimalTemplate';
+import { ClassicTemplate } from './templates/ClassicTemplate';
 
-interface InvoiceItem {
-  description: string;
-  quantity: string | number;
-  unit_price: string | number;
-  amount: number;
-}
+type TemplateType = 'modern' | 'minimal' | 'classic';
 
 export function FreeInvoiceBuilder() {
-  const invoiceRef = useRef<HTMLDivElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // --- State ---
   const [logoUrl, setLogoUrl] = useState('');
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-001');
+  const [invoiceNumber, setInvoiceNumber] = useState('INV-2026-001');
   const [companyDetails, setCompanyDetails] = useState('');
   const [clientDetails, setClientDetails] = useState('');
   
@@ -26,17 +26,21 @@ export function FreeInvoiceBuilder() {
     { description: '', quantity: 1, unit_price: '', amount: 0 },
   ]);
 
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [notes, setNotes] = useState('');
   const [taxRate, setTaxRate] = useState<number>(0);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateType>('modern');
 
   // --- Calcs ---
   const subtotal = items.reduce((s, i) => s + i.amount, 0);
   const taxAmount = subtotal * (taxRate / 100);
   const total = subtotal + taxAmount - discountAmount;
+
+  const invoiceData: InvoiceData = {
+    logoUrl, invoiceNumber, companyDetails, clientDetails, issueDate, dueDate,
+    items, notes, taxRate, discountAmount, subtotal, taxAmount, total
+  };
 
   const fmtSummary = (v: number) => {
     return '$' + v.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -57,7 +61,7 @@ export function FreeInvoiceBuilder() {
   const removeRow = (i: number) => { if (items.length > 1) setItems(items.filter((_, idx) => idx !== i)); };
 
   const handleDownloadPDF = async () => {
-    if (!invoiceRef.current) return;
+    if (!printRef.current) return;
     setIsDownloading(true);
 
     try {
@@ -66,75 +70,71 @@ export function FreeInvoiceBuilder() {
       const jsPDFModule = await import('jspdf') as any;
       const JsPDFClass = jsPDFModule.default?.jsPDF || (typeof jsPDFModule.default === 'function' ? jsPDFModule.default : jsPDFModule.jsPDF);
       
-      const uiElements = invoiceRef.current.querySelectorAll('.hide-on-print');
-      uiElements.forEach(el => (el as HTMLElement).style.display = 'none');
+      // We capture the hidden printRef directly. It is already perfectly formatted!
+      // We need to briefly ensure it's visible in the DOM (though offscreen) for html2image to work properly
+      printRef.current.style.display = 'block';
       
-      const inputs = invoiceRef.current.querySelectorAll('.print-input');
-      inputs.forEach(el => {
-        (el as HTMLElement).style.border = 'none';
-        (el as HTMLElement).style.background = 'transparent';
-        (el as HTMLElement).style.boxShadow = 'none';
-        (el as HTMLElement).style.padding = '0';
-        (el as HTMLElement).style.resize = 'none';
-      });
+      const imgData = await toPng(printRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
       
-      const labels = invoiceRef.current.querySelectorAll('.print-label');
-      labels.forEach(el => {
-         if (el.classList.contains('hide-on-print-label')) {
-            (el as HTMLElement).style.display = 'none';
-         }
-      });
-
-      const imgData = await toPng(invoiceRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
-      
-      uiElements.forEach(el => (el as HTMLElement).style.display = '');
-      inputs.forEach(el => {
-        (el as HTMLElement).style.border = '';
-        (el as HTMLElement).style.background = '';
-        (el as HTMLElement).style.boxShadow = '';
-        (el as HTMLElement).style.padding = '';
-        (el as HTMLElement).style.resize = '';
-      });
-      labels.forEach(el => {
-         if (el.classList.contains('hide-on-print-label')) {
-            (el as HTMLElement).style.display = '';
-         }
-      });
+      printRef.current.style.display = 'none';
 
       const pdf = new JsPDFClass('p', 'mm', 'a4');
       const pw = pdf.internal.pageSize.getWidth();
-      const ph = (invoiceRef.current.offsetHeight * pw) / invoiceRef.current.offsetWidth;
+      const ph = (printRef.current.offsetHeight * pw) / printRef.current.offsetWidth;
       
       pdf.addImage(imgData, 'PNG', 0, 0, pw, ph);
       pdf.save(`${invoiceNumber || 'Invoice'}.pdf`);
     } catch (err: any) {
       console.error('PDF Error:', err);
       alert('Failed to generate PDF');
+      if (printRef.current) printRef.current.style.display = 'none';
     } finally {
       setIsDownloading(false);
     }
   };
 
-  // Ultra-compact, beautiful box styling
-  const boxStyle = "print-input w-full bg-slate-50 border border-slate-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:outline-none focus:bg-white rounded-md px-3 py-1.5 text-sm text-slate-900 placeholder:text-slate-400 transition-all shadow-sm";
-  const labelStyle = "flex items-center gap-1.5 text-[13px] font-bold text-slate-700 mb-1.5";
+  // Modern, premium styling for the dashboard
+  const boxStyle = "w-full bg-white border border-indigo-100 hover:border-indigo-200 focus:border-indigo-500 focus:ring-[3px] focus:ring-indigo-500/20 rounded-2xl px-4 py-3 text-[15px] font-medium text-slate-800 placeholder:text-slate-400 transition-all duration-300 shadow-sm outline-none";
+  const labelStyle = "flex items-center gap-2 text-[13px] font-bold text-indigo-900/70 mb-2 uppercase tracking-wide";
+  const cardStyle = "bg-white/80 backdrop-blur-xl border border-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.1)] rounded-[2rem] p-6 sm:p-10 relative overflow-hidden";
 
   return (
-    <div className="w-full flex justify-center bg-slate-50 py-4 px-2 sm:px-4 pb-28">
+    <div className="w-full min-h-screen bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-50 via-white to-blue-50 py-12 px-2 sm:px-6 flex justify-center font-sans">
       
-      {/* Compact Dashboard Container */}
-      <div 
-        ref={invoiceRef}
-        className="w-full max-w-[850px] bg-white shadow-lg rounded-xl border border-slate-200 overflow-hidden relative"
-      >
-        {/* Top Accent Gradient Bar */}
-        <div className="h-2 w-full bg-gradient-to-r from-blue-600 to-indigo-600 hide-on-print"></div>
+      {/* Hidden Print Container - Always perfectly 794px wide for A4 */}
+      <div className="absolute top-0 left-[-9999px] overflow-hidden" style={{ width: '794px' }}>
+         <div ref={printRef} style={{ display: 'none' }}>
+           {selectedTemplate === 'modern' && <ModernTemplate data={invoiceData} renderRef={null as any} />}
+           {selectedTemplate === 'minimal' && <MinimalTemplate data={invoiceData} renderRef={null as any} />}
+           {selectedTemplate === 'classic' && <ClassicTemplate data={invoiceData} renderRef={null as any} />}
+         </div>
+      </div>
+
+      {/* Master Container */}
+      <div className="w-full max-w-[900px] mb-24">
         
-        <div className="p-4 sm:p-6 md:p-8">
-          
-          {/* Header Row: Logo & Invoice Title/Number */}
-          <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-6">
-            <div className="w-full sm:w-1/2">
+        {/* Template Selector */}
+        <div className="mb-8 flex flex-col sm:flex-row items-center gap-4 bg-white/60 backdrop-blur-xl border border-white p-2 rounded-full shadow-sm mx-auto max-w-fit">
+           {(['modern', 'minimal', 'classic'] as TemplateType[]).map((t) => (
+             <button
+               key={t}
+               onClick={() => setSelectedTemplate(t)}
+               className={`flex items-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all capitalize ${selectedTemplate === t ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-600 hover:bg-white'}`}
+             >
+               {selectedTemplate === t && <CheckCircle2 size={16} />}
+               {t} Design
+             </button>
+           ))}
+        </div>
+
+        <div className={cardStyle}>
+          {/* Subtle decorative blob */}
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+          {/* Header Row */}
+          <div className="flex flex-col-reverse md:flex-row justify-between items-start gap-8 mb-10 relative z-10">
+            {/* Logo */}
+            <div className="w-full md:w-1/2">
               <div className="mb-2">
                 <input type="file" accept="image/*" ref={fileInputRef} className="hidden" onChange={(e) => {
                   const file = e.target.files?.[0];
@@ -146,126 +146,126 @@ export function FreeInvoiceBuilder() {
                   e.target.value = '';
                 }} />
                 {logoUrl ? (
-                  <div className="relative inline-block border border-slate-200 rounded p-1">
-                    <img src={logoUrl} alt="Logo" className="h-16 object-contain" />
-                    <button onClick={() => setLogoUrl('')} className="hide-on-print absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-0.5 shadow hover:bg-red-600">
-                      <X size={12} strokeWidth={3} />
+                  <div className="relative inline-block border-2 border-indigo-50 rounded-2xl p-2 bg-white shadow-sm group">
+                    <img src={logoUrl} alt="Logo" className="h-20 object-contain" />
+                    <button onClick={() => setLogoUrl('')} className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:scale-110">
+                      <X size={14} strokeWidth={3} />
                     </button>
                   </div>
                 ) : (
-                  <button onClick={() => fileInputRef.current?.click()} className="hide-on-print w-[140px] h-[60px] border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:text-blue-600 hover:border-blue-400 hover:bg-blue-50 transition-all">
-                    <UploadCloud size={20} className="mb-1" />
-                    <span className="text-[11px] font-bold">Add Logo</span>
+                  <button onClick={() => fileInputRef.current?.click()} className="group w-[180px] h-[80px] border-2 border-dashed border-indigo-200 rounded-2xl flex flex-col items-center justify-center text-indigo-400 hover:text-indigo-600 hover:border-indigo-400 hover:bg-indigo-50/50 transition-all bg-white/50">
+                    <UploadCloud size={24} className="mb-1 group-hover:-translate-y-1 transition-transform" />
+                    <span className="text-[12px] font-bold">Upload Logo</span>
                   </button>
                 )}
               </div>
             </div>
 
-            <div className="w-full sm:w-1/2 flex flex-col sm:items-end">
-              <h1 className="text-3xl font-black text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-2">
-                <FileText className="text-blue-600 hide-on-print" size={28} />
+            {/* Title & Number */}
+            <div className="w-full md:w-1/2 flex flex-col md:items-end">
+              <h1 className="text-5xl sm:text-6xl font-black bg-gradient-to-br from-indigo-900 to-indigo-600 bg-clip-text text-transparent tracking-tighter mb-4">
                 INVOICE
               </h1>
-              <div className="flex items-center w-full sm:max-w-[180px] bg-slate-50 border border-slate-200 rounded-md overflow-hidden">
-                <span className="bg-slate-100 text-slate-500 font-bold px-3 py-1.5 border-r border-slate-200 text-sm">#</span>
+              <div className="flex items-center w-full md:max-w-[240px] bg-white border border-indigo-100 rounded-2xl shadow-sm overflow-hidden focus-within:border-indigo-500 focus-within:ring-[3px] focus-within:ring-indigo-500/20 transition-all">
+                <div className="bg-indigo-50 text-indigo-400 font-bold px-4 py-3 border-r border-indigo-100 flex items-center justify-center">
+                  <Hash size={16} strokeWidth={3} />
+                </div>
                 <input 
                   value={invoiceNumber} 
                   onChange={e => setInvoiceNumber(e.target.value)} 
-                  placeholder="INV-001" 
-                  className="print-input w-full bg-transparent border-none focus:ring-0 outline-none px-2 py-1.5 text-sm font-bold text-slate-900 sm:text-right" 
+                  placeholder="INV-2026-001" 
+                  className="w-full bg-transparent border-none outline-none px-3 py-3 text-[15px] font-bold text-slate-800" 
                 />
               </div>
             </div>
           </div>
 
-          <div className="border-b border-slate-100 mb-6 hide-on-print"></div>
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-100 to-transparent mb-10"></div>
 
-          {/* Details Row: From, To, Dates */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-6">
-            
-            {/* From */}
-            <div className="md:col-span-4">
-              <label className={labelStyle}><Building size={14} className="text-blue-500 hide-on-print" /> From (Your Details)</label>
+          {/* Details Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10 relative z-10">
+            <div className="bg-indigo-50/30 rounded-3xl p-5 sm:p-6 border border-indigo-50">
+              <label className={labelStyle}><Building2 size={16} className="text-indigo-500" /> From</label>
               <textarea 
                 value={companyDetails} 
                 onChange={e => setCompanyDetails(e.target.value)} 
-                placeholder="Company Name&#10;Address&#10;City, State" 
+                placeholder="Your Company Name&#10;123 Business Rd.&#10;City, State, Zip" 
                 rows={3} 
-                className={boxStyle} 
+                className={`${boxStyle} bg-white/80`} 
               />
             </div>
             
-            {/* Bill To */}
-            <div className="md:col-span-4">
-              <label className={labelStyle}><User size={14} className="text-blue-500 hide-on-print" /> Bill To</label>
+            <div className="bg-blue-50/30 rounded-3xl p-5 sm:p-6 border border-blue-50">
+              <label className={labelStyle}><UserCircle2 size={16} className="text-blue-500" /> Bill To</label>
               <textarea 
                 value={clientDetails} 
                 onChange={e => setClientDetails(e.target.value)} 
-                placeholder="Client Name&#10;Address&#10;City, State" 
+                placeholder="Client Name&#10;456 Client St.&#10;City, State, Zip" 
                 rows={3} 
-                className={boxStyle} 
+                className={`${boxStyle} bg-white/80`} 
               />
             </div>
+          </div>
 
-            {/* Dates */}
-            <div className="md:col-span-4 flex flex-row md:flex-col gap-3">
-              <div className="flex-1">
-                <label className={labelStyle}><Calendar size={14} className="text-blue-500 hide-on-print" /> Date Issued</label>
-                <div className="relative">
-                  <input 
-                    type="date" 
-                    value={issueDate} 
-                    onChange={e => setIssueDate(e.target.value)} 
-                    className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
-                  />
-                  <Calendar size={14} className="hide-on-print absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 z-0" />
-                </div>
+          {/* Dates Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-12 relative z-10">
+            <div>
+              <label className={labelStyle}><Calendar size={16} className="text-indigo-400" /> Date Issued</label>
+              <div className="relative">
+                <input 
+                  type="date" 
+                  value={issueDate} 
+                  onChange={e => setIssueDate(e.target.value)} 
+                  className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-white cursor-pointer`} 
+                />
+                <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-300 z-0 pointer-events-none" />
               </div>
-              <div className="flex-1">
-                <label className={labelStyle}><Calendar size={14} className="text-blue-500 hide-on-print" /> Due Date</label>
-                <div className="relative">
-                  <input 
-                    type="date" 
-                    value={dueDate} 
-                    onChange={e => setDueDate(e.target.value)} 
-                    className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
-                  />
-                  <Calendar size={14} className="hide-on-print absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 z-0" />
-                </div>
+            </div>
+            <div>
+              <label className={labelStyle}><Calendar size={16} className="text-indigo-400" /> Due Date</label>
+              <div className="relative">
+                <input 
+                  type="date" 
+                  value={dueDate} 
+                  onChange={e => setDueDate(e.target.value)} 
+                  className={`${boxStyle} [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-white cursor-pointer`} 
+                />
+                <Calendar size={18} className="absolute right-4 top-1/2 -translate-y-1/2 text-indigo-300 z-0 pointer-events-none" />
               </div>
             </div>
           </div>
 
-          {/* Line Items */}
-          <div className="mb-6">
-            <label className={`${labelStyle} mb-3 text-[14px]`}><LayoutList size={16} className="text-blue-500 hide-on-print" /> Line Items</label>
-            
-            {/* Table Headers */}
-            <div className="hidden sm:flex bg-slate-800 text-white rounded-t-md p-2 text-[11px] font-bold uppercase tracking-wider">
-              <div className="flex-1 pl-2">Description</div>
-              <div className="w-[100px] text-right pr-2">Rate</div>
-              <div className="w-[80px] text-right pr-2">Qty</div>
-              <div className="w-[100px] text-right pr-2">Amount</div>
-              <div className="w-8 hide-on-print"></div>
+          {/* Line Items Section */}
+          <div className="mb-10 relative z-10">
+            <div className="flex items-center gap-2 mb-6">
+              <div className="bg-indigo-100 p-2 rounded-xl"><FileText size={18} className="text-indigo-600" /></div>
+              <h2 className="text-xl font-bold text-slate-800">Invoice Items</h2>
             </div>
             
-            <div className="space-y-3 sm:space-y-0">
+            <div className="hidden sm:flex bg-indigo-900 text-indigo-50 rounded-2xl p-4 text-[12px] font-bold uppercase tracking-widest shadow-md mb-4">
+              <div className="flex-1 pl-2">Description</div>
+              <div className="w-[120px] text-right pr-2">Rate</div>
+              <div className="w-[100px] text-right pr-2">Qty</div>
+              <div className="w-[140px] text-right pr-2">Amount</div>
+              <div className="w-10"></div>
+            </div>
+            
+            <div className="space-y-4">
               {items.map((item, idx) => (
-                <div key={idx} className="flex flex-col sm:flex-row gap-2 sm:gap-0 items-start sm:items-center bg-slate-50 sm:bg-white p-3 sm:p-2 border border-slate-200 rounded-lg sm:rounded-none sm:border-t-0 sm:last:rounded-b-md">
-                   
-                   <div className="w-full sm:flex-1 sm:pr-2">
-                     <label className="print-label hide-on-print-label sm:hidden text-[10px] font-bold text-slate-500 uppercase mb-1 block">Description</label>
+                <div key={idx} className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-white p-5 sm:p-2 border border-indigo-50 rounded-3xl sm:rounded-2xl shadow-sm hover:shadow-md transition-shadow group">
+                   <div className="w-full sm:flex-1 sm:pl-2">
+                     <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Description</label>
                      <input 
                        value={item.description} 
                        onChange={e => handleItemChange(idx, 'description', e.target.value)} 
-                       placeholder="Item description" 
+                       placeholder="Service or product description" 
                        className={boxStyle} 
                      />
                    </div>
                    
-                   <div className="flex w-full sm:w-auto gap-2">
-                     <div className="flex-1 sm:w-[100px] sm:pr-2">
-                       <label className="print-label hide-on-print-label sm:hidden text-[10px] font-bold text-slate-500 uppercase mb-1 block">Rate</label>
+                   <div className="flex w-full sm:w-auto gap-4">
+                     <div className="flex-1 sm:w-[120px]">
+                       <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Rate</label>
                        <input 
                          type="number" placeholder="0.00" 
                          value={item.unit_price} 
@@ -274,8 +274,8 @@ export function FreeInvoiceBuilder() {
                        />
                      </div>
                      
-                     <div className="flex-1 sm:w-[80px] sm:pr-2">
-                       <label className="print-label hide-on-print-label sm:hidden text-[10px] font-bold text-slate-500 uppercase mb-1 block">Qty</label>
+                     <div className="flex-1 sm:w-[100px]">
+                       <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Qty</label>
                        <input 
                          type="number" placeholder="1" 
                          value={item.quantity} 
@@ -285,21 +285,21 @@ export function FreeInvoiceBuilder() {
                      </div>
                    </div>
                    
-                   <div className="w-full sm:w-[100px] sm:pr-2">
-                     <label className="print-label hide-on-print-label sm:hidden text-[10px] font-bold text-slate-500 uppercase mb-1 block">Amount</label>
+                   <div className="w-full sm:w-[140px]">
+                     <label className="sm:hidden text-[11px] font-bold text-indigo-400 uppercase mb-2 block">Amount</label>
                      <input 
                        value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
                        readOnly placeholder="0.00" 
-                       className="print-input w-full bg-slate-100 border border-slate-200 rounded-md py-1.5 px-3 text-right text-sm font-bold text-slate-900 cursor-default" 
+                       className="w-full bg-indigo-50/50 border border-transparent rounded-2xl py-3 px-4 text-right text-[15px] font-bold text-indigo-950 cursor-default" 
                      />
                    </div>
 
-                   <div className="hide-on-print w-full sm:w-8 flex justify-end sm:justify-center mt-1 sm:mt-0">
+                   <div className="w-full sm:w-10 flex justify-end sm:justify-center mt-2 sm:mt-0">
                      <button 
                        onClick={() => removeRow(idx)} disabled={items.length === 1} 
-                       className="text-slate-400 hover:text-red-500 bg-white sm:bg-transparent border border-slate-300 sm:border-transparent p-1.5 rounded-md transition-all disabled:opacity-30"
+                       className="text-slate-300 hover:text-red-500 hover:bg-red-50 bg-white border border-slate-200 sm:border-transparent p-2.5 rounded-xl transition-all disabled:opacity-0"
                      >
-                       <X size={16} strokeWidth={2.5} />
+                       <X size={18} strokeWidth={3} />
                      </button>
                    </div>
                 </div>
@@ -308,79 +308,79 @@ export function FreeInvoiceBuilder() {
             
             <button 
               onClick={addRow} 
-              className="hide-on-print mt-3 flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold text-[12px] rounded-md transition-colors border border-blue-100"
+              className="mt-6 flex items-center gap-2 px-5 py-3 bg-white border-2 border-indigo-100 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-200 font-bold text-[14px] rounded-2xl transition-all shadow-sm"
             >
-              <Plus size={14} strokeWidth={3} /> Add Item
+              <Plus size={18} strokeWidth={3} /> Add Another Item
             </button>
           </div>
 
-          <div className="border-b border-slate-100 mb-6 hide-on-print"></div>
+          <div className="h-px w-full bg-gradient-to-r from-transparent via-indigo-100 to-transparent mb-10"></div>
 
-          {/* Footer Notes & Totals */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-6">
+          {/* Footer Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 relative z-10">
             
-            {/* Notes */}
-            <div className="sm:col-span-7">
-              <label className={labelStyle}><FileSignature size={14} className="text-blue-500 hide-on-print" /> Notes / Payment Terms</label>
+            <div className="lg:col-span-7">
+              <label className={labelStyle}><Sparkles size={16} className="text-amber-500" /> Notes & Payment Terms</label>
               <textarea 
                 value={notes} 
                 onChange={e => setNotes(e.target.value)} 
-                placeholder="Thank you for your business! Payment is due within 15 days." 
-                rows={4} 
-                className={boxStyle} 
+                placeholder="Thank you for your business! Please make payment within 15 days." 
+                rows={5} 
+                className={`${boxStyle} bg-amber-50/30 border-amber-100 focus:border-amber-400 focus:ring-amber-400/20`} 
               />
             </div>
             
-            {/* Totals */}
-            <div className="sm:col-span-5">
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-4 shadow-sm">
-                <label className={`${labelStyle} mb-3`}><Calculator size={14} className="text-blue-500 hide-on-print" /> Summary</label>
-                
-                <div className="space-y-2 mb-3">
-                  <div className="flex justify-between items-center text-sm">
-                    <span className="font-semibold text-slate-500">Subtotal</span>
-                    <span className="font-bold text-slate-800">{fmtSummary(subtotal)}</span>
-                  </div>
-                  
-                  {/* Tax & Discount Inputs to fill space nicely */}
-                  <div className="flex justify-between items-center text-sm hide-on-print">
-                    <span className="font-semibold text-slate-500">Tax (%)</span>
-                    <input 
-                      type="number" 
-                      value={taxRate || ''} 
-                      onChange={e => setTaxRate(parseFloat(e.target.value) || 0)} 
-                      placeholder="0" 
-                      className="w-16 bg-white border border-slate-300 rounded text-right px-2 py-0.5 focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  {taxAmount > 0 && (
-                    <div className="flex justify-between items-center text-sm">
-                      <span className="font-semibold text-slate-500">Tax</span>
-                      <span className="font-bold text-slate-800">{fmtSummary(taxAmount)}</span>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center text-sm hide-on-print">
-                    <span className="font-semibold text-slate-500">Discount ($)</span>
-                    <input 
-                      type="number" 
-                      value={discountAmount || ''} 
-                      onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} 
-                      placeholder="0" 
-                      className="w-20 bg-white border border-slate-300 rounded text-right px-2 py-0.5 focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  {discountAmount > 0 && (
-                    <div className="flex justify-between items-center text-sm text-green-600">
-                      <span className="font-semibold">Discount</span>
-                      <span className="font-bold">-{fmtSummary(discountAmount)}</span>
-                    </div>
-                  )}
-                </div>
+            <div className="lg:col-span-5">
+              <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-[2rem] p-8 shadow-xl text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/20 rounded-full blur-2xl"></div>
 
-                <div className="pt-3 border-t border-slate-200 flex justify-between items-center">
-                  <span className="text-[16px] font-bold text-slate-900">Total</span>
-                  <span className="text-[24px] font-black text-blue-600">{fmtSummary(total)}</span>
+                <div className="relative z-10">
+                  <div className="space-y-4 mb-6">
+                    <div className="flex justify-between items-center text-[15px]">
+                      <span className="font-medium text-slate-300">Subtotal</span>
+                      <span className="font-bold">{fmtSummary(subtotal)}</span>
+                    </div>
+                    
+                    <div className="flex justify-between items-center text-[15px]">
+                      <span className="font-medium text-slate-300">Tax (%)</span>
+                      <input 
+                        type="number" 
+                        value={taxRate || ''} 
+                        onChange={e => setTaxRate(parseFloat(e.target.value) || 0)} 
+                        placeholder="0" 
+                        className="w-20 bg-slate-700/50 border border-slate-600 rounded-xl text-right px-3 py-1.5 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
+                      />
+                    </div>
+                    {taxAmount > 0 && (
+                      <div className="flex justify-between items-center text-[15px]">
+                        <span className="font-medium text-slate-300">Tax</span>
+                        <span className="font-bold">{fmtSummary(taxAmount)}</span>
+                      </div>
+                    )}
+                    
+                    <div className="flex justify-between items-center text-[15px]">
+                      <span className="font-medium text-slate-300">Discount ($)</span>
+                      <input 
+                        type="number" 
+                        value={discountAmount || ''} 
+                        onChange={e => setDiscountAmount(parseFloat(e.target.value) || 0)} 
+                        placeholder="0" 
+                        className="w-24 bg-slate-700/50 border border-slate-600 rounded-xl text-right px-3 py-1.5 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/20 outline-none transition-all"
+                      />
+                    </div>
+                    {discountAmount > 0 && (
+                      <div className="flex justify-between items-center text-[15px] text-emerald-400">
+                        <span className="font-medium">Discount</span>
+                        <span className="font-bold">-{fmtSummary(discountAmount)}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="pt-6 border-t border-slate-700/50 flex flex-col items-end">
+                    <span className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-1">Total Amount</span>
+                    <span className="text-[40px] font-black text-white tracking-tight">{fmtSummary(total)}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -390,16 +390,18 @@ export function FreeInvoiceBuilder() {
       </div>
 
       {/* Floating Action Button */}
-      <div className="fixed bottom-6 right-6 z-50">
+      <div className="fixed bottom-8 right-8 z-50">
         <button 
           onClick={handleDownloadPDF}
           disabled={isDownloading}
-          className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[14px] rounded-full shadow-[0_8px_30px_-5px_rgba(37,99,235,0.8)] transition-all active:scale-[0.95] flex items-center gap-2 disabled:opacity-50"
+          className="group px-8 py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-[16px] rounded-full shadow-[0_20px_40px_-10px_rgba(79,70,229,0.8)] transition-all hover:scale-105 active:scale-95 flex items-center gap-3 disabled:opacity-50 border border-indigo-400/30 overflow-hidden relative"
         >
+          <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+          
           {isDownloading ? (
-            <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+            <span className="h-5 w-5 rounded-full border-4 border-white/30 border-t-white animate-spin relative z-10" />
           ) : (
-            <><Download size={18} /> Download PDF</>
+            <><Download size={22} className="relative z-10" /> <span className="relative z-10">Download PDF</span></>
           )}
         </button>
       </div>
