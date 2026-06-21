@@ -110,16 +110,16 @@ export function FreeInvoiceBuilder() {
   const rightInputStyles = "w-full bg-slate-50 border border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 focus:outline-none transition-all rounded-lg py-2 px-3 text-right text-zinc-900 placeholder:text-zinc-400 shadow-[0_1px_2px_rgba(0,0,0,0.02)]";
 
   return (
-    <div className="w-full flex flex-col items-center justify-center font-sans pb-24">
+    <div className="w-full flex flex-col items-center justify-center font-sans pb-24 px-2 md:px-6">
       
       {/* Editor Container (Looks like an A4 paper) */}
       <div 
         ref={invoiceRef}
-        className="w-full max-w-[850px] bg-white sm:p-16 p-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-sm my-12 border border-zinc-200 relative"
-        style={{ minHeight: '1100px' }}
+        className="w-full max-w-[850px] bg-white p-4 sm:p-10 md:p-16 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] rounded-xl md:rounded-sm my-6 md:my-12 border border-zinc-200 relative"
+        style={{ minHeight: 'auto', paddingBottom: '40px' }}
       >
         {/* Top Header */}
-        <div className="flex flex-col md:flex-row justify-between items-start gap-12 mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-start gap-8 md:gap-12 mb-10 md:mb-16">
           <div className="w-full md:w-1/2">
             {/* Logo Upload */}
             <div className="mb-6">
@@ -169,24 +169,24 @@ export function FreeInvoiceBuilder() {
             />
           </div>
 
-          <div className="w-full md:w-1/2 flex flex-col items-start md:items-end md:text-right">
-            <h1 className="text-5xl font-black tracking-widest text-zinc-200 uppercase mb-6">Invoice</h1>
-            <div className="flex items-center justify-end w-full max-w-[200px]">
-              <span className="text-zinc-400 font-bold text-xl mr-2">#</span>
+          <div className="w-full md:w-1/2 flex flex-col items-start md:items-end md:text-right mt-4 md:mt-0">
+            <h1 className="text-4xl md:text-5xl font-black tracking-widest text-zinc-200 uppercase mb-4 md:mb-6">Invoice</h1>
+            <div className="flex items-center justify-start md:justify-end w-full max-w-[200px]">
+              <span className="text-zinc-400 font-bold text-lg md:text-xl mr-2">#</span>
               <input 
                 value={invoiceNumber} 
                 onChange={e => setInvoiceNumber(e.target.value)} 
                 placeholder="INV-001" 
-                className={`${rightInputStyles} text-xl font-bold placeholder:font-normal`} 
+                className={`${rightInputStyles} text-lg md:text-xl font-bold placeholder:font-normal text-left md:text-right`} 
               />
             </div>
           </div>
         </div>
 
         {/* Bill To & Dates */}
-        <div className="flex flex-col md:flex-row justify-between items-end gap-12 mb-16">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 md:gap-12 mb-10 md:mb-16">
           <div className="w-full md:w-1/2">
-            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 px-2">Bill To</h3>
+            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2 md:mb-3 px-1 md:px-2">Bill To</h3>
             <textarea 
               value={clientDetails} 
               onChange={e => setClientDetails(e.target.value)} 
@@ -195,9 +195,9 @@ export function FreeInvoiceBuilder() {
               className={`${textStyles} text-[15px] leading-relaxed`} 
             />
           </div>
-          <div className="w-full md:w-1/2 flex gap-8 md:justify-end">
-            <div className="w-32">
-              <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 md:text-right px-2 md:px-0">Date Issued</h3>
+          <div className="w-full md:w-1/2 flex gap-4 md:gap-8 justify-start md:justify-end">
+            <div className="flex-1 md:flex-none md:w-32">
+              <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2 md:mb-3 md:text-right px-1 md:px-0">Date Issued</h3>
               <div className="relative">
                 <input 
                   type="date" 
@@ -215,17 +215,17 @@ export function FreeInvoiceBuilder() {
                   type="date" 
                   value={dueDate} 
                   onChange={e => setDueDate(e.target.value)} 
-                  className={`${rightInputStyles} text-[15px] font-medium [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
+                  className={`${rightInputStyles} text-[15px] font-medium text-left md:text-right [&::-webkit-calendar-picker-indicator]:opacity-0 z-10 relative bg-transparent cursor-pointer`} 
                 />
-                <Calendar size={16} className="absolute left-2 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none z-0 hide-on-print md:hidden" />
+                <Calendar size={16} className="absolute left-2 md:left-auto md:right-2 top-1/2 -translate-y-1/2 text-zinc-300 pointer-events-none z-0 hide-on-print md:hidden" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Line Items Table */}
-        <div className="mb-12">
-          <div className="flex border-b-2 border-zinc-100 pb-3 mb-3 px-2 text-[12px] font-bold uppercase tracking-widest text-zinc-400">
+        <div className="mb-10 md:mb-16">
+          <div className="hidden md:flex border-b-2 border-zinc-100 pb-3 mb-3 px-2 text-[12px] font-bold uppercase tracking-widest text-zinc-400">
             <div className="flex-1">Description</div>
             <div className="w-24 text-right">Rate</div>
             <div className="w-20 text-right">Qty</div>
@@ -233,52 +233,58 @@ export function FreeInvoiceBuilder() {
             <div className="w-8 ml-2 hide-on-print"></div>
           </div>
           
-          <div className="space-y-1">
+          <div className="space-y-4 md:space-y-1">
             {items.map((item, idx) => (
-              <div key={idx} className="flex gap-2 items-center group">
-                 <div className="flex-1">
+              <div key={idx} className="flex flex-col md:flex-row gap-3 md:gap-2 items-start md:items-center group bg-slate-50/50 md:bg-transparent p-4 md:p-0 rounded-xl md:rounded-none border border-slate-100 md:border-transparent">
+                 <div className="w-full md:flex-1">
+                   <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 px-1">Description</span>
                    <input 
                      value={item.description} 
                      onChange={e => handleItemChange(idx, 'description', e.target.value)} 
                      placeholder="Item description" 
-                     className={`${inputStyles} text-[15px] font-medium`} 
+                     className={`${inputStyles} text-[15px] font-medium bg-white md:bg-slate-50`} 
                    />
                  </div>
                  
-                 <div className="w-24 relative">
-                   <input 
-                     type="number" 
-                     placeholder="0.00" 
-                     value={item.unit_price} 
-                     onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
-                     className={`${rightInputStyles} text-[15px]`} 
-                   />
+                 <div className="flex w-full md:w-auto gap-3">
+                   <div className="flex-1 md:w-24 relative">
+                     <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 px-1">Rate</span>
+                     <input 
+                       type="number" 
+                       placeholder="0.00" 
+                       value={item.unit_price} 
+                       onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} 
+                       className={`${rightInputStyles} text-[15px] text-left md:text-right bg-white md:bg-slate-50`} 
+                     />
+                   </div>
+                   
+                   <div className="flex-1 md:w-20">
+                     <span className="md:hidden block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1 px-1">Qty</span>
+                     <input 
+                       type="number" 
+                       placeholder="1" 
+                       value={item.quantity} 
+                       onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
+                       className={`${rightInputStyles} text-[15px] text-left md:text-right bg-white md:bg-slate-50`} 
+                     />
+                   </div>
                  </div>
                  
-                 <div className="w-20">
-                   <input 
-                     type="number" 
-                     placeholder="1" 
-                     value={item.quantity} 
-                     onChange={e => handleItemChange(idx, 'quantity', e.target.value)} 
-                     className={`${rightInputStyles} text-[15px]`} 
-                   />
-                 </div>
-                 
-                 <div className="w-28">
+                 <div className="flex items-center justify-between md:justify-end w-full md:w-28 mt-2 md:mt-0 pt-3 md:pt-0 border-t border-slate-100 md:border-transparent">
+                   <span className="md:hidden text-[11px] font-bold uppercase tracking-widest text-slate-500 px-1">Amount</span>
                    <input 
                      value={item.amount > 0 ? item.amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''} 
                      readOnly 
                      placeholder="0.00" 
-                     className="w-full bg-slate-50 border border-transparent text-right py-2 px-3 rounded-lg text-[15px] font-semibold text-zinc-900 cursor-default" 
+                     className="w-[120px] md:w-full bg-slate-50 border border-transparent text-right py-2 px-3 rounded-lg text-[15px] font-semibold text-zinc-900 cursor-default" 
                    />
                  </div>
 
-                 <div className="w-8 flex justify-center hide-on-print opacity-0 group-hover:opacity-100 transition-opacity">
+                 <div className="w-full md:w-8 flex justify-end md:justify-center mt-2 md:mt-0 hide-on-print md:opacity-0 group-hover:opacity-100 transition-opacity absolute right-4 md:static md:right-auto md:ml-0 top-4 md:top-auto">
                    <button 
                      onClick={() => removeRow(idx)} 
                      disabled={items.length === 1} 
-                     className="text-zinc-400 hover:text-red-500 hover:bg-red-50 p-1.5 rounded disabled:opacity-0 transition-colors"
+                     className="text-zinc-400 hover:text-red-500 hover:bg-red-50 p-2 md:p-1.5 rounded-lg md:rounded disabled:opacity-0 transition-colors border border-slate-200 md:border-transparent bg-white md:bg-transparent"
                    >
                      <X size={16} strokeWidth={2.5} />
                    </button>
@@ -299,10 +305,10 @@ export function FreeInvoiceBuilder() {
         </div>
 
         {/* Footer: Notes & Totals */}
-        <div className="flex flex-col md:flex-row justify-between gap-16 mt-auto">
+        <div className="flex flex-col-reverse md:flex-row justify-between gap-10 md:gap-16 mt-auto">
           {/* Notes */}
-          <div className="flex-1">
-            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-3 px-2">Notes</h3>
+          <div className="flex-1 mt-6 md:mt-0">
+            <h3 className="text-[12px] font-bold uppercase tracking-widest text-zinc-400 mb-2 md:mb-3 px-1 md:px-2">Notes</h3>
             <textarea 
               value={notes} 
               onChange={e => setNotes(e.target.value)} 
@@ -331,11 +337,11 @@ export function FreeInvoiceBuilder() {
       </div>
 
       {/* Floating Action Button for Download */}
-      <div className="fixed bottom-8 right-8 z-50">
+      <div className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50">
         <button 
           onClick={handleDownloadPDF}
           disabled={isDownloading}
-          className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[15px] rounded-full shadow-[0_10px_40px_-10px_rgba(37,99,235,0.6)] hover:shadow-[0_10px_40px_-10px_rgba(37,99,235,0.8)] transition-all active:scale-[0.95] flex items-center gap-3 disabled:opacity-50"
+          className="px-6 py-4 md:px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold text-[14px] md:text-[15px] rounded-full shadow-[0_10px_40px_-10px_rgba(37,99,235,0.6)] hover:shadow-[0_10px_40px_-10px_rgba(37,99,235,0.8)] transition-all active:scale-[0.95] flex items-center gap-3 disabled:opacity-50"
         >
           {isDownloading ? (
             <span className="h-5 w-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
