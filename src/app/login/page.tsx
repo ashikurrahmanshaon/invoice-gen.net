@@ -35,6 +35,13 @@ function LoginContent() {
     } else {
       setIsSignUp(false);
     }
+
+    const errorParam = searchParams.get('error');
+    if (errorParam === 'auth-failed') {
+      setError('Authentication failed. Please ensure Google Provider is enabled in Supabase and your credentials are correct.');
+    } else if (errorParam) {
+      setError(errorParam);
+    }
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {

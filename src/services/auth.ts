@@ -174,18 +174,27 @@ export const authService = {
       const { data: { subscription } } = client.auth.onAuthStateChange(
         async (event, session) => {
           if (session?.user) {
-            // Fetch metadata
-            const { data: profile } = await client
-              .from('profiles')
-              .select('company_name')
-              .eq('id', session.user.id)
-              .single();
+            // Fetch metadata safely
+            let companyName = session.user.user_metadata?.company_name || 'My Company';
+            try {
+              const { data: profile, error } = await client
+                .from('profiles')
+                .select('company_name')
+                .eq('id', session.user.id)
+                .single();
+              
+              if (profile && profile.company_name) {
+                companyName = profile.company_name;
+              }
+            } catch (err) {
+              console.warn('Could not fetch profile during auth state change:', err);
+            }
 
             currentUser = {
               id: session.user.id,
               email: session.user.email!,
               user_metadata: {
-                company_name: profile?.company_name || 'My Company',
+                company_name: companyName,
                 full_name: session.user.user_metadata?.full_name,
                 avatar_url: session.user.user_metadata?.avatar_url,
               },
