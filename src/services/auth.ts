@@ -52,6 +52,7 @@ export const authService = {
       });
       if (error) throw error;
       if (!data.user) throw new Error('Failed to register user.');
+      if (!data.session && data.user) throw new Error('Please check your email to confirm your account.');
       
       const user: User = {
         id: data.user.id,
@@ -129,7 +130,7 @@ export const authService = {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: `${window.location.origin}/dashboard`,
+          redirectTo: `${window.location.origin}/auth/callback?next=/dashboard`,
         },
       });
       if (error) throw error;
@@ -167,7 +168,6 @@ export const authService = {
 
   onAuthStateChange(callback: AuthChangeCallback): () => void {
     listeners.add(callback);
-    callback(currentUser); // Initial trigger
 
     if (isSupabaseConfigured && supabase) {
       const client = supabase;
@@ -203,6 +203,7 @@ export const authService = {
       };
     }
 
+    callback(currentUser); // Initial trigger for mock
     return () => {
       listeners.delete(callback);
     };
