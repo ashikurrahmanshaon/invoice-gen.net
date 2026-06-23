@@ -37,9 +37,7 @@ function LoginContent() {
     }
 
     const errorParam = searchParams.get('error');
-    if (errorParam === 'auth-failed') {
-      setError('Authentication failed. Please ensure Google Provider is enabled in Supabase and your credentials are correct.');
-    } else if (errorParam) {
+    if (errorParam && errorParam !== 'auth-failed') {
       setError(errorParam);
     }
   }, [searchParams]);

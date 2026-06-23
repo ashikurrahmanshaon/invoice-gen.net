@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy - Invoice-Gen.Net',
-  description: 'Review the privacy policy for Invoice-Gen.Net. Learn about data isolation, RLS rules, and transaction data processing via Stripe.',
+  description: 'Review the privacy policy for Invoice-Gen.Nettik Learn about data isolation, RLS rules, and transaction data processing via Stripe.',
 };
 
 export default function PrivacyPage() {
