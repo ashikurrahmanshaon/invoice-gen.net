@@ -3,9 +3,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Modal } from '@/components/ui/modal';
-import { useAuth } from '@/context/auth';
-import { useRouter } from 'next/navigation';
-import { dbService } from '@/services/db';
 import { Button } from '@/components/ui/button';
 import { Plus, Trash2, Calendar as CalIcon, ChevronDown, Check, Type, ArrowRight, Save, Download, Image as ImageIcon } from 'lucide-react';
 
@@ -122,63 +119,7 @@ export function FreeInvoiceBuilder() {
   const invoiceRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Auth & Router
-  const { user } = useAuth();
-  const router = useRouter();
 
-  const handleSave = async () => {
-    if (!user) {
-      router.push('/login');
-      return;
-    }
-
-    try {
-      const invoiceData = {
-        user_id: user.id,
-        client_id: '',
-        invoice_number: invoiceNumber || 'INV-DRAFT',
-        status: 'draft' as const,
-        issue_date: issueDate,
-        due_date: dueDate,
-        currency: currency,
-        tax_rate: Number(taxRate) || 0,
-        tax_amount: taxAmount,
-        discount_rate: Number(discountRate) || 0,
-        discount_amount: discountAmount,
-        subtotal: subtotal,
-        total: total,
-        notes: notes,
-        items: items.map(item => ({
-          id: undefined as any,
-          description: item.description,
-          quantity: Number(item.quantity) || 1,
-          unit_price: Number(item.unit_price) || 0,
-          amount: item.amount,
-        })),
-      };
-
-      const clients = await dbService.getClients(user.id);
-      let clientId = clients.length > 0 ? clients[0].id : null;
-      if (!clientId) {
-         const newClient = await dbService.createClient({
-           user_id: user.id,
-           name: clientName || 'Unknown Client',
-           email: clientEmail || '',
-           phone: '',
-           address: clientAddress || '',
-         });
-         clientId = newClient.id;
-      }
-      
-      invoiceData.client_id = clientId;
-
-      await dbService.createInvoice(invoiceData);
-      router.push('/dashboard/invoices');
-    } catch (error) {
-      console.error('Failed to save invoice:', error);
-      alert('Failed to save invoice. Please try again.');
-    }
-  };
 
   // --- State ---
   const [template, setTemplate] = useState<typeof TEMPLATES[number]>('modern');
@@ -625,7 +566,7 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white sm:p-12 p-6 rounded-[1.5rem] border border-zinc-200 shadow-sm font-sans text-zinc-900">
+    <div className="w-full mx-auto bg-white sm:p-12 p-6 font-sans text-zinc-900">
       
       {/* --- TOP SECTION (2 COLUMNS) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10">
@@ -829,18 +770,10 @@ export function FreeInvoiceBuilder() {
           </div>
           
           {/* Actions */}
-          <div className="mt-8 flex flex-col sm:flex-row justify-end items-center gap-4">
-            <button 
-              onClick={handleSave}
-              className="w-full md:w-auto px-10 py-4 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-900 font-medium text-base rounded-xl transition-all active:scale-[0.98] flex items-center justify-center gap-2"
-            >
-              <Save size={18} className="text-zinc-500" />
-              Save to Dashboard
-            </button>
-
+          <div className="mt-8 flex justify-end">
             <button 
               onClick={() => setShowPreview(true)}
-              className="w-full md:w-auto px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-base rounded-xl shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98]"
+              className="w-full md:w-auto px-10 py-4 bg-zinc-900 hover:bg-zinc-800 text-white font-medium text-base rounded-xl shadow-xl shadow-zinc-900/20 transition-all active:scale-[0.98]"
             >
               Preview & Download PDF
             </button>
