@@ -91,7 +91,7 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 const CleanInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
-    className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 px-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all ${props.className || ''}`}
+    className={`w-full h-11 rounded-xl bg-zinc-50/50 border border-transparent hover:bg-zinc-50 hover:border-zinc-200 px-4 text-[13.5px] font-medium text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:bg-white focus:outline-none focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 ${props.className || ''}`}
   />
 );
 
@@ -99,18 +99,18 @@ const CleanSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
   <div className="relative group">
     <select
       {...props}
-      className={`w-full h-10 rounded-lg bg-zinc-50 border border-zinc-200 pl-3 pr-8 text-[13px] text-zinc-900 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer ${props.className || ''}`}
+      className={`w-full h-11 rounded-xl bg-zinc-50/50 border border-transparent hover:bg-zinc-50 hover:border-zinc-200 pl-4 pr-10 text-[13.5px] font-medium text-zinc-900 focus:bg-white focus:outline-none focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 appearance-none cursor-pointer ${props.className || ''}`}
     >
       {props.children}
     </select>
-    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
+    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
   </div>
 );
 
 const CleanTextarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
     {...props}
-    className={`w-full rounded-lg bg-zinc-50 border border-zinc-200 p-3 text-[13px] text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 transition-all resize-none ${props.className || ''}`}
+    className={`w-full rounded-xl bg-zinc-50/50 border border-transparent hover:bg-zinc-50 hover:border-zinc-200 p-4 text-[13.5px] font-medium text-zinc-900 placeholder:text-zinc-400 placeholder:font-normal focus:bg-white focus:outline-none focus:border-emerald-500/40 focus:ring-4 focus:ring-emerald-500/10 transition-all duration-200 resize-none ${props.className || ''}`}
   />
 );
 
@@ -566,7 +566,7 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full max-w-5xl mx-auto bg-white sm:p-12 p-6 font-sans text-zinc-900">
+    <div className="w-full bg-white sm:p-14 p-6 font-sans text-zinc-900 rounded-[2rem]">
       
       {/* --- TOP SECTION (2 COLUMNS) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10">
@@ -574,7 +574,7 @@ export function FreeInvoiceBuilder() {
         <div className="space-y-6">
           <div>
             <Label>Logo</Label>
-            <div className="relative border border-zinc-200 rounded-xl p-4 flex items-center gap-4 hover:bg-zinc-50 cursor-pointer transition-colors h-[76px]">
+            <div className="relative rounded-2xl bg-zinc-50/50 border border-transparent hover:bg-zinc-50 hover:border-zinc-200 p-4 flex items-center gap-4 cursor-pointer transition-all duration-200 h-[76px] group">
               <input
                 type="file"
                 accept="image/*"
@@ -588,14 +588,14 @@ export function FreeInvoiceBuilder() {
                 }}
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               />
-              <div className="w-8 h-8 rounded border border-zinc-200 flex items-center justify-center bg-white text-zinc-500">
-                <ImageIcon size={14} />
+              <div className="w-10 h-10 rounded-xl bg-white border border-zinc-100 flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-105 transition-transform duration-300">
+                <ImageIcon size={18} strokeWidth={2.5} />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-semibold text-zinc-800 underline decoration-zinc-300 underline-offset-4">Upload file</p>
-                <p className="text-[11px] text-zinc-400 mt-1 uppercase tracking-wide">JPG, JPEG, PNG, less than 5MB</p>
+                <p className="text-[13.5px] font-bold text-zinc-800">Upload Logo</p>
+                <p className="text-[10px] text-zinc-400 mt-0.5 uppercase tracking-wide font-medium">JPG, PNG &lt; 5MB</p>
               </div>
-              {logoUrl && <button type="button" onClick={(e) => { e.preventDefault(); setLogoUrl(''); }} className="absolute right-4 text-xs font-bold text-rose-500 z-20 hover:underline">Clear</button>}
+              {logoUrl && <button type="button" onClick={(e) => { e.preventDefault(); setLogoUrl(''); }} className="absolute right-4 text-[11px] font-black uppercase tracking-wider text-rose-500 z-20 hover:text-rose-600">Clear</button>}
             </div>
           </div>
           <div>
@@ -651,7 +651,7 @@ export function FreeInvoiceBuilder() {
       </div>
 
       {/* --- LINE ITEMS --- */}
-      <div className="bg-zinc-50/50 rounded-[1.5rem] p-6 mb-10 border border-zinc-100">
+      <div className="bg-white rounded-[2rem] p-2 sm:p-8 mb-12 border border-zinc-100 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.04)]">
         <div className="hidden md:flex items-center gap-4 px-2 pb-3">
           <div className="flex-1 text-xs font-bold text-zinc-400 uppercase tracking-widest">Item</div>
           <div className="w-24 text-xs font-bold text-zinc-400 uppercase tracking-widest text-center">Rate</div>
