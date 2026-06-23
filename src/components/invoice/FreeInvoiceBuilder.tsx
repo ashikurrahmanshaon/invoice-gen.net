@@ -566,7 +566,7 @@ export function FreeInvoiceBuilder() {
   }
 
   return (
-    <div className="w-full mx-auto bg-white sm:p-12 p-6 font-sans text-zinc-900">
+    <div className="w-full max-w-5xl mx-auto bg-white sm:p-12 p-6 font-sans text-zinc-900">
       
       {/* --- TOP SECTION (2 COLUMNS) --- */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8 mb-10">
