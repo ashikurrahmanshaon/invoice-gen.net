@@ -4,66 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, X, Menu, Zap } from 'lucide-react';
-
-/* ─── Ticker messages ─────────────────────────────────── */
-const TICKER_ITEMS = [
-  { icon: '⚡', text: 'Free invoice generator — no sign-up needed.' },
-  { icon: '🎉', text: '10,000+ invoices created this week.' },
-  { icon: '🔒', text: 'Bank-grade security: all data stays on your device.' },
-  { icon: '🚀', text: 'Create a professional invoice in under 2 minutes.' },
-];
-
-function AnnouncementBar({ onDismiss }: { onDismiss: () => void }) {
-  const [idx, setIdx] = useState(0);
-
-  useEffect(() => {
-    const t = setInterval(() => {
-      setIdx(i => (i + 1) % TICKER_ITEMS.length);
-    }, 5000);
-    return () => clearInterval(t);
-  }, []);
-
-  const item = TICKER_ITEMS[idx];
-
-  return (
-    <div className="relative z-50 bg-zinc-950 border-b border-white/[0.06] overflow-hidden">
-      {/* subtle emerald glow line at top */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/60 to-transparent" />
-
-      <div className="relative flex items-center justify-center h-8 px-10">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={idx}
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            transition={{ duration: 0.25 }}
-            className="flex items-center gap-2 text-[11.5px]"
-          >
-            {/* glowing badge */}
-            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-wider">
-              <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
-              Free
-            </span>
-
-            <span className="text-zinc-350 font-medium">
-              {item.text}
-            </span>
-          </motion.div>
-        </AnimatePresence>
-
-        <button
-          onClick={onDismiss}
-          aria-label="Dismiss"
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full text-zinc-600 hover:text-zinc-300 hover:bg-white/10 transition-all cursor-pointer"
-        >
-          <X size={11} />
-        </button>
-      </div>
-    </div>
-  );
-}
+import { FileText, X, Menu } from 'lucide-react';
 
 /* ─── Main Navbar ─────────────────────────────────────── */
 const navLinks = [
@@ -77,7 +18,6 @@ export default function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [showAnnouncement, setShowAnnouncement] = useState(true);
 
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 10);
@@ -100,10 +40,6 @@ export default function Navbar() {
 
   return (
     <div className="sticky top-0 z-50 w-full no-print">
-      {showAnnouncement && (
-        <AnnouncementBar onDismiss={() => setShowAnnouncement(false)} />
-      )}
-
       {/* ── Navbar Shell ── */}
       <div
         className={`w-full transition-all duration-300 ${
