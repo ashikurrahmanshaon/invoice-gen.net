@@ -39,7 +39,7 @@ const InlineInput = ({ value, onChange, className, placeholder, align = 'left', 
     onChange={e => onChange(e.target.value)}
     placeholder={placeholder}
     readOnly={readOnly}
-    className={`bg-transparent outline-none border-b border-transparent hover:border-zinc-200 focus:border-zinc-300 dark:hover:border-zinc-800 dark:focus:border-zinc-700 transition-colors w-full ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left'} ${readOnly ? 'pointer-events-none' : ''} ${className}`}
+    className={`bg-zinc-50/50 hover:bg-zinc-100 focus:bg-white outline-none border border-transparent hover:border-zinc-200 focus:border-zinc-300 transition-colors w-full px-2 py-1 -ml-2 rounded-md ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left'} ${readOnly ? 'pointer-events-none bg-transparent' : ''} ${className}`}
   />
 );
 
@@ -60,7 +60,7 @@ const InlineTextarea = ({ value, onChange, className, placeholder, align = 'left
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
       rows={1}
-      className={`bg-transparent outline-none border-b border-transparent hover:border-zinc-200 focus:border-zinc-300 dark:hover:border-zinc-800 dark:focus:border-zinc-700 transition-colors w-full resize-none overflow-hidden ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left'} ${className}`}
+      className={`bg-zinc-50/50 hover:bg-zinc-100 focus:bg-white outline-none border border-transparent hover:border-zinc-200 focus:border-zinc-300 transition-colors w-full px-2 py-1 -ml-2 rounded-md resize-none overflow-hidden ${align === 'right' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left'} ${className}`}
     />
   );
 };
