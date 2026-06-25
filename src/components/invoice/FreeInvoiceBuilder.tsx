@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Trash2, ChevronDown, Download, Image as ImageIcon } from 'lucide-react';
+import { Plus, Trash2, ChevronDown, Download, Image as ImageIcon, Briefcase, User, List, FileText, Settings, Eye } from 'lucide-react';
 
 // --- Types ---
 interface InvoiceItem {
@@ -61,8 +61,9 @@ const CURRENCIES = [
   { code: 'GHS', symbol: 'GH₵', name: 'Ghanaian Cedi' },
 ];
 
+// --- Minimalist UI Components ---
 const Label = ({ children }: { children: React.ReactNode }) => (
-  <label className="block text-[10px] font-bold text-zinc-450 dark:text-zinc-500 mb-1.5 uppercase tracking-wider">
+  <label className="block text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 mb-2 uppercase tracking-widest">
     {children}
   </label>
 );
@@ -70,28 +71,67 @@ const Label = ({ children }: { children: React.ReactNode }) => (
 const CleanInput = (props: React.InputHTMLAttributes<HTMLInputElement>) => (
   <input
     {...props}
-    className={`w-full h-10 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/80 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 px-3.5 text-[13px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 placeholder:font-normal focus:bg-white dark:focus:bg-zinc-950 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-200 ${props.className || ''}`}
+    className={`w-full h-11 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 px-4 text-[14px] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all duration-300 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none ${props.className || ''}`}
   />
-);
-
-const CleanSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
-  <div className="relative group w-full">
-    <select
-      {...props}
-      className={`w-full h-10 rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/80 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 pl-3.5 pr-9 text-[13px] font-medium text-zinc-900 dark:text-zinc-100 focus:bg-white dark:focus:bg-zinc-950 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-200 appearance-none cursor-pointer ${props.className || ''}`}
-    >
-      {props.children}
-    </select>
-    <ChevronDown size={13} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-zinc-500 pointer-events-none group-focus-within:text-emerald-500 transition-colors" />
-  </div>
 );
 
 const CleanTextarea = (props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) => (
   <textarea
     {...props}
-    className={`w-full rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/80 hover:bg-zinc-100/50 dark:hover:bg-zinc-800/50 p-3 text-[13px] font-medium text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 placeholder:font-normal focus:bg-white dark:focus:bg-zinc-950 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/10 transition-all duration-200 resize-none ${props.className || ''}`}
+    className={`w-full rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 p-4 text-[14px] text-zinc-900 dark:text-zinc-100 placeholder:text-zinc-400 transition-all duration-300 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none resize-none ${props.className || ''}`}
   />
 );
+
+const CleanSelect = (props: React.SelectHTMLAttributes<HTMLSelectElement>) => (
+  <div className="relative w-full">
+    <select
+      {...props}
+      className={`w-full h-11 rounded-lg bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800/80 pl-4 pr-10 text-[14px] text-zinc-900 dark:text-zinc-100 transition-all duration-300 focus:bg-white dark:focus:bg-zinc-900 focus:border-emerald-500/50 focus:ring-4 focus:ring-emerald-500/10 focus:outline-none appearance-none cursor-pointer ${props.className || ''}`}
+    >
+      {props.children}
+    </select>
+    <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
+  </div>
+);
+
+// --- Accordion Component ---
+const Accordion = ({ title, icon: Icon, children, defaultOpen = true }: { title: string, icon: any, children: React.ReactNode, defaultOpen?: boolean }) => {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+  return (
+    <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+      <button 
+        type="button" 
+        onClick={() => setIsOpen(!isOpen)} 
+        className="w-full px-6 py-5 flex items-center justify-between bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900/50 transition-colors"
+      >
+        <div className="flex items-center gap-3 text-zinc-900 dark:text-zinc-100">
+          <div className="p-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg text-zinc-500 dark:text-zinc-400">
+            <Icon size={18} strokeWidth={2} />
+          </div>
+          <span className="font-semibold text-[15px]">{title}</span>
+        </div>
+        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
+          <ChevronDown size={20} className="text-zinc-400" />
+        </motion.div>
+      </button>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="overflow-hidden"
+          >
+            <div className="p-6 pt-0 border-t border-zinc-100 dark:border-zinc-900">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 export function FreeInvoiceBuilder() {
   const invoiceRef = useRef<HTMLDivElement>(null);
@@ -114,8 +154,6 @@ export function FreeInvoiceBuilder() {
   const [issueDate, setIssueDate]         = useState('');
   const [dueDate, setDueDate]             = useState('');
 
-  const [mobileTab, setMobileTab] = useState<'info' | 'items' | 'payment'>('info');
-
   useEffect(() => {
     setIssueDate(new Date().toISOString().split('T')[0]);
     setDueDate(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]);
@@ -133,17 +171,18 @@ export function FreeInvoiceBuilder() {
     { description: 'Hosting & Maintenance', quantity: 1, unit_price: 600, amount: 600 },
   ]);
 
-  const [showPreview, setShowPreview] = useState(false);
+  const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [scale, setScale] = useState(1);
 
-  // --- Scale Logic to Fit Screen ---
+  // --- Scale Logic to Fit Screen (for live preview on right) ---
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         const w = containerRef.current.clientWidth;
         if (w === 0) return;
         const padding = 32;
+        // Preview is 800px wide. 
         const scaleW = (w - padding) / 800;
         setScale(Math.min(scaleW, 1));
       }
@@ -155,7 +194,7 @@ export function FreeInvoiceBuilder() {
       window.removeEventListener('resize', handleResize);
       clearTimeout(timer);
     };
-  }, [showPreview]);
+  }, [showMobilePreview]); // Re-run if we show full preview
 
   // --- Calcs ---
   const subtotal       = items.reduce((s, i) => s + i.quantity * i.unit_price, 0);
@@ -215,16 +254,16 @@ export function FreeInvoiceBuilder() {
   };
 
   // ---------------------------------------------------------------------------
-  // PROFESSIONAL TEMPLATES
+  // PROFESSIONAL TEMPLATES (Unchanged HTML structure, just beautiful defaults)
   // ---------------------------------------------------------------------------
   const renderModernTemplate = () => (
-    <div className="bg-white min-h-[1120px] w-full text-[12px] text-zinc-800 font-sans p-16 relative flex flex-col">
+    <div className="bg-white min-h-[1120px] w-[800px] text-[12px] text-zinc-800 font-sans p-16 relative flex flex-col shadow-2xl rounded-sm">
       <div className="absolute top-0 left-0 w-full h-3" style={{ backgroundColor: themeColor.value }} />
       <div className="flex justify-between items-start mb-16 mt-4">
         <div>
           {logoUrl ? <img src={logoUrl} alt="Logo" className="max-h-16 mb-4 object-contain" /> : <h1 className="text-3xl font-bold tracking-tight mb-2 text-zinc-900">{companyName || 'Your Company'}</h1>}
-          <p className="text-zinc-505 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
-          <p className="text-zinc-505 mt-1">{companyEmail}</p>
+          <p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
+          <p className="text-zinc-500 mt-1">{companyEmail}</p>
         </div>
         <div className="text-right">
           <h2 className="text-5xl font-light tracking-tight text-zinc-200 uppercase mb-2">Invoice</h2>
@@ -236,7 +275,7 @@ export function FreeInvoiceBuilder() {
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Billed To</p>
           <p className="font-semibold text-lg text-zinc-900">{clientName}</p>
           <p className="text-zinc-600 whitespace-pre-wrap mt-1 leading-relaxed">{clientAddress}</p>
-          <p className="text-zinc-505 mt-1">{clientEmail}</p>
+          <p className="text-zinc-500 mt-1">{clientEmail}</p>
         </div>
         <div className="flex gap-16 text-right">
           <div>
@@ -262,8 +301,8 @@ export function FreeInvoiceBuilder() {
           {items.map((item, idx) => (
             <tr key={idx}>
               <td className="py-5 text-zinc-900 font-medium text-sm">{item.description || 'Item'}</td>
-              <td className="py-5 text-zinc-505 text-center">{item.quantity}</td>
-              <td className="py-5 text-zinc-550 text-right">{fmt(item.unit_price)}</td>
+              <td className="py-5 text-zinc-500 text-center">{item.quantity}</td>
+              <td className="py-5 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
               <td className="py-5 text-zinc-900 font-semibold text-right">{fmt(item.amount)}</td>
             </tr>
           ))}
@@ -272,13 +311,13 @@ export function FreeInvoiceBuilder() {
       <div className="mt-auto flex justify-between items-start gap-12">
         <div className="flex-1 space-y-8">
           {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Instructions</p><p className="text-zinc-600 leading-relaxed whitespace-pre-wrap">{paymentDetails}</p></div>)}
-          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-505 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
+          {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 leading-relaxed whitespace-pre-wrap">{notes}</p></div>)}
         </div>
         <div className="w-80 bg-zinc-50 rounded-2xl p-8 border border-zinc-100">
           <div className="space-y-4 mb-6">
-            <div className="flex justify-between text-zinc-505"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
-            {discountAmount > 0 && <div className="flex justify-between text-zinc-505"><span>Discount</span><span>−{fmt(discountAmount)}</span></div>}
-            {taxRate > 0 && <div className="flex justify-between text-zinc-505"><span>Tax ({taxRate}%)</span><span>{fmt(taxAmount)}</span></div>}
+            <div className="flex justify-between text-zinc-500"><span>Subtotal</span><span>{fmt(subtotal)}</span></div>
+            {discountAmount > 0 && <div className="flex justify-between text-zinc-500"><span>Discount</span><span>−{fmt(discountAmount)}</span></div>}
+            {taxRate > 0 && <div className="flex justify-between text-zinc-500"><span>Tax ({taxRate}%)</span><span>{fmt(taxAmount)}</span></div>}
           </div>
           <div className="pt-6 border-t border-zinc-200 flex justify-between items-center">
             <span className="text-base font-bold text-zinc-900">Total Due</span>
@@ -290,13 +329,13 @@ export function FreeInvoiceBuilder() {
   );
 
   const renderClassicTemplate = () => (
-    <div className="bg-white min-h-[1120px] w-full text-[12px] text-zinc-900 font-serif p-16 flex flex-col border-[1px] border-zinc-200">
+    <div className="bg-white min-h-[1120px] w-[800px] text-[12px] text-zinc-900 font-serif p-16 flex flex-col border-[1px] border-zinc-200 shadow-2xl rounded-sm">
       <div className="flex justify-between items-start mb-16">
         <div className="w-1/2">
           {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 mb-8 object-contain" />}
           <h1 className="text-3xl font-bold text-zinc-900 mb-2">{companyName || 'Your Company'}</h1>
-          <p className="text-zinc-650 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
-          <p className="text-zinc-650 mt-1">{companyEmail}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap leading-relaxed">{companyAddress}</p>
+          <p className="text-zinc-600 mt-1">{companyEmail}</p>
         </div>
         <div className="text-right">
           <h2 className="text-6xl uppercase tracking-widest text-zinc-900 mb-8 font-light">Invoice</h2>
@@ -317,7 +356,7 @@ export function FreeInvoiceBuilder() {
       </div>
       <table className="w-full text-left mb-12 border-collapse font-sans">
         <thead>
-          <tr className="border-y-2 border-zinc-900 bg-zinc-55">
+          <tr className="border-y-2 border-zinc-900 bg-zinc-50">
             <th className="py-4 px-6 text-[12px] font-bold text-zinc-800">Description</th>
             <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-center w-24">Qty</th>
             <th className="py-4 px-6 text-[12px] font-bold text-zinc-800 text-right w-32">Price</th>
@@ -344,7 +383,7 @@ export function FreeInvoiceBuilder() {
           <table className="w-full text-right text-[13px]">
             <tbody>
               <tr><td className="py-2 text-zinc-600">Subtotal</td><td className="py-2 font-medium">{fmt(subtotal)}</td></tr>
-              {discountAmount > 0 && <tr><td className="py-2 text-zinc-600">Discount</td><td className="py-2 text-red-650 font-medium">−{fmt(discountAmount)}</td></tr>}
+              {discountAmount > 0 && <tr><td className="py-2 text-zinc-600">Discount</td><td className="py-2 text-red-500 font-medium">−{fmt(discountAmount)}</td></tr>}
               {taxRate > 0 && <tr><td className="py-2 text-zinc-600">Tax ({taxRate}%)</td><td className="py-2 font-medium">{fmt(taxAmount)}</td></tr>}
               <tr className="border-t-2 border-zinc-900 text-[18px] font-bold">
                 <td className="py-6 uppercase tracking-widest">Total Due</td>
@@ -358,7 +397,7 @@ export function FreeInvoiceBuilder() {
   );
 
   const renderCreativeTemplate = () => (
-    <div className="bg-white min-h-[1120px] w-full text-[12px] text-zinc-900 font-sans flex flex-col overflow-hidden">
+    <div className="bg-white min-h-[1120px] w-[800px] text-[12px] text-zinc-900 font-sans flex flex-col overflow-hidden shadow-2xl rounded-sm">
       <div className="p-16 flex justify-between items-end" style={{ backgroundColor: themeColor.value }}>
         <div className="text-white">
           <h2 className="text-[60px] font-black tracking-tighter leading-none mb-4 animate-fade-in">INVOICE</h2>
@@ -375,15 +414,15 @@ export function FreeInvoiceBuilder() {
           <div className="bg-zinc-50 p-8 rounded-3xl border border-zinc-100 flex-1 mr-12">
             <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-4">Bill To</p>
             <p className="font-bold text-2xl text-zinc-900 mb-2">{clientName}</p>
-            <p className="text-zinc-505 mb-1">{clientEmail}</p>
-            <p className="text-zinc-605 whitespace-pre-wrap mt-3 leading-relaxed">{clientAddress}</p>
+            <p className="text-zinc-500 mb-1">{clientEmail}</p>
+            <p className="text-zinc-600 whitespace-pre-wrap mt-3 leading-relaxed">{clientAddress}</p>
           </div>
           <div className="w-72 space-y-5 pt-4">
             <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
-              <span className="text-[12px] font-semibold text-zinc-550 uppercase">Issue Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
+              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Issue Date</span><span className="font-bold text-zinc-900">{issueDate}</span>
             </div>
             <div className="flex justify-between items-center border-b border-zinc-100 pb-3">
-              <span className="text-[12px] font-semibold text-zinc-550 uppercase">Due Date</span><span className="font-bold text-zinc-900">{dueDate}</span>
+              <span className="text-[12px] font-semibold text-zinc-500 uppercase">Due Date</span><span className="font-bold text-zinc-900">{dueDate}</span>
             </div>
           </div>
         </div>
@@ -400,8 +439,8 @@ export function FreeInvoiceBuilder() {
             {items.map((item, idx) => (
               <tr key={idx}>
                 <td className="py-6 text-zinc-900 font-semibold text-sm">{item.description || 'Item'}</td>
-                <td className="py-6 text-zinc-505 text-center">{item.quantity}</td>
-                <td className="py-6 text-zinc-505 text-right">{fmt(item.unit_price)}</td>
+                <td className="py-6 text-zinc-500 text-center">{item.quantity}</td>
+                <td className="py-6 text-zinc-500 text-right">{fmt(item.unit_price)}</td>
                 <td className="py-6 text-zinc-900 font-bold text-right text-sm">{fmt(item.amount)}</td>
               </tr>
             ))}
@@ -410,7 +449,7 @@ export function FreeInvoiceBuilder() {
         <div className="mt-auto flex justify-between items-end gap-12">
           <div className="flex-1 space-y-8">
             {paymentDetails && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Payment Details</p><p className="text-zinc-700 whitespace-pre-wrap leading-relaxed">{paymentDetails}</p></div>)}
-            {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-505 whitespace-pre-wrap leading-relaxed">{notes}</p></div>)}
+            {notes && (<div><p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-2">Notes</p><p className="text-zinc-500 whitespace-pre-wrap leading-relaxed">{notes}</p></div>)}
           </div>
           <div className="w-96 bg-zinc-900 text-white p-10 rounded-[2.5rem] shadow-xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-48 h-48 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none" />
@@ -430,31 +469,31 @@ export function FreeInvoiceBuilder() {
   );
 
   const renderEnterpriseTemplate = () => (
-    <div className="bg-white min-h-[1120px] w-full text-[11px] text-zinc-800 font-sans p-16 border-[12px] border-zinc-50 flex flex-col">
+    <div className="bg-white min-h-[1120px] w-[800px] text-[11px] text-zinc-800 font-sans p-16 border-[12px] border-zinc-50 flex flex-col shadow-2xl rounded-sm">
       <div className="flex justify-between items-start border-b-2 border-zinc-200 pb-10 mb-10">
         <div className="flex items-center gap-8">
           {logoUrl && <img src={logoUrl} alt="Logo" className="max-h-20 object-contain" />}
           <div>
             <h1 className="text-2xl font-bold text-zinc-900 uppercase tracking-wide">{companyName || 'Your Company'}</h1>
-            <p className="text-zinc-505 mt-1">{companyEmail}</p>
+            <p className="text-zinc-500 mt-1">{companyEmail}</p>
           </div>
         </div>
         <div className="text-right">
           <h2 className="text-4xl font-black tracking-tight text-zinc-900 uppercase">Invoice</h2>
-          <p className="font-bold text-zinc-505 mt-2 text-lg">{invoiceNumber}</p>
+          <p className="font-bold text-zinc-500 mt-2 text-lg">{invoiceNumber}</p>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-10 mb-10">
         <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">From</p>
           <p className="font-bold text-zinc-900 text-sm">{companyName}</p>
-          <p className="text-zinc-606 whitespace-pre-wrap mt-2">{companyAddress}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{companyAddress}</p>
         </div>
         <div className="col-span-1 border border-zinc-200 p-5 rounded-xl bg-zinc-50">
           <p className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 mb-3">Bill To</p>
           <p className="font-bold text-zinc-900 text-sm">{clientName}</p>
-          <p className="text-zinc-606 whitespace-pre-wrap mt-2">{clientAddress}</p>
-          <p className="text-zinc-606 mt-1">{clientEmail}</p>
+          <p className="text-zinc-600 whitespace-pre-wrap mt-2">{clientAddress}</p>
+          <p className="text-zinc-600 mt-1">{clientEmail}</p>
         </div>
         <div className="col-span-1 border border-zinc-200 rounded-xl overflow-hidden flex flex-col">
           <div className="flex-1 border-b border-zinc-200 p-5 flex justify-between items-center bg-white">
@@ -478,8 +517,8 @@ export function FreeInvoiceBuilder() {
           {items.map((item, idx) => (
             <tr key={idx} className="border-b border-zinc-200 last:border-0">
               <td className="p-4 text-zinc-900 font-medium border-r border-zinc-200">{item.description || 'Item'}</td>
-              <td className="p-4 text-zinc-606 text-center border-r border-zinc-200">{item.quantity}</td>
-              <td className="p-4 text-zinc-606 text-right border-r border-zinc-200">{fmt(item.unit_price)}</td>
+              <td className="p-4 text-zinc-600 text-center border-r border-zinc-200">{item.quantity}</td>
+              <td className="p-4 text-zinc-600 text-right border-r border-zinc-200">{fmt(item.unit_price)}</td>
               <td className="p-4 text-zinc-900 font-bold text-right">{fmt(item.amount)}</td>
             </tr>
           ))}
@@ -505,340 +544,267 @@ export function FreeInvoiceBuilder() {
     </div>
   );
 
-  if (showPreview) {
-    return (
-      <div className="w-full bg-zinc-50/50 dark:bg-zinc-950/20 p-4 sm:p-8 flex flex-col items-center min-h-[500px]">
-        <div className="w-full max-w-3xl flex justify-between items-center mb-6 no-print">
-          <button 
-            type="button"
-            onClick={() => setShowPreview(false)}
-            className="px-4 py-2.5 bg-white dark:bg-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all"
-          >
-            ← Edit Invoice
-          </button>
-          <button
-            type="button"
-            onClick={handleDownloadPDF}
-            disabled={isDownloading}
-            style={{ backgroundColor: themeColor.value }}
-            className="px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all disabled:opacity-50 hover:brightness-105"
-          >
-            {isDownloading ? <span className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /> : <><Download size={14} strokeWidth={2.5} /> Download PDF</>}
-          </button>
-        </div>
-        
-        {/* Invoice Page Container */}
-        <div ref={containerRef} className="w-full flex justify-center overflow-x-auto pb-8 select-none">
-          <div 
-            className="relative transition-all duration-300 ease-out origin-top"
-            style={{ transform: `scale(${scale})` }}
-          >
-            <div className="absolute inset-0 bg-black/5 dark:bg-black/20 blur-xl rounded-xl pointer-events-none -z-10" />
-            <div className="relative w-[800px] bg-white text-black shadow-lg rounded-sm overflow-hidden select-text pointer-events-auto border border-zinc-200/50">
-              <div ref={invoiceRef}>
-                {template === 'modern' && renderModernTemplate()}
-                {template === 'classic' && renderClassicTemplate()}
-                {template === 'creative' && renderCreativeTemplate()}
-                {template === 'enterprise' && renderEnterpriseTemplate()}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="w-full bg-white dark:bg-[#0B0B0B] p-4 sm:p-6 md:p-8 font-sans text-zinc-900 dark:text-zinc-150 rounded-2xl relative pb-20 md:pb-8">
+    <div className="w-full max-w-[1400px] mx-auto">
       
-      {/* Mobile Tab Navigation */}
-      <div className="md:hidden flex p-1 bg-zinc-100 dark:bg-zinc-900/90 backdrop-blur-md rounded-xl mb-5 border border-zinc-200/50 dark:border-zinc-800/55 sticky top-[56px] z-30">
-        <button
-          type="button"
-          onClick={() => setMobileTab('info')}
-          className={`flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all ${
-            mobileTab === 'info'
-              ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300'
-          }`}
-        >
-          📄 Info
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab('items')}
-          className={`flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all ${
-            mobileTab === 'items'
-              ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300'
-          }`}
-        >
-          📋 Items ({items.length})
-        </button>
-        <button
-          type="button"
-          onClick={() => setMobileTab('payment')}
-          className={`flex-1 py-2 text-center text-xs font-bold rounded-lg transition-all ${
-            mobileTab === 'payment'
-              ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-300'
-          }`}
-        >
-          ⚙️ Config
-        </button>
-      </div>
-
-      {/* --- TOP SECTION (2 COLUMNS) --- */}
-      <div className={`grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6 ${mobileTab === 'info' ? 'block' : 'hidden md:grid'}`}>
-        {/* Left Column */}
-        <div className="space-y-4">
-          <div>
-            <Label>Logo</Label>
-            <div className="relative rounded-xl bg-zinc-50/50 dark:bg-zinc-900/40 border border-zinc-200/50 dark:border-zinc-800/80 hover:bg-zinc-100/55 dark:hover:bg-zinc-800/40 p-3.5 flex items-center gap-3.5 cursor-pointer transition-all duration-200 h-[68px] group">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => { setLogoUrl(ev.target?.result as string); };
-                    reader.readAsDataURL(file);
-                  } else { setLogoUrl(''); }
-                }}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              <div className="w-9 h-9 rounded-lg bg-white dark:bg-zinc-950 border border-zinc-100 dark:border-zinc-800 flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-105 transition-transform duration-300">
-                <ImageIcon size={16} strokeWidth={2.5} />
-              </div>
-              <div className="flex-1">
-                <p className="text-[13px] font-bold text-zinc-800 dark:text-zinc-200">Upload Logo</p>
-                <p className="text-[9px] text-zinc-400 dark:text-zinc-550 mt-0.5 uppercase tracking-wider font-medium">JPG, PNG &lt; 5MB</p>
-              </div>
-              {logoUrl && <button type="button" onClick={(e) => { e.preventDefault(); setLogoUrl(''); }} className="absolute right-4 text-[10px] font-black uppercase tracking-wider text-rose-500 z-20 hover:text-rose-600">Clear</button>}
-            </div>
-          </div>
-          <div>
-            <Label>Your company details</Label>
-            <CleanTextarea 
-              value={companyName + (companyAddress ? '\n' + companyAddress : '')} 
-              onChange={e => {
-                const lines = e.target.value.split('\n');
-                setCompanyName(lines[0] || '');
-                setCompanyAddress(lines.slice(1).join('\n'));
-              }} 
-              rows={3} 
-              className="resize-none h-[80px]"
-              placeholder="Your Company Name&#10;Address Line 1&#10;Address Line 2"
-            />
-          </div>
-          <div>
-            <Label>Date issued</Label>
-            <CleanInput type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} className="appearance-none" />
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="space-y-4">
-          <div>
-            <Label>Invoice number</Label>
-            <div className="relative">
-              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-450 dark:text-zinc-500 font-medium text-[13px]">#</span>
-              <CleanInput value={invoiceNumber.replace('#', '')} onChange={e => setInvoiceNumber(e.target.value)} className="pl-7 h-10 text-[13px] font-medium" />
-            </div>
-          </div>
-          <div>
-            <Label>Bill to</Label>
-            <CleanTextarea 
-              value={clientName + (clientAddress ? '\n' + clientAddress : '')} 
-              onChange={e => {
-                const lines = e.target.value.split('\n');
-                setClientName(lines[0] || '');
-                setClientAddress(lines.slice(1).join('\n'));
-              }} 
-              rows={3}
-              className="resize-none h-[80px]" 
-              placeholder="Client Name&#10;Address Line 1&#10;Address Line 2"
-            />
-          </div>
-          <div>
-            <Label>Due date</Label>
-            <CleanInput type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} className="appearance-none" />
-          </div>
-        </div>
-      </div>
-
-      {/* --- LINE ITEMS --- */}
-      <div className={`bg-zinc-50/40 dark:bg-zinc-950/20 rounded-2xl p-3 sm:p-5 mb-8 border border-zinc-200/55 dark:border-zinc-900 shadow-[0_2px_8px_rgba(0,0,0,0.01)] ${mobileTab === 'items' ? 'block' : 'hidden md:block'}`}>
-        <div className="hidden md:flex items-center gap-3 px-2 pb-2">
-          <div className="flex-1 text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider">Item Description</div>
-          <div className="w-24 text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider text-center">Rate</div>
-          <div className="w-20 text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider text-center">Qty</div>
-          <div className="w-28 text-[9px] font-bold text-zinc-450 dark:text-zinc-500 uppercase tracking-wider text-center">Amount</div>
-          <div className="w-8"></div>
-        </div>
-        
-        <div className="space-y-3 mb-6">
-          <AnimatePresence initial={false}>
-            {items.map((item, idx) => (
-              <motion.div 
-                key={idx} 
-                initial={{ opacity: 0, height: 0 }} 
-                animate={{ opacity: 1, height: 'auto' }} 
-                exit={{ opacity: 0, height: 0 }} 
-                className="flex flex-col md:flex-row gap-3 items-start md:items-center bg-white dark:bg-zinc-900/40 md:bg-transparent p-3 md:p-0 rounded-xl md:rounded-none border border-zinc-200/60 dark:border-zinc-800/80 md:border-none shadow-sm md:shadow-none relative group"
-              >
-                <div className="flex-1 w-full">
-                  <span className="md:hidden text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1 block ml-1">Item Description</span>
-                  <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} className="bg-zinc-50/30 md:bg-white dark:md:bg-zinc-950/40 border-zinc-200 dark:border-zinc-850 h-9" placeholder="Item description" />
-                </div>
-                <div className="flex gap-2 w-full md:w-auto">
-                  <div className="w-1/2 md:w-24 relative">
-                    <span className="md:hidden text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1 block ml-1">Rate</span>
-                    <span className="absolute left-3 top-[26px] md:top-1/2 md:-translate-y-1/2 text-zinc-400 dark:text-zinc-500 text-xs font-semibold">{currentSymbol}</span>
-                    <CleanInput type="number" step="0.01" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} className="pl-6 bg-zinc-50/30 md:bg-white dark:md:bg-zinc-950/40 border-zinc-200 dark:border-zinc-855 text-right md:text-center h-9" placeholder="0.00" />
-                  </div>
-                  <div className="w-1/2 md:w-20">
-                    <span className="md:hidden text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1 block ml-1">Qty</span>
-                    <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} className="bg-zinc-50/30 md:bg-white dark:md:bg-zinc-950/40 border-zinc-200 dark:border-zinc-855 text-center h-9" placeholder="1" />
-                  </div>
-                </div>
-                <div className="w-full md:w-28 relative">
-                   <span className="md:hidden text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1 block ml-1">Amount</span>
-                   <span className="absolute left-3 top-[26px] md:top-1/2 md:-translate-y-1/2 text-zinc-450 dark:text-zinc-550 text-xs font-semibold">{currentSymbol}</span>
-                   <CleanInput disabled value={fmt(item.amount).replace(currentSymbol, '').trim()} className="pl-6 bg-zinc-100/65 dark:bg-zinc-900 border-zinc-200/50 dark:border-zinc-800/85 text-right md:text-center font-bold h-9 opacity-80" />
-                </div>
-                <button 
-                  type="button"
-                  onClick={() => removeRow(idx)} 
-                  disabled={items.length === 1} 
-                  className="absolute right-2 top-2 md:relative md:right-0 md:top-0 w-7 h-7 flex items-center justify-center text-zinc-450 dark:text-zinc-550 hover:text-rose-500 dark:hover:text-rose-400 transition-colors disabled:opacity-0"
-                >
-                  <Trash2 size={14} />
-                </button>
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-        
-        <div className="flex flex-col items-center justify-center">
-          <button 
-            type="button"
-            onClick={addRow} 
-            style={{ backgroundColor: themeColor.value }}
-            className="w-9 h-9 text-white rounded-full flex items-center justify-center transition-all shadow-md hover:scale-105 active:scale-95"
+      {/* MOBILE FULL PREVIEW MODAL */}
+      <AnimatePresence>
+        {showMobilePreview && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="fixed inset-0 z-50 bg-zinc-50 dark:bg-zinc-950 overflow-y-auto lg:hidden"
           >
-            <Plus size={18} strokeWidth={2.5} />
-          </button>
-          <span className="text-[11px] font-bold mt-2" style={{ color: themeColor.value }}>Add Item</span>
-        </div>
-      </div>
+            <div className="sticky top-0 p-4 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800 flex justify-between items-center z-10">
+              <button onClick={() => setShowMobilePreview(false)} className="px-4 py-2 bg-zinc-100 dark:bg-zinc-900 rounded-lg font-bold text-sm">
+                ← Back
+              </button>
+              <button onClick={handleDownloadPDF} disabled={isDownloading} className="px-4 py-2 text-white font-bold text-sm rounded-lg flex items-center gap-2" style={{ backgroundColor: themeColor.value }}>
+                {isDownloading ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download size={16} />} Download
+              </button>
+            </div>
+            <div className="p-4 flex justify-center">
+              <div 
+                className="relative origin-top"
+                style={{ transform: `scale(${scale})` }}
+              >
+                <div ref={invoiceRef}>
+                  {template === 'modern' && renderModernTemplate()}
+                  {template === 'classic' && renderClassicTemplate()}
+                  {template === 'creative' && renderCreativeTemplate()}
+                  {template === 'enterprise' && renderEnterpriseTemplate()}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* --- TOTALS & NOTES --- */}
-      <div className={`flex flex-col md:flex-row gap-8 mb-8 ${mobileTab === 'payment' ? 'flex' : 'hidden md:flex'}`}>
-        <div className="flex-1 space-y-4">
-          <div>
-            <Label>Notes</Label>
-            <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} className="h-[76px] resize-none" placeholder="Thank you for your business." />
-          </div>
-          <div>
-            <Label>Payment Instructions</Label>
-            <CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={3} className="h-[76px] resize-none" placeholder="Bank details, payment links, etc." />
-          </div>
-        </div>
+      <div className="flex flex-col lg:flex-row gap-8 items-start relative">
         
-        <div className="w-full md:w-80 space-y-3 animate-fade-in">
-          <div className="flex justify-between items-center text-sm px-2">
-            <span className="font-bold text-zinc-550 dark:text-zinc-450">Subtotal</span>
-            <span className="font-bold text-zinc-900 dark:text-white text-base">{fmt(subtotal)}</span>
-          </div>
+        {/* --- LEFT: FORM CONFIGURATION --- */}
+        <div className="w-full lg:w-[45%] xl:w-[40%] flex-shrink-0 space-y-6">
           
-          <div className="flex justify-between items-center gap-4 text-sm">
-            <span className="font-medium text-zinc-455 dark:text-zinc-500 pl-2">Tax (%)</span>
-            <div className="relative w-28">
-               <CleanInput type="number" min="0" value={taxRate || ''} onChange={e => setTaxRate(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0.00" className="pr-6 text-right h-9 rounded-xl border-zinc-200 dark:border-zinc-800" />
-               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-450 dark:text-zinc-550 font-medium">%</span>
-            </div>
-          </div>
-          
-          <div className="flex justify-between items-center gap-4 text-sm">
-            <span className="font-medium text-zinc-455 dark:text-zinc-500 pl-2">Discount</span>
-            <div className="relative w-36 flex">
-              <button type="button" onClick={() => setDiscountType('percent')} className={`px-2 text-[10px] font-bold rounded-l-xl border-y border-l transition-colors ${discountType === 'percent' ? 'bg-zinc-200 dark:bg-zinc-700 border-zinc-300 dark:border-zinc-650 text-zinc-900 dark:text-white' : 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-450 dark:text-zinc-550 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}>%</button>
-              <button type="button" onClick={() => setDiscountType('flat')} className={`px-2 text-[10px] font-bold border-y border-l transition-colors ${discountType === 'flat' ? 'bg-zinc-200 dark:bg-zinc-700 border-zinc-300 dark:border-zinc-650 text-zinc-900 dark:text-white' : 'bg-zinc-50 dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 text-zinc-450 dark:text-zinc-550 hover:bg-zinc-100 dark:hover:bg-zinc-800'}`}>$</button>
-              <CleanInput type="number" value={discountType === 'percent' ? (discountRate || '') : (discountVal || '')} onChange={e => discountType === 'percent' ? setDiscountRate(Math.max(0, parseFloat(e.target.value) || 0)) : setDiscountVal(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0.00" className="flex-1 rounded-none rounded-r-xl border-zinc-200 dark:border-zinc-800 text-right h-9 shadow-sm" />
-            </div>
-          </div>
-          
-          <div className="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex justify-between items-center px-2">
-            <span className="font-bold text-zinc-900 dark:text-white text-base">Total</span>
-            <span className="font-extrabold text-xl animate-pulse-once" style={{ color: themeColor.value }}>{fmt(total)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* --- TEMPLATE & SETTINGS SELECTION --- */}
-      <section className={`pt-6 border-t border-zinc-200/50 dark:border-zinc-900/50 ${mobileTab === 'payment' ? 'block' : 'hidden md:block'}`}>
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          <div className="flex flex-wrap items-center gap-6">
-            <div>
-              <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5 block">Design Style</label>
-              <div className="flex gap-1.5">
-                {TEMPLATES.map(t => (
-                  <button key={t} type="button" onClick={() => setTemplate(t)} className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold capitalize transition-all ${template === t ? 'bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900' : 'bg-zinc-100 dark:bg-zinc-900 text-zinc-650 dark:text-zinc-400 hover:bg-zinc-200/60 dark:hover:bg-zinc-800/80'}`}>
-                    {t}
-                  </button>
-                ))}
+          <div className="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800/80 rounded-2xl p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-zinc-900 dark:text-zinc-100 mb-6 flex items-center gap-2">
+              <Settings className="text-emerald-500" /> General Settings
+            </h2>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <Label>Template</Label>
+                <CleanSelect value={template} onChange={e => setTemplate(e.target.value as any)}>
+                  {TEMPLATES.map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+                </CleanSelect>
+              </div>
+              <div>
+                <Label>Currency</Label>
+                <CleanSelect value={currency} onChange={e => setCurrency(e.target.value)}>
+                  {CURRENCIES.map(c => <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>)}
+                </CleanSelect>
               </div>
             </div>
             <div>
-              <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5 block">Accent Color</label>
-              <div className="flex gap-1.5">
+              <Label>Theme Color</Label>
+              <div className="flex gap-3 mt-2">
                 {THEME_COLORS.map(c => (
-                  <button key={c.value} type="button" onClick={() => setThemeColor(c)} className={`w-5 h-5 rounded-full transition-all ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900 dark:ring-white scale-110' : 'hover:scale-105'}`} style={{ backgroundColor: c.value }} title={c.name} />
+                  <button 
+                    key={c.value} 
+                    type="button" 
+                    onClick={() => setThemeColor(c)} 
+                    className={`w-8 h-8 rounded-full transition-all flex items-center justify-center ${themeColor.value === c.value ? 'ring-2 ring-offset-2 ring-zinc-900 dark:ring-white dark:ring-offset-zinc-950 scale-110' : 'hover:scale-105'}`} 
+                    style={{ backgroundColor: c.value }} 
+                    title={c.name} 
+                  />
                 ))}
               </div>
             </div>
-            <div>
-              <label className="text-[9px] font-bold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-1.5 block">Currency</label>
-              <CleanSelect value={currency} onChange={e => setCurrency(e.target.value)} className="h-8 text-xs py-0.5">
-                {CURRENCIES.map(c => (
-                  <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
-                ))}
-              </CleanSelect>
-            </div>
           </div>
+
+          <Accordion title="Your Details" icon={Briefcase}>
+            <div className="space-y-4 pt-2">
+              <div>
+                <Label>Company Logo</Label>
+                <div className="relative rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 bg-zinc-50 dark:bg-zinc-900/30 p-4 flex items-center gap-4 cursor-pointer transition-all duration-300 group">
+                  <input type="file" accept="image/*" onChange={(e) => { const f = e.target.files?.[0]; if(f){ const r = new FileReader(); r.onload = ev => setLogoUrl(ev.target?.result as string); r.readAsDataURL(f); }else setLogoUrl(''); }} className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" />
+                  <div className="w-12 h-12 rounded-xl bg-white dark:bg-zinc-950 shadow-sm flex items-center justify-center text-emerald-500 group-hover:scale-110 transition-transform">
+                    <ImageIcon size={20} />
+                  </div>
+                  <div>
+                    <p className="font-bold text-[14px] text-zinc-900 dark:text-zinc-100">Upload Logo</p>
+                    <p className="text-[12px] text-zinc-500">JPG, PNG &lt; 5MB</p>
+                  </div>
+                  {logoUrl && <button type="button" onClick={(e) => { e.preventDefault(); setLogoUrl(''); }} className="absolute right-4 text-[12px] font-bold text-rose-500 z-20 hover:text-rose-600 bg-rose-50 dark:bg-rose-500/10 px-3 py-1 rounded-lg">Remove</button>}
+                </div>
+              </div>
+              <div>
+                <Label>Company Name</Label>
+                <CleanInput value={companyName} onChange={e => setCompanyName(e.target.value)} placeholder="Acme Corp" />
+              </div>
+              <div>
+                <Label>Company Address</Label>
+                <CleanTextarea value={companyAddress} onChange={e => setCompanyAddress(e.target.value)} rows={2} placeholder="123 Business Rd..." />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Invoice Number</Label>
+                  <CleanInput value={invoiceNumber} onChange={e => setInvoiceNumber(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Issue Date</Label>
+                  <CleanInput type="date" value={issueDate} onChange={e => setIssueDate(e.target.value)} />
+                </div>
+              </div>
+            </div>
+          </Accordion>
+
+          <Accordion title="Client Details" icon={User} defaultOpen={false}>
+            <div className="space-y-4 pt-2">
+              <div>
+                <Label>Client Name</Label>
+                <CleanInput value={clientName} onChange={e => setClientName(e.target.value)} placeholder="John Doe" />
+              </div>
+              <div>
+                <Label>Client Email</Label>
+                <CleanInput value={clientEmail} onChange={e => setClientEmail(e.target.value)} placeholder="john@example.com" />
+              </div>
+              <div>
+                <Label>Client Address</Label>
+                <CleanTextarea value={clientAddress} onChange={e => setClientAddress(e.target.value)} rows={2} placeholder="456 Client St..." />
+              </div>
+              <div>
+                <Label>Due Date</Label>
+                <CleanInput type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
+              </div>
+            </div>
+          </Accordion>
+
+          <Accordion title="Line Items" icon={List}>
+            <div className="space-y-4 pt-2">
+              <AnimatePresence>
+                {items.map((item, idx) => (
+                  <motion.div 
+                    key={idx} 
+                    initial={{ opacity: 0, x: -20 }} 
+                    animate={{ opacity: 1, x: 0 }} 
+                    exit={{ opacity: 0, x: 20 }} 
+                    className="bg-zinc-50 dark:bg-zinc-900/30 rounded-xl p-4 border border-zinc-200/80 dark:border-zinc-800/50 relative group"
+                  >
+                    <div className="flex gap-3 mb-3">
+                      <div className="flex-1">
+                        <Label>Description</Label>
+                        <CleanInput value={item.description} onChange={e => handleItemChange(idx, 'description', e.target.value)} placeholder="Item description" className="h-10" />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <div className="w-1/3">
+                        <Label>Rate</Label>
+                        <CleanInput type="number" value={item.unit_price || ''} onChange={e => handleItemChange(idx, 'unit_price', e.target.value)} placeholder="0.00" className="h-10" />
+                      </div>
+                      <div className="w-1/3">
+                        <Label>Qty</Label>
+                        <CleanInput type="number" min="1" value={item.quantity || ''} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} placeholder="1" className="h-10" />
+                      </div>
+                      <div className="w-1/3">
+                        <Label>Amount</Label>
+                        <div className="h-10 bg-zinc-200/50 dark:bg-zinc-900 rounded-lg flex items-center px-4 font-bold text-zinc-700 dark:text-zinc-300">
+                          {fmt(item.amount)}
+                        </div>
+                      </div>
+                    </div>
+                    <button 
+                      onClick={() => removeRow(idx)} 
+                      disabled={items.length === 1}
+                      className="absolute -top-3 -right-3 w-8 h-8 bg-white dark:bg-zinc-800 rounded-full shadow-md text-zinc-400 hover:text-rose-500 border border-zinc-100 dark:border-zinc-700 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity disabled:hidden"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+              <button 
+                onClick={addRow} 
+                className="w-full py-4 rounded-xl border-2 border-dashed border-zinc-200 dark:border-zinc-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 text-zinc-500 dark:text-zinc-400 font-bold text-sm flex items-center justify-center gap-2 transition-colors hover:text-emerald-600 dark:hover:text-emerald-500"
+              >
+                <Plus size={18} /> Add Another Item
+              </button>
+            </div>
+          </Accordion>
+
+          <Accordion title="Totals & Notes" icon={FileText} defaultOpen={false}>
+            <div className="space-y-6 pt-2">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Tax Rate (%)</Label>
+                  <CleanInput type="number" min="0" value={taxRate || ''} onChange={e => setTaxRate(Math.max(0, parseFloat(e.target.value) || 0))} placeholder="0" />
+                </div>
+                <div>
+                  <Label>Discount ({discountType === 'percent' ? '%' : '$'})</Label>
+                  <div className="flex">
+                    <button onClick={() => setDiscountType('percent')} className={`px-3 border border-r-0 border-zinc-200 dark:border-zinc-800 rounded-l-lg text-xs font-bold transition-colors ${discountType === 'percent' ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500'}`}>%</button>
+                    <button onClick={() => setDiscountType('flat')} className={`px-3 border border-r-0 border-zinc-200 dark:border-zinc-800 text-xs font-bold transition-colors ${discountType === 'flat' ? 'bg-zinc-200 dark:bg-zinc-700 text-zinc-900 dark:text-white' : 'bg-zinc-50 dark:bg-zinc-900 text-zinc-500'}`}>$</button>
+                    <CleanInput type="number" value={discountType === 'percent' ? (discountRate || '') : (discountVal || '')} onChange={e => discountType === 'percent' ? setDiscountRate(Math.max(0, parseFloat(e.target.value) || 0)) : setDiscountVal(Math.max(0, parseFloat(e.target.value) || 0))} className="rounded-l-none" placeholder="0.00" />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Label>Notes</Label>
+                <CleanTextarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} />
+              </div>
+              <div>
+                <Label>Payment Instructions</Label>
+                <CleanTextarea value={paymentDetails} onChange={e => setPaymentDetails(e.target.value)} rows={2} />
+              </div>
+            </div>
+          </Accordion>
           
-          {/* Actions */}
-          <div className="w-full md:w-auto flex justify-end">
-            <button 
-              type="button"
-              onClick={() => setShowPreview(true)}
-              style={{ backgroundColor: themeColor.value }}
-              className="w-full md:w-auto px-8 py-3 text-white font-bold text-sm rounded-xl shadow-lg shadow-zinc-900/10 hover:brightness-105 transition-all active:scale-[0.98]"
-            >
-              Preview & Download PDF
+          <div className="lg:hidden">
+            <button onClick={() => setShowMobilePreview(true)} className="w-full py-4 text-white font-bold text-[15px] rounded-xl flex items-center justify-center gap-2 shadow-lg" style={{ backgroundColor: themeColor.value }}>
+              <Eye size={20} /> Preview Invoice
             </button>
           </div>
-        </div>
-      </section>
 
-      {/* Sticky Bottom Bar on Mobile */}
-      <div className="fixed bottom-0 left-0 right-0 p-3.5 bg-white/90 dark:bg-zinc-950/90 backdrop-blur-lg border-t border-zinc-200/50 dark:border-zinc-900/80 flex items-center justify-between z-40 md:hidden no-print">
-        <div className="flex flex-col">
-          <span className="text-[9px] uppercase tracking-wider text-zinc-450 dark:text-zinc-500 font-bold">Total Due</span>
-          <span className="text-lg font-black" style={{ color: themeColor.value }}>{fmt(total)}</span>
         </div>
-        <button
-          type="button"
-          onClick={() => setShowPreview(true)}
-          style={{ backgroundColor: themeColor.value }}
-          className="px-5 py-2.5 text-white font-bold text-xs rounded-xl shadow-md transition-all active:scale-[0.97]"
-        >
-          Preview PDF
-        </button>
+
+        {/* --- RIGHT: LIVE PREVIEW --- */}
+        <div className="hidden lg:flex w-full lg:w-[55%] xl:w-[60%] flex-col items-center">
+          <div className="sticky top-8 w-full flex flex-col items-center">
+            
+            {/* Download Top Bar */}
+            <div className="w-full max-w-[800px] mb-6 flex justify-between items-center bg-white dark:bg-zinc-950 p-4 rounded-2xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+              <div className="flex items-center gap-4 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+                <span className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live Preview</span>
+              </div>
+              <button 
+                onClick={handleDownloadPDF} 
+                disabled={isDownloading}
+                className="px-6 py-2.5 text-white font-bold text-sm rounded-xl flex items-center gap-2 shadow-md hover:brightness-105 transition-all disabled:opacity-50"
+                style={{ backgroundColor: themeColor.value }}
+              >
+                {isDownloading ? <span className="h-4 w-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Download size={18} />} 
+                Download PDF
+              </button>
+            </div>
+
+            {/* Preview Render */}
+            <div ref={containerRef} className="w-full flex justify-center">
+              <div 
+                className="relative origin-top shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] dark:shadow-none rounded-sm transition-transform duration-200"
+                style={{ transform: `scale(${scale})` }}
+              >
+                <div ref={invoiceRef}>
+                  {template === 'modern' && renderModernTemplate()}
+                  {template === 'classic' && renderClassicTemplate()}
+                  {template === 'creative' && renderCreativeTemplate()}
+                  {template === 'enterprise' && renderEnterpriseTemplate()}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
-
     </div>
   );
 }
