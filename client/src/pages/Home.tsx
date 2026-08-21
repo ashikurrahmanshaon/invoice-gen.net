@@ -1,33 +1,19 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+import { formatBdt } from "@shared/invoice";
+import { useLocale } from "@/contexts/LocaleContext";
+import { trpc } from "@/lib/trpc";
+import { ArrowUpRight, CircleDollarSign, Clock3, FileText, Plus, Users } from "lucide-react";
+import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { Card, CardContent } from "@/components/ui/card";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
- */
+const currency = (amount: number, locale: string) => formatBdt(amount, locale === "bn" ? "bn-BD" : "en-BD");
+
 export default function Home() {
-  // The useAuth hook provides authentication state.
-  // To implement login/logout, call logout(), or start login from an event
-  // handler: onClick={() => startLogin()} (imported from "@/const"). Never call
-  // startLogin() during render (no href={startLogin()}) — it mints a one-time
-  // nonce cookie and must run only at the moment of navigation.
-  let { user, loading, error, isAuthenticated, logout } = useAuth();
-
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
-    </div>
-  );
+  const { t, locale } = useLocale();
+  const [, navigate] = useLocation();
+  const { data: invoices = [], isLoading } = trpc.invoices.list.useQuery();
+  const paid = invoices.filter((row) => row.invoice.status === "paid").reduce((sum, row) => sum + row.invoice.totalAmount, 0);
+  const outstanding = invoices.filter((row) => row.invoice.status !== "paid").reduce((sum, row) => sum + row.invoice.totalAmount, 0);
+  const cards = [{ label: t("totalReceivable"), value: currency(invoices.reduce((sum, row) => sum + row.invoice.totalAmount, 0), locale), icon: CircleDollarSign, color: "bg-blue-600" }, { label: t("paid"), value: currency(paid, locale), icon: ArrowUpRight, color: "bg-emerald-500" }, { label: t("outstanding"), value: currency(outstanding, locale), icon: Clock3, color: "bg-amber-500" }, { label: t("invoices"), value: String(invoices.length), icon: FileText, color: "bg-indigo-500" }];
+  return <div className="container max-w-7xl space-y-7"><section className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"><div><p className="text-sm font-semibold text-blue-700">InvoiceFlow</p><h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950">{t("dashboard")}</h1><p className="mt-2 text-sm text-slate-500">{locale === "bn" ? "আপনার ইনভয়েস ও পেমেন্টের সারসংক্ষেপ" : "A clear view of your invoicing and payments."}</p></div><Button onClick={() => navigate("/invoices/new")} className="h-11 bg-blue-700 px-5 shadow-lg shadow-blue-200 hover:bg-blue-800"><Plus className="mr-2 h-4 w-4" />{t("newInvoice")}</Button></section><section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map((card) => <Card key={card.label} className="border-0 bg-white shadow-sm"><CardContent className="flex items-start justify-between p-5"><div><p className="text-sm font-medium text-slate-500">{card.label}</p><p className="mt-2 text-2xl font-bold tracking-tight text-slate-950">{card.value}</p></div><div className={`grid h-10 w-10 place-items-center rounded-xl ${card.color} text-white`}><card.icon className="h-5 w-5" /></div></CardContent></Card>)}</section><section className="rounded-2xl border border-slate-200 bg-white"><div className="flex items-center justify-between border-b border-slate-100 px-5 py-4"><div><h2 className="font-bold text-slate-900">{t("recentInvoices")}</h2><p className="mt-1 text-sm text-slate-500">{locale === "bn" ? "সাম্প্রতিক তৈরি করা ইনভয়েসগুলো" : "Your most recently created invoices."}</p></div><button onClick={() => navigate("/invoices")} className="text-sm font-semibold text-blue-700 hover:text-blue-900">{t("invoices")}</button></div>{isLoading ? <div className="p-8 text-sm text-slate-500">Loading…</div> : invoices.length ? <div className="divide-y divide-slate-100">{invoices.slice(0, 5).map((row) => <button key={row.invoice.id} onClick={() => navigate(`/invoices/${row.invoice.id}`)} className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-slate-50"><div className="flex min-w-0 items-center gap-3"><div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700"><FileText className="h-4 w-4" /></div><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-800">{row.invoice.invoiceNumber}</p><p className="truncate text-xs text-slate-500">{locale === "bn" ? row.customer.nameBn || row.customer.name : row.customer.name}</p></div></div><p className="shrink-0 text-sm font-semibold text-slate-900">{currency(row.invoice.totalAmount, locale)}</p></button>)}</div> : <div className="grid place-items-center gap-3 px-5 py-14 text-center"><div className="grid h-12 w-12 place-items-center rounded-2xl bg-blue-50 text-blue-700"><Users className="h-5 w-5" /></div><p className="font-semibold text-slate-800">{t("noInvoices")}</p><Button variant="outline" onClick={() => navigate("/invoices/new")}>{t("createFirstInvoice")}</Button></div>}</section></div>;
 }

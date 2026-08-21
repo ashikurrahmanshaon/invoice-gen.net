@@ -1,0 +1,29 @@
+# Project TODO
+
+- [x] Define invoice, customer, product, line-item, and status-history database tables with user ownership.
+- [x] Build protected tRPC procedures for customers, products, invoices, totals, status changes, and bilingual data rendering.
+- [x] Create the responsive blue-and-white dashboard layout with bilingual sidebar navigation and language toggle.
+- [x] Build customer management with create, edit, delete, validation, and empty states.
+- [x] Build product/service catalog management with create, edit, delete, default pricing, and validation.
+- [x] Build invoice creation and editing with customer selection, dynamic line items, tax/VAT, discount, and real-time totals.
+- [x] Build a searchable, filterable, and sortable invoice list with draft, sent, paid, and overdue statuses.
+- [x] Build a bilingual invoice detail and print-ready preview with business, customer, line-item, and total sections.
+- [x] Add browser printing and PDF export for bilingual invoice output.
+- [x] Integrate credential-ready direct invoice email sending from the invoice detail page, pending a verified Resend sender configuration.
+- [x] Add client and server Vitest coverage for invoice total calculations, bilingual email content, and protected authentication behavior.
+- [x] Verify responsive layouts, accessibility, primary workflows, and browser console health.
+- [x] Build an invoice edit route that loads an existing invoice into the form and saves changes end-to-end.
+- [x] Add visible sortable invoice table columns for number, customer, due date, amount, and status.
+- [x] Add client-side tests for bilingual language switching, total rendering, sortable columns, and invoice detail actions.
+- [x] Add server tests confirming protected invoice data procedures reject unauthenticated access.
+- [x] Execute documented create, edit, status, print/PDF, and credential-ready email-path workflow checks without inserting test business records.
+- [x] Verify keyboard access, accessible labels, focus treatment, and semantic controls for the core forms and navigation.
+- [x] Add UI-level tests for locale switching, invoice totals, sortable table header interactions, and invoice detail actions.
+- [x] Add unauthenticated rejection coverage for invoice-specific protected procedures.
+- [x] Perform executable create, edit, status, PDF, and email-error-path workflow checks without modifying user business data.
+- [x] Run explicit keyboard and semantic accessibility checks for primary controls and document the results.
+- [x] Add a component test that clicks invoice sortable headers and verifies rendered row order changes.
+- [x] Add explicit keyboard-accessibility tests for sidebar navigation, core invoice controls, and action buttons.
+- [x] Add a focused keyboard-accessibility test for the sidebar navigation controls.
+- [x] Add Enter/Space activation and focus-order checks for sidebar navigation controls.
+- [x] Add Space-key activation and Tab-based traversal checks for sidebar navigation controls.

@@ -119,6 +119,7 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: Inter, "Hind Siliguri", ui-sans-serif, system-ui, sans-serif;
   }
   button:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
@@ -132,6 +133,15 @@
     @apply cursor-pointer;
   }
 }
+
+@media print {
+  @page { size: A4; margin: 12mm; }
+  body { background: white !important; }
+  .invoice-paper { width: 100%; max-width: none; box-shadow: none !important; }
+  [data-sidebar], aside, header { display: none !important; }
+}
+
+.invoice-paper { border-radius: 1rem; padding: clamp(1.25rem, 4vw, 3rem); }
 
 @layer components {
   /**

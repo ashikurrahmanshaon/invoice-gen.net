@@ -1,20 +1,34 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import DashboardLayout from "@/components/DashboardLayout";
+import { LocaleProvider } from "@/contexts/LocaleContext";
+import Customers from "@/pages/Customers";
+import InvoiceDetail from "@/pages/InvoiceDetail";
+import Invoices from "@/pages/Invoices";
+import NewInvoice from "@/pages/NewInvoice";
 import NotFound from "@/pages/NotFound";
+import Products from "@/pages/Products";
+import Settings from "@/pages/Settings";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <DashboardLayout>
+      <Switch>
+        <Route path={"/"} component={Home} />
+        <Route path={"/invoices"} component={Invoices} />
+        <Route path={"/invoices/new"} component={NewInvoice} />
+        <Route path={"/invoices/:id/edit"} component={NewInvoice} />
+        <Route path={"/invoices/:id"} component={InvoiceDetail} />
+        <Route path={"/customers"} component={Customers} />
+        <Route path={"/products"} component={Products} />
+        <Route path={"/settings"} component={Settings} />
+        <Route component={NotFound} />
+      </Switch>
+    </DashboardLayout>
   );
 }
 
@@ -30,10 +44,12 @@ function App() {
         defaultTheme="light"
         // switchable
       >
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <LocaleProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </LocaleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
