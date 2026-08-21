@@ -76,3 +76,15 @@ Success criteria: The header and footer visibly use invoice-gen.net; the languag
 - [x] Add invoice-gen.net public SEO title, description, canonical, language, and social preview metadata.
 - [x] Add an automated assertion covering the public page metadata contract.
 - [x] Expand the SEO contract test to cover HTML language metadata and the full declared Open Graph/Twitter metadata set.
+
+- [x] Redesign the public header with stronger branding, improved navigation, language access, and clearer conversion actions.
+- [x] Redesign the public footer with product links, resource links, app access, contact context, and a stronger brand close.
+- [x] Create a bilingual SEO-friendly blog index with category filters or topic grouping and article cards.
+- [x] Create initial original blog article pages focused on practical invoicing, small-business billing, currencies, and payment workflows.
+- [x] Add article metadata, canonical URLs, Open Graph/Twitter tags, structured data, sitemap/robots coverage, and internal linking for the blog.
+- [x] Add public-site tests and responsive visual validation for the polished header, footer, blog index, and article pages.
+- [ ] Save a checkpoint for the premium public website and blog update.
+- [x] Add route-aware per-article canonical, Open Graph, and Twitter metadata and test the metadata values.
+- [x] Run fresh mobile visual validation for the blog index and at least one article page, including responsive header and footer behavior.
+- [x] Inject per-article canonical, Open Graph, Twitter, and BlogPosting metadata into the initial HTML response for /blog/:slug routes.
+- [x] Validate delivered HTML for a blog article route, not only hydrated browser DOM metadata.

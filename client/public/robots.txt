@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /blog/*
+Disallow: /app
+Disallow: /invoices
+Disallow: /customers
+Disallow: /products
+Disallow: /settings
+
+Sitemap: https://invoice-gen.net/sitemap.xml

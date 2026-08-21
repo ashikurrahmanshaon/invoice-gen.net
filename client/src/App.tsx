@@ -15,6 +15,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "@/pages/Home";
 import PublicHome from "@/pages/PublicHome";
+import Blog from "@/pages/Blog";
+import BlogPost from "@/pages/BlogPost";
 
 function ProtectedRouter() {
   return <DashboardLayout><Switch>
@@ -34,6 +36,8 @@ function ProtectedRouter() {
 function Router() {
   return <Switch>
     <Route path={"/"} component={PublicHome} />
+    <Route path={"/blog"} component={Blog} />
+    <Route path={"/blog/:slug"} component={BlogPost} />
     <Route component={ProtectedRouter} />
   </Switch>;
 }
