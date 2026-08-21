@@ -19,4 +19,13 @@ describe("public SEO metadata", () => {
     expect(html).toContain('name="twitter:title"');
     expect(html).toContain('name="twitter:description"');
   });
+
+  it("lists the guest generator in sitemap and protects private or transient routes from indexing", () => {
+    const sitemap = readFileSync(resolve(__dirname, "../public/sitemap.xml"), "utf8");
+    const robots = readFileSync(resolve(__dirname, "../public/robots.txt"), "utf8");
+    expect(sitemap).toContain("https://invoice-gen.net/invoice-generator");
+    expect(robots).toContain("Allow: /invoice-generator");
+    expect(robots).toContain("Disallow: /invoice-generator/preview");
+    expect(robots).toContain("Disallow: /app");
+  });
 });

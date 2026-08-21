@@ -17,6 +17,8 @@ import Home from "@/pages/Home";
 import PublicHome from "@/pages/PublicHome";
 import Blog from "@/pages/Blog";
 import BlogPost from "@/pages/BlogPost";
+import GuestInvoice from "@/pages/GuestInvoice";
+import GuestInvoicePreview from "@/pages/GuestInvoicePreview";
 
 function ProtectedRouter() {
   return <DashboardLayout><Switch>
@@ -38,6 +40,8 @@ function Router() {
     <Route path={"/"} component={PublicHome} />
     <Route path={"/blog"} component={Blog} />
     <Route path={"/blog/:slug"} component={BlogPost} />
+    <Route path={"/invoice-generator"} component={GuestInvoice} />
+    <Route path={"/invoice-generator/preview"} component={GuestInvoicePreview} />
     <Route component={ProtectedRouter} />
   </Switch>;
 }

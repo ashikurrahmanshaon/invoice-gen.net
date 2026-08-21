@@ -88,3 +88,20 @@ Success criteria: The header and footer visibly use invoice-gen.net; the languag
 - [x] Run fresh mobile visual validation for the blog index and at least one article page, including responsive header and footer behavior.
 - [x] Inject per-article canonical, Open Graph, Twitter, and BlogPosting metadata into the initial HTML response for /blog/:slug routes.
 - [x] Validate delivered HTML for a blog article route, not only hydrated browser DOM metadata.
+
+### Guest invoice and SEO expansion
+
+- [x] Add a public guest invoice generator entry point that does not require sign-in.
+- [x] Keep saved invoices, customer records, and protected workspace actions behind authentication.
+- [x] Make guest invoice creation smooth with clear steps, validation, autosave-in-session, preview, print, and PDF output.
+- [x] Add professional conversion copy explaining guest mode versus saved workspace mode.
+- [x] Expand SEO metadata and structured content for the public generator route.
+- [x] Verify sitemap, robots directives, canonical URLs, social metadata, and crawler-visible HTML for public routes.
+- [x] Add automated tests for guest invoice creation, protected saved actions, responsive access, and SEO contracts.
+- [x] Run fresh desktop/mobile visual validation and save a final checkpoint for the guest invoice experience.
+
+### Guest-flow follow-up validation
+
+- [x] Autosave and restore guest invoice draft fields in session storage while editing.
+- [x] Add automated guest route and mobile-access contract coverage.
+- [ ] Save a checkpoint after the guest invoice expansion and final validation.

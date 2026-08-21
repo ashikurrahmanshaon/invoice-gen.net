@@ -17,7 +17,27 @@ function getBlogSlug(url: string) {
   return match ? decodeURIComponent(match[1]) : undefined;
 }
 
+function replaceRouteMetadata(template: string, title: string, description: string, canonical: string) {
+  return template
+    .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
+    .replace(/<meta name="description"[^>]*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`)
+    .replace(/<link rel="canonical"[^>]*\/>/, `<link rel="canonical" href="${canonical}" />`)
+    .replace(/<meta property="og:url"[^>]*\/>/, `<meta property="og:url" content="${canonical}" />`)
+    .replace(/<meta property="og:title"[^>]*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`)
+    .replace(/<meta property="og:description"[^>]*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`)
+    .replace(/<meta name="twitter:title"[^>]*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
+    .replace(/<meta name="twitter:description"[^>]*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`);
+}
+
 export function injectBlogMetadata(template: string, url: string) {
+  const pathname = url.split("?")[0].replace(/\/$/, "") || "/";
+  if (pathname === "/invoice-generator") {
+    const title = "Free Invoice Generator — Create Professional Invoices | invoice-gen.net";
+    const description = "Create a professional invoice online without signing in. Add items, tax, discounts, and currency, then print or download a polished PDF with invoice-gen.net.";
+    const canonical = "https://invoice-gen.net/invoice-generator";
+    const jsonLd = JSON.stringify({ "@context": "https://schema.org", "@type": "WebApplication", name: "invoice-gen.net Free Invoice Generator", url: canonical, applicationCategory: "BusinessApplication", operatingSystem: "Web", description });
+    return replaceRouteMetadata(template, title, description, canonical).replace("</head>", `<script type="application/ld+json">${jsonLd}</script></head>`);
+  }
   const slug = getBlogSlug(url);
   const post = slug ? getBlogPost(slug) : undefined;
   if (!post) return template;
@@ -36,15 +56,7 @@ export function injectBlogMetadata(template: string, url: string) {
     mainEntityOfPage: { "@type": "WebPage", "@id": canonical },
   });
 
-  let page = template
-    .replace(/<title>.*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
-    .replace(/<meta name="description"[^>]*\/>/, `<meta name="description" content="${escapeHtml(description)}" />`)
-    .replace(/<link rel="canonical"[^>]*\/>/, `<link rel="canonical" href="${canonical}" />`)
-    .replace(/<meta property="og:url"[^>]*\/>/, `<meta property="og:url" content="${canonical}" />`)
-    .replace(/<meta property="og:title"[^>]*\/>/, `<meta property="og:title" content="${escapeHtml(title)}" />`)
-    .replace(/<meta property="og:description"[^>]*\/>/, `<meta property="og:description" content="${escapeHtml(description)}" />`)
-    .replace(/<meta name="twitter:title"[^>]*\/>/, `<meta name="twitter:title" content="${escapeHtml(title)}" />`)
-    .replace(/<meta name="twitter:description"[^>]*\/>/, `<meta name="twitter:description" content="${escapeHtml(description)}" />`);
+  let page = replaceRouteMetadata(template, title, description, canonical);
   return page.replace("</head>", `<script type="application/ld+json">${jsonLd}</script></head>`);
 }
 

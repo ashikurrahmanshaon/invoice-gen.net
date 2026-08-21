@@ -2,6 +2,8 @@ User-agent: *
 Allow: /
 Allow: /blog
 Allow: /blog/*
+Allow: /invoice-generator
+Disallow: /invoice-generator/preview
 Disallow: /app
 Disallow: /invoices
 Disallow: /customers
