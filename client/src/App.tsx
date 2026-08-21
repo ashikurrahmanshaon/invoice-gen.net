@@ -13,25 +13,29 @@ import Settings from "@/pages/Settings";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import Home from "@/pages/Home";
+import PublicHome from "@/pages/PublicHome";
+
+function ProtectedRouter() {
+  return <DashboardLayout><Switch>
+    <Route path={"/app"} component={Home} />
+    <Route path={"/invoices"} component={Invoices} />
+    <Route path={"/invoices/new"} component={NewInvoice} />
+    <Route path={"/invoices/:id/edit"} component={NewInvoice} />
+    <Route path={"/invoices/temporary"} component={TemporaryInvoice} />
+    <Route path={"/invoices/:id"} component={InvoiceDetail} />
+    <Route path={"/customers"} component={Customers} />
+    <Route path={"/products"} component={Products} />
+    <Route path={"/settings"} component={Settings} />
+    <Route component={NotFound} />
+  </Switch></DashboardLayout>;
+}
 
 function Router() {
-  return (
-    <DashboardLayout>
-      <Switch>
-        <Route path={"/"} component={Home} />
-        <Route path={"/invoices"} component={Invoices} />
-        <Route path={"/invoices/new"} component={NewInvoice} />
-        <Route path={"/invoices/:id/edit"} component={NewInvoice} />
-        <Route path={"/invoices/temporary"} component={TemporaryInvoice} />
-        <Route path={"/invoices/:id"} component={InvoiceDetail} />
-        <Route path={"/customers"} component={Customers} />
-        <Route path={"/products"} component={Products} />
-        <Route path={"/settings"} component={Settings} />
-        <Route component={NotFound} />
-      </Switch>
-    </DashboardLayout>
-  );
+  return <Switch>
+    <Route path={"/"} component={PublicHome} />
+    <Route component={ProtectedRouter} />
+  </Switch>;
 }
 
 // NOTE: About Theme

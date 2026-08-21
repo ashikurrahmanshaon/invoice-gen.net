@@ -33,7 +33,7 @@
 - [x] Add a global currency selector with localized currency symbols and invoice total formatting.
 - [x] Add temporary invoice mode that permits invoice generation with unsaved customer details and does not require creating a customer record.
 - [x] Add tests and responsive validation for the new brand, language, currency, and temporary-invoice flows.
-- [ ] Save a new checkpoint for the invoice-gen.net update.
+- [x] Save a new checkpoint for the invoice-gen.net update.
 
 ### Implementation assumptions
 
@@ -66,3 +66,13 @@ Success criteria: The header and footer visibly use invoice-gen.net; the languag
 - [x] Add an executable keyboard/form submission test for the primary invoice action in both saved and temporary modes.
 - [x] Add a saved-customer keyboard/form-submit test that verifies the create mutation fires without a click.
 - [x] Add a temporary-customer keyboard/form-submit test that verifies transient session data and navigation without a click.
+
+- [x] Create a public invoice-gen.net landing page for visitors who are not signed in.
+- [x] Add public navigation, hero section, product explanation, feature sections, trust-oriented messaging, and clear sign-in/get-started CTAs.
+- [x] Keep the invoice dashboard and management routes protected and reachable from the public site.
+- [x] Add public-site SEO metadata, semantic structure, responsive behavior, and accessible navigation.
+- [x] Add automated coverage and fresh desktop/mobile visual validation for the public website.
+- [ ] Save a checkpoint for the public-facing invoice-gen.net website update.
+- [x] Add invoice-gen.net public SEO title, description, canonical, language, and social preview metadata.
+- [x] Add an automated assertion covering the public page metadata contract.
+- [x] Expand the SEO contract test to cover HTML language metadata and the full declared Open Graph/Twitter metadata set.
