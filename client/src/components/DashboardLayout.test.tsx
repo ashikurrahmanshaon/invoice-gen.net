@@ -21,7 +21,7 @@ describe("DashboardLayout", () => {
   it("reaches sidebar controls in order through Tab and routes an Invoices control activated with Enter", async () => {
     const user = userEvent.setup();
     render(<LocaleProvider><DashboardLayout><div>Workspace</div></DashboardLayout></LocaleProvider>);
-    const brand = screen.getByRole("button", { name: /InvoiceFlow/ });
+    const brand = screen.getByRole("button", { name: /invoice-gen\.net/ });
     const dashboard = screen.getByRole("button", { name: "Dashboard" });
     const invoices = screen.getByRole("button", { name: "Invoices" });
     await user.tab();

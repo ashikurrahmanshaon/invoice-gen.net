@@ -98,6 +98,7 @@ export type BusinessProfilePayload = {
 export type InvoicePayload = {
   invoiceNumber: string;
   customerId: number;
+  currencyCode: string;
   issueDate: Date;
   dueDate?: Date | null;
   taxRate: number;
@@ -234,6 +235,7 @@ export async function createInvoice(userId: number, data: InvoicePayload) {
   const result = await db.insert(invoices).values({
     userId,
     customerId: data.customerId,
+    currencyCode: data.currencyCode,
     invoiceNumber: data.invoiceNumber,
     issueDate: data.issueDate,
     dueDate: data.dueDate ?? null,
@@ -266,6 +268,7 @@ export async function updateInvoice(userId: number, invoiceId: number, data: Inv
   const totals = calculateInvoiceTotals(data.items, data.taxRate, data.discountAmount);
   await db.update(invoices).set({
     customerId: data.customerId,
+    currencyCode: data.currencyCode,
     invoiceNumber: data.invoiceNumber,
     issueDate: data.issueDate,
     dueDate: data.dueDate ?? null,

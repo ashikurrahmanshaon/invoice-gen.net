@@ -1,5 +1,5 @@
-import { formatBdt } from "@shared/invoice";
 import { type Locale, useLocale } from "@/contexts/LocaleContext";
+import { formatMoney } from "@shared/invoice";
 import React from "react";
 
 type InvoiceDocumentProps = { data: any; locale?: Locale };
@@ -18,7 +18,9 @@ export function InvoiceDocument({ data, locale: localeOverride }: InvoiceDocumen
   const locale = localeOverride ?? localeContext.locale;
   const t = localeContext.t;
   const { invoice, customer, business, items } = data;
-  const currencyLocale = locale === "bn" ? "bn-BD" : "en-BD";
+  const currencyCode = invoice.currencyCode || localeContext.currency;
+  const currencyLocale = locale === "bn" ? "bn-BD" : undefined;
+  const money = (amount: number) => formatMoney(amount, currencyCode, currencyLocale);
 
   return (
     <article className="invoice-paper bg-white text-slate-900 shadow-sm print:shadow-none" id="invoice-print-area">
@@ -26,7 +28,7 @@ export function InvoiceDocument({ data, locale: localeOverride }: InvoiceDocumen
         <section>
           <div className="mb-3 flex items-center gap-2">
             <div className="grid h-10 w-10 place-items-center rounded-xl bg-blue-700 text-sm font-black text-white">IF</div>
-            <span className="text-lg font-bold tracking-tight text-blue-950">InvoiceFlow</span>
+            <span className="text-lg font-bold tracking-tight text-blue-950">invoice-gen.net</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">{readText(business?.name, business?.nameBn, locale)}</h1>
           <p className="mt-2 max-w-xs whitespace-pre-line text-sm leading-6 text-slate-600">{readText(business?.address, business?.addressBn, locale)}</p>
@@ -61,16 +63,16 @@ export function InvoiceDocument({ data, locale: localeOverride }: InvoiceDocumen
             <tr><th className="px-4 py-3">{t("item")}</th><th className="px-4 py-3 text-right">{t("quantity")}</th><th className="px-4 py-3 text-right">{t("price")}</th><th className="px-4 py-3 text-right">{t("total")}</th></tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
-            {items.map((item: any) => <tr key={item.id}><td className="px-4 py-4"><p className="font-medium text-slate-900">{readText(item.name, item.nameBn, locale)}</p>{(item.description || item.descriptionBn) ? <p className="mt-1 text-xs text-slate-500">{readText(item.description, item.descriptionBn, locale)}</p> : null}</td><td className="px-4 py-4 text-right text-slate-600">{item.quantity}</td><td className="px-4 py-4 text-right text-slate-600">{formatBdt(item.unitPrice, currencyLocale)}</td><td className="px-4 py-4 text-right font-semibold">{formatBdt(item.lineTotal, currencyLocale)}</td></tr>)}
+            {items.map((item: any) => <tr key={item.id}><td className="px-4 py-4"><p className="font-medium text-slate-900">{readText(item.name, item.nameBn, locale)}</p>{(item.description || item.descriptionBn) ? <p className="mt-1 text-xs text-slate-500">{readText(item.description, item.descriptionBn, locale)}</p> : null}</td><td className="px-4 py-4 text-right text-slate-600">{item.quantity}</td><td className="px-4 py-4 text-right text-slate-600">{money(item.unitPrice)}</td><td className="px-4 py-4 text-right font-semibold">{money(item.lineTotal)}</td></tr>)}
           </tbody>
         </table>
       </div>
 
       <div className="mt-7 ml-auto w-full max-w-sm space-y-3 text-sm">
-        <div className="flex justify-between text-slate-600"><span>{t("subtotal")}</span><span>{formatBdt(invoice.subtotal, currencyLocale)}</span></div>
-        <div className="flex justify-between text-slate-600"><span>{t("taxVat")} ({invoice.taxRate}%)</span><span>{formatBdt(invoice.taxAmount, currencyLocale)}</span></div>
-        <div className="flex justify-between text-slate-600"><span>{t("discount")}</span><span>− {formatBdt(invoice.discountAmount, currencyLocale)}</span></div>
-        <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold text-slate-950"><span>{t("grandTotal")}</span><span>{formatBdt(invoice.totalAmount, currencyLocale)}</span></div>
+        <div className="flex justify-between text-slate-600"><span>{t("subtotal")}</span><span>{money(invoice.subtotal)}</span></div>
+        <div className="flex justify-between text-slate-600"><span>{t("taxVat")} ({invoice.taxRate}%)</span><span>{money(invoice.taxAmount)}</span></div>
+        <div className="flex justify-between text-slate-600"><span>{t("discount")}</span><span>− {money(invoice.discountAmount)}</span></div>
+        <div className="flex justify-between border-t border-slate-200 pt-4 text-lg font-bold text-slate-950"><span>{t("grandTotal")}</span><span>{money(invoice.totalAmount)}</span></div>
       </div>
       {invoice.notes ? <section className="mt-10 border-t border-slate-200 pt-6"><p className="text-xs font-bold uppercase tracking-[0.16em] text-slate-400">{t("notes")}</p><p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-600">{invoice.notes}</p></section> : null}
     </article>
@@ -79,5 +81,5 @@ export function InvoiceDocument({ data, locale: localeOverride }: InvoiceDocumen
 
 function statusLabelText(status: string, locale: Locale) {
   const labels = { en: { draft: "Draft", sent: "Sent", paid: "Paid", overdue: "Overdue" }, bn: { draft: "খসড়া", sent: "প্রেরিত", paid: "পরিশোধিত", overdue: "মেয়াদোত্তীর্ণ" } };
-  return labels[locale][status as keyof typeof labels.en] ?? status;
+  return labels[locale === "bn" ? "bn" : "en"][status as keyof typeof labels.en] ?? status;
 }

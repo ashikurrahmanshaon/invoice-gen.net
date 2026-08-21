@@ -27,3 +27,42 @@
 - [x] Add a focused keyboard-accessibility test for the sidebar navigation controls.
 - [x] Add Enter/Space activation and focus-order checks for sidebar navigation controls.
 - [x] Add Space-key activation and Tab-based traversal checks for sidebar navigation controls.
+
+- [x] Rebrand the application to invoice-gen.net in the website title, header, footer, and invoice output.
+- [x] Add a global language selector covering the application UI and invoice document output with a broad supported-language catalog.
+- [x] Add a global currency selector with localized currency symbols and invoice total formatting.
+- [x] Add temporary invoice mode that permits invoice generation with unsaved customer details and does not require creating a customer record.
+- [x] Add tests and responsive validation for the new brand, language, currency, and temporary-invoice flows.
+- [ ] Save a new checkpoint for the invoice-gen.net update.
+
+### Implementation assumptions
+
+- The initial language catalog will include the most widely used global languages with native labels and a fallback strategy for unsupported copy.
+- Currency selection will be persisted per user preference and stored on each saved invoice so historical invoices keep their original currency.
+- Temporary invoices will support preview, print, PDF download, and email only when a valid recipient email is supplied; they will not be persisted as invoices unless the user explicitly saves them.
+- The existing BDT-based records will remain compatible and default to BDT until a different currency is selected.
+
+### References
+
+- [1]: https://www.unicode.org/cldr/ Unicode CLDR locale and currency data.
+- [2]: https://www.iso.org/iso-4217-currency-codes.html ISO 4217 currency code standard.
+- [3]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat JavaScript Intl.NumberFormat reference.
+
+References: [1] [2] [3]
+
+Rules: Prefer Intl locale and currency formatting over handwritten symbol tables. Keep saved invoice currency immutable after creation unless the user explicitly edits it. Treat temporary invoice customer data as transient and avoid inserting it into the customer table automatically.
+
+Success criteria: The header and footer visibly use invoice-gen.net; the language and currency selectors update UI/invoice output; a user can make a preview-ready invoice without creating a customer; existing flows continue to pass type checks and tests.
+
+- [x] Limit the language selector to locales with real UI/invoice translations or add real localization coverage and locale-aware invoice output for each exposed language.
+- [x] Prevent mixed-currency dashboard totals from being summed under one selected currency; group summary values by currency or clearly label them.
+- [x] Add executable tests for temporary invoice creation and preview behavior.
+- [x] Run fresh desktop and mobile visual validation after the invoice-gen.net, language, currency, and temporary-invoice changes.
+- [x] Prevent invoice-gen.net mobile header branding from wrapping or clipping at narrow viewport widths.
+- [x] Add a component test that switches NewInvoice into temporary mode, fills unsaved customer data, submits, and verifies transient session data and navigation.
+- [x] Add a component test for TemporaryInvoice that verifies preview rendering plus print/PDF actions when temporary data exists.
+- [x] Make temporary mode controls stable for accessible component testing and keep form submission behavior consistent across modes.
+- [x] Restore a semantic submit path for the primary invoice action and verify saved and temporary modes submit consistently.
+- [x] Add an executable keyboard/form submission test for the primary invoice action in both saved and temporary modes.
+- [x] Add a saved-customer keyboard/form-submit test that verifies the create mutation fires without a click.
+- [x] Add a temporary-customer keyboard/form-submit test that verifies transient session data and navigation without a click.

@@ -51,6 +51,7 @@ const invoiceItemInput = z.object({
 const invoiceInput = z.object({
   invoiceNumber: z.string().trim().min(1).max(80),
   customerId: z.number().int().positive(),
+  currencyCode: z.string().trim().length(3).default("BDT"),
   issueDate: z.coerce.date(),
   dueDate: z.coerce.date().nullable().optional(),
   taxRate: z.number().min(0).max(100),

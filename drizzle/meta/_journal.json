@@ -8,6 +8,13 @@
       "when": 1787313007309,
       "tag": "0000_strange_ricochet",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787317962194,
+      "tag": "0001_tough_luckman",
+      "breakpoints": true
     }
   ]
 }

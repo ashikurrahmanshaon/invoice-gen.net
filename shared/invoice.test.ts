@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateInvoiceTotals, formatBdt } from "./invoice";
+import { calculateInvoiceTotals, formatBdt, formatMoney, getCurrencyMeta } from "./invoice";
 
 describe("calculateInvoiceTotals", () => {
   it("calculates line subtotals, VAT, and a fixed discount in poisha", () => {
@@ -25,5 +25,14 @@ describe("calculateInvoiceTotals", () => {
 
   it("renders BDT values from integer poisha", () => {
     expect(formatBdt(12550, "en-BD")).toContain("125.50");
+  });
+
+  it("formats selected global currencies with Intl", () => {
+    expect(formatMoney(12550, "USD", "en-US")).toContain("125.50");
+    expect(formatMoney(12550, "EUR", "de-DE")).toContain("125,50");
+  });
+
+  it("falls back to BDT for unknown currency codes", () => {
+    expect(getCurrencyMeta("XXX").code).toBe("BDT");
   });
 });

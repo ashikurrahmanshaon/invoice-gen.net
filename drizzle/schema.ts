@@ -71,6 +71,7 @@ export const invoices = mysqlTable(
     id: int("id").autoincrement().primaryKey(),
     userId: int("userId").notNull(),
     customerId: int("customerId").notNull(),
+    currencyCode: varchar("currencyCode", { length: 3 }).notNull().default("BDT"),
     invoiceNumber: varchar("invoiceNumber", { length: 80 }).notNull(),
     issueDate: timestamp("issueDate").notNull(),
     dueDate: timestamp("dueDate"),

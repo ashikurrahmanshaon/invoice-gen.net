@@ -6,6 +6,7 @@ import Customers from "@/pages/Customers";
 import InvoiceDetail from "@/pages/InvoiceDetail";
 import Invoices from "@/pages/Invoices";
 import NewInvoice from "@/pages/NewInvoice";
+import TemporaryInvoice from "@/pages/TemporaryInvoice";
 import NotFound from "@/pages/NotFound";
 import Products from "@/pages/Products";
 import Settings from "@/pages/Settings";
@@ -22,6 +23,7 @@ function Router() {
         <Route path={"/invoices"} component={Invoices} />
         <Route path={"/invoices/new"} component={NewInvoice} />
         <Route path={"/invoices/:id/edit"} component={NewInvoice} />
+        <Route path={"/invoices/temporary"} component={TemporaryInvoice} />
         <Route path={"/invoices/:id"} component={InvoiceDetail} />
         <Route path={"/customers"} component={Customers} />
         <Route path={"/products"} component={Products} />
