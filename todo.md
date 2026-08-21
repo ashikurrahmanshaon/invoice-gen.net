@@ -83,7 +83,7 @@ Success criteria: The header and footer visibly use invoice-gen.net; the languag
 - [x] Create initial original blog article pages focused on practical invoicing, small-business billing, currencies, and payment workflows.
 - [x] Add article metadata, canonical URLs, Open Graph/Twitter tags, structured data, sitemap/robots coverage, and internal linking for the blog.
 - [x] Add public-site tests and responsive visual validation for the polished header, footer, blog index, and article pages.
-- [ ] Save a checkpoint for the premium public website and blog update.
+- [x] Save a checkpoint for the premium public website and blog update.
 - [x] Add route-aware per-article canonical, Open Graph, and Twitter metadata and test the metadata values.
 - [x] Run fresh mobile visual validation for the blog index and at least one article page, including responsive header and footer behavior.
 - [x] Inject per-article canonical, Open Graph, Twitter, and BlogPosting metadata into the initial HTML response for /blog/:slug routes.
