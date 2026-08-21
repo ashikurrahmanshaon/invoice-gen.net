@@ -72,7 +72,7 @@ Success criteria: The header and footer visibly use invoice-gen.net; the languag
 - [x] Keep the invoice dashboard and management routes protected and reachable from the public site.
 - [x] Add public-site SEO metadata, semantic structure, responsive behavior, and accessible navigation.
 - [x] Add automated coverage and fresh desktop/mobile visual validation for the public website.
-- [ ] Save a checkpoint for the public-facing invoice-gen.net website update.
+- [x] Save a checkpoint for the public-facing invoice-gen.net website update.
 - [x] Add invoice-gen.net public SEO title, description, canonical, language, and social preview metadata.
 - [x] Add an automated assertion covering the public page metadata contract.
 - [x] Expand the SEO contract test to cover HTML language metadata and the full declared Open Graph/Twitter metadata set.
