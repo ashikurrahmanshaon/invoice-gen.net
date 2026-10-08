@@ -30,6 +30,7 @@
     $("#currency").value = inv.currency;
     $("#status").value = inv.status || "draft";
     setAccent(inv.accent, false);
+    setTemplate(inv.template, false);
     showLogo();
     renderItems();
     autosizeAll();
@@ -87,6 +88,15 @@
     inv.accent = color;
     $("#sheet").style.setProperty("--accent", color);
     $$(".swatch").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.color === color)));
+    if (save) changed();
+  }
+
+  function setTemplate(t, save) {
+    if (IG.TEMPLATES.indexOf(t) < 0) t = "classic";
+    inv.template = t;
+    const sheet = $("#sheet");
+    IG.TEMPLATES.forEach((k) => sheet.classList.toggle("t-" + k, k === t));
+    $$(".tpl-btn").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.template === t)));
     if (save) changed();
   }
 
@@ -269,7 +279,7 @@
   async function saveProfile() {
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
       name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
-      currency: inv.currency, accent: inv.accent, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
+      currency: inv.currency, accent: inv.accent, template: inv.template, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
       taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms
     });
     IG.store.set("ig_profile", p);
@@ -305,7 +315,7 @@
     if (!window.confirm("Start a new invoice? Your business details stay; this invoice's client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
     const keepFrom = inv.from;
-    const keep = { logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency };
+    const keep = { logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, template: inv.template };
     inv = IG.blankInvoice();
     inv.from = Object.assign({}, inv.from, keepFrom);
     Object.assign(inv, keep);
@@ -495,6 +505,17 @@
     const sw = $("#swatches");
     sw.innerHTML = IG.ACCENTS.map(([c, n]) =>
       '<button type="button" class="swatch" data-color="' + c + '" style="background:' + c + '" aria-label="' + n + '" aria-pressed="false"></button>').join("");
+    $("#tplPicker").addEventListener("click", (e) => {
+      const b = e.target.closest(".tpl-btn");
+      if (b) setTemplate(b.dataset.template, true);
+    });
+    document.addEventListener("click", (e) => {
+      const b = e.target.closest("[data-use-template]");
+      if (!b) return;
+      setTemplate(b.dataset.useTemplate, true);
+      $("#create").scrollIntoView({ behavior: "smooth", block: "start" });
+      IG.toast(b.textContent.replace("Use ", "") + " design selected.", "ok");
+    });
     sw.addEventListener("click", (e) => {
       const b = e.target.closest(".swatch");
       if (b) setAccent(b.dataset.color, true);

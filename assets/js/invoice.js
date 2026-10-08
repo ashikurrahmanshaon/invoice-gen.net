@@ -13,6 +13,8 @@
     ["MXN", "Mexican Peso"], ["TRY", "Turkish Lira"], ["QAR", "Qatari Riyal"], ["KWD", "Kuwaiti Dinar"]
   ];
 
+  IG.TEMPLATES = ["classic", "modern", "minimal"];
+
   IG.ACCENTS = [
     ["#16213a", "Ink navy"], ["#0e7c5a", "Stamp green"], ["#2f5bd3", "Carbon blue"],
     ["#8a2c47", "Burgundy"], ["#b4561a", "Rust"], ["#333333", "Graphite"]
@@ -60,6 +62,7 @@
       dueDate: IG.addDays(today, p.dueDays != null ? p.dueDays : 14),
       poNumber: "",
       currency: p.currency || "USD",
+      template: p.template || "classic",
       accent: p.accent || "#16213a",
       logo: p.logo || null,
       logoW: p.logoW || 0,

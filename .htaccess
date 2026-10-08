@@ -15,7 +15,7 @@ ErrorDocument 404 /404.html
   RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
   RewriteRule ^(.*/)?index\.html$ /$1 [L,R=301]
   # never serve repo/setup files
-  RewriteRule ^(\.git|supabase|README\.md) - [F,L,NC]
+  RewriteRule ^(\.git|supabase|tools|README\.md) - [F,L,NC]
 </IfModule>
 
 <IfModule mod_headers.c>

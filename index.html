@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=2">
+<link rel="stylesheet" href="/assets/css/style.css?v=3">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "invoice-gen.net invoice generator", "url": "https://invoice-gen.net/", "applicationCategory": "BusinessApplication", "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": "Free online invoice generator. Create professional invoices, download PDF and email them to clients."}</script>
@@ -59,54 +59,88 @@
   </div>
 </header>
 <main id="main">
-<section class="studio" aria-label="Invoice generator">
-  <div class="wrap">
-    <div class="studio-intro">
-      <h1>Free invoice generator</h1>
-      <p class="lede">Type straight onto the invoice. Download a PDF, print it, or email it to your client.</p>
-      <ul class="trust">
-        <li>Free, no sign-up needed to start</li>
-        <li>Clean A4 PDF with your logo</li>
-        <li>Email it with the PDF attached</li>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-grid">
+    <div class="hero-copy">
+      <p class="hero-pill"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Free to use. No sign-up needed.</p>
+      <h1 id="hero-title">Create professional invoices in minutes</h1>
+      <p class="hero-lede">Fill in a polished invoice, download it as a PDF, or email it straight to your client. Made for freelancers and small businesses, in 28 currencies.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#create">Create your invoice <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
+        <a class="btn btn-glass btn-lg" href="#templates">See the designs</a>
+      </div>
+      <ul class="hero-facts">
+        <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> PDF download</li>
+        <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg> Email to clients</li>
+        <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg> Private by default</li>
       </ul>
     </div>
-    <aside class="controls" aria-label="Invoice actions and settings">
-      <div class="actions">
-        <button class="btn btn-primary" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
-        <button class="btn btn-ink" id="sendBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send by email</button>
-        <div class="row-2">
-          <button class="btn btn-ghost" id="saveBtn" type="button">Save</button>
-          <button class="btn btn-ghost" id="printBtn" type="button">Print</button>
+    <div class="hero-art" aria-hidden="true">
+      <div class="mock mock-back"></div>
+      <div class="mock mock-front">
+        <span class="mock-tag">Example</span>
+        <div class="m-top">
+          <span class="m-logo">AS</span>
+          <div class="m-title"><b>Invoice</b><span>INV-0042</span></div>
         </div>
-        <button class="btn btn-ghost" id="newBtn" type="button">New invoice</button>
+        <div class="m-parties">
+          <div><small>From</small><b>Arshaon Studio</b><span>Dhaka, Bangladesh</span></div>
+          <div><small>Bill to</small><b>Acme Ltd</b><span>London, United Kingdom</span></div>
+        </div>
+        <div class="m-items">
+          <div class="m-row m-head"><span>Description</span><span>Qty</span><span>Amount</span></div>
+          <div class="m-row"><span>Brand identity design</span><span>1</span><span>$900.00</span></div>
+          <div class="m-row"><span>Landing page design</span><span>1</span><span>$250.00</span></div>
+          <div class="m-row"><span>Social media kit</span><span>2</span><span>$100.00</span></div>
+        </div>
+        <div class="m-total"><span>Balance due</span><b>$1,250.00</b></div>
       </div>
-      <div class="panel">
-        <h2>Invoice settings</h2>
-        <div class="field">
-          <label for="currency">Currency</label>
-          <select class="input" id="currency"></select>
-        </div>
-        <div class="field">
-          <label for="status">Status</label>
-          <select class="input" id="status">
+      <div class="chip chip-sent"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg><span><b>Invoice sent</b>accounts@acme.com</span></div>
+      <div class="chip chip-pdf"><span class="pdf-badge">PDF</span><span><b>INV-0042-Acme.pdf</b>Ready to download</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="workspace" id="create" aria-labelledby="create-title">
+  <div class="wrap">
+    <div class="ws-head">
+      <div>
+        <h2 id="create-title">Your invoice</h2>
+        <p class="ws-note" id="cloudNote">Your draft is kept in this browser.</p>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="profileBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg> Save my details for next time</button>
+    </div>
+
+    <div class="toolbar" role="toolbar" aria-label="Invoice design and actions">
+      <div class="tb-group">
+        <span class="tb-label" id="tplLabel">Design</span>
+        <div class="tpl-picker" id="tplPicker" role="group" aria-labelledby="tplLabel"><button type="button" class="tpl-btn" data-template="classic" aria-pressed="false" title="Classic design"><span class="tpl-thumb t-classic" aria-hidden="true"><i></i><i></i><i></i></span><span>Classic</span></button><button type="button" class="tpl-btn" data-template="modern" aria-pressed="false" title="Modern design"><span class="tpl-thumb t-modern" aria-hidden="true"><i></i><i></i><i></i></span><span>Modern</span></button><button type="button" class="tpl-btn" data-template="minimal" aria-pressed="false" title="Minimal design"><span class="tpl-thumb t-minimal" aria-hidden="true"><i></i><i></i><i></i></span><span>Minimal</span></button></div>
+      </div>
+      <div class="tb-group">
+        <span class="tb-label" id="accentLabel">Colour</span>
+        <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
+      </div>
+      <div class="tb-group tb-selects">
+        <label class="tb-field"><span class="tb-label">Currency</span><select class="input input-sm" id="currency"></select></label>
+        <label class="tb-field"><span class="tb-label">Status</span>
+          <select class="input input-sm" id="status">
             <option value="draft">Draft</option>
             <option value="sent">Sent</option>
-            <option value="paid">Paid (adds a Paid stamp)</option>
+            <option value="paid">Paid (adds stamp)</option>
           </select>
-        </div>
-        <div class="field">
-          <span class="hint" id="accentLabel">Colour</span>
-          <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
-        </div>
+        </label>
       </div>
-      <div class="panel">
-        <p class="cloud-note" id="cloudNote">Your draft is kept in this browser.</p>
-        <button class="btn btn-ghost btn-sm btn-block" id="profileBtn" type="button">Save my details for next time</button>
+      <div class="tb-actions">
+        <button class="btn btn-ghost btn-icon" id="newBtn" type="button" title="New invoice"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>New</span></button>
+        <button class="btn btn-ghost btn-icon" id="saveBtn" type="button" title="Save"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg><span>Save</span></button>
+        <button class="btn btn-ghost btn-icon" id="printBtn" type="button" title="Print"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M7 14h10v6H7z"/></svg><span>Print</span></button>
+        <button class="btn btn-ink" id="sendBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send</button>
+        <button class="btn btn-primary" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
       </div>
-    </aside>
+    </div>
 
     <div class="sheet-wrap">
-      <div class="sheet" id="sheet">
+      <div class="sheet t-classic" id="sheet">
         <div class="stamp" id="stamp" aria-hidden="true">Ready</div>
         <div class="sheet-top">
           <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
@@ -145,11 +179,13 @@
           </div>
         </div>
 
-        <table class="items">
-          <colgroup><col><col class="c-qty"><col class="c-rate"><col class="c-amt"><col class="c-x"></colgroup>
-          <thead><tr><th scope="col">Description</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Rate</th><th scope="col" class="num">Amount</th><th scope="col"><span class="sr-only">Remove</span></th></tr></thead>
-          <tbody id="itemRows"></tbody>
-        </table>
+        <div class="items-wrap">
+          <table class="items">
+            <colgroup><col><col class="c-qty"><col class="c-rate"><col class="c-amt"><col class="c-x"></colgroup>
+            <thead><tr><th scope="col">Description</th><th scope="col" class="num">Qty</th><th scope="col" class="num">Rate</th><th scope="col" class="num">Amount</th><th scope="col"><span class="sr-only">Remove</span></th></tr></thead>
+            <tbody id="itemRows"></tbody>
+          </table>
+        </div>
         <button type="button" class="add-line" id="addLine">+ Add line item</button>
 
         <div class="lower">
@@ -176,8 +212,8 @@
 </section>
 
 <div class="mobile-bar" role="region" aria-label="Invoice actions">
-  <button class="btn btn-primary" id="mDownload" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download</button>
   <button class="btn btn-ink" id="mSend" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send</button>
+  <button class="btn btn-primary" id="mDownload" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
 </div>
 
 <dialog class="modal" id="sendModal" aria-labelledby="sendTitle">
@@ -188,22 +224,83 @@
     <div class="field"><label for="sendTo">Client's email</label><input class="input" id="sendTo" type="email" autocomplete="off" placeholder="client@company.com"></div>
     <div class="field"><label for="sendSubject">Subject</label><input class="input" id="sendSubject"></div>
     <div class="field"><label for="sendMsg">Message</label><textarea class="input" id="sendMsg" rows="6"></textarea></div>
-    <label class="hint" style="display:flex;gap:8px;align-items:center"><input type="checkbox" id="sendCopy" checked> Send me a copy</label>
-    <p class="hint" style="margin-top:10px">The invoice is attached as a PDF. When your client replies, it goes to your email.</p>
+    <label class="check-line"><input type="checkbox" id="sendCopy" checked> Send me a copy</label>
+    <p class="hint">The invoice is attached as a PDF. When your client replies, it goes to your email.</p>
   </div>
   <div class="modal-foot">
     <button class="btn btn-ghost" id="sendCancel" type="button">Cancel</button>
     <button class="btn btn-ghost" id="sendMailApp" type="button">Use my email app</button>
-    <button class="btn btn-primary" id="sendNow" type="button">Send invoice</button>
+    <button class="btn btn-primary" id="sendNow" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send invoice</button>
   </div>
 </dialog>
 
-<section class="band paper" aria-labelledby="how">
+<section class="band" id="templates" aria-labelledby="tpl-title">
   <div class="wrap">
-    <h2 id="how">Make an invoice in three steps</h2>
-    <p class="lede">invoice-gen.net works like filling in a paper invoice, except the maths is done for you.</p>
+    <div class="band-head">
+      <h2 id="tpl-title">Three designs, six colours</h2>
+      <p class="lede">Every design gives you the same clean A4 PDF. Pick one, and switch any time while you work.</p>
+    </div>
+    <div class="tpl-gallery">
+      <article class="tpl-card">
+        <div class="mini t-classic" aria-hidden="true">
+          <div class="mini-top"><span class="mini-logo"></span><span class="mini-title">Invoice</span></div>
+          <div class="mini-parties"><span></span><span></span></div>
+          <div class="mini-head"></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-total"><span>Balance due</span><b>$1,250</b></div>
+        </div>
+        <div class="tpl-card-body">
+          <h3>Classic</h3>
+          <p>Colour bar on top and a filled table header. Works for any business.</p>
+          <button type="button" class="btn btn-ghost btn-sm" data-use-template="classic">Use Classic</button>
+        </div>
+      </article>
+      <article class="tpl-card">
+        <div class="mini t-modern" aria-hidden="true">
+          <div class="mini-top"><span class="mini-logo"></span><span class="mini-title">Invoice</span></div>
+          <div class="mini-parties"><span></span><span></span></div>
+          <div class="mini-head"></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-total"><span>Balance due</span><b>$1,250</b></div>
+        </div>
+        <div class="tpl-card-body">
+          <h3>Modern</h3>
+          <p>A bold colour band with your logo and invoice details. Stands out in an inbox.</p>
+          <button type="button" class="btn btn-ghost btn-sm" data-use-template="modern">Use Modern</button>
+        </div>
+      </article>
+      <article class="tpl-card">
+        <div class="mini t-minimal" aria-hidden="true">
+          <div class="mini-top"><span class="mini-logo"></span><span class="mini-title">Invoice</span></div>
+          <div class="mini-parties"><span></span><span></span></div>
+          <div class="mini-head"></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-row"><span></span><i></i></div>
+          <div class="mini-total"><span>Balance due</span><b>$1,250</b></div>
+        </div>
+        <div class="tpl-card-body">
+          <h3>Minimal</h3>
+          <p>Fine lines and lots of white space. Calm and elegant for studios and consultants.</p>
+          <button type="button" class="btn btn-ghost btn-sm" data-use-template="minimal">Use Minimal</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="band band-white" aria-labelledby="how">
+  <div class="wrap">
+    <div class="band-head">
+      <h2 id="how">Make an invoice in three steps</h2>
+      <p class="lede">It works like filling in a paper invoice, except the maths is done for you.</p>
+    </div>
     <ol class="steps">
-      <li><h3>Fill in the invoice</h3><p>Click any line on the invoice and type: your business, your client, then each item or service with its quantity and rate.</p></li>
+      <li><h3>Fill in the invoice</h3><p>Click any line and type: your business, your client, then each item or service with its quantity and rate.</p></li>
       <li><h3>Check the totals</h3><p>Add tax or VAT, a discount, shipping or a part payment. The total and balance due update as you type.</p></li>
       <li><h3>Download or send</h3><p>Download a clean A4 PDF, print it, or email it to your client with the PDF attached.</p></li>
     </ol>
@@ -214,7 +311,7 @@
   <div class="wrap showcase">
     <div class="showcase-copy">
       <h2 id="client-view">What your client receives</h2>
-      <p class="lede">A short, clear email with your invoice attached as a PDF. It comes from invoice-gen.net with your business name on it, and when your client presses Reply, the answer goes to your own inbox.</p>
+      <p class="lede">A short, clear email with your invoice attached as a PDF. It shows your business name, and when your client presses Reply, the answer goes to your own inbox.</p>
       <ul class="trust">
         <li>Your name in the From line</li>
         <li>Replies go straight to you</li>
@@ -222,6 +319,7 @@
       </ul>
     </div>
     <figure class="mail" aria-label="Example of the email your client receives">
+      <div class="mail-bar"><span></span><span></span><span></span></div>
       <div class="mail-head">
         <div class="mail-row"><span>From</span><strong>Arshaon Studio via invoice-gen.net</strong></div>
         <div class="mail-row"><span>To</span>accounts@acme.com</div>
@@ -241,42 +339,82 @@
   </div>
 </section>
 
-<section class="band" aria-labelledby="features">
+<section class="band band-white" aria-labelledby="features">
   <div class="wrap">
-    <h2 id="features">Everything a professional invoice needs</h2>
-    <div class="feature-list">
-      <div class="feature"><h3>Email invoices to clients</h3><p>Send the PDF straight from invoice-gen.net. Replies come to your own inbox, and the invoice is marked as sent.</p></div>
-      <div class="feature"><h3>PDF ready to send</h3><p>A tidy A4 PDF with your logo, colour and totals. Works in every email app and prints cleanly.</p></div>
-      <div class="feature"><h3>28 currencies</h3><p>Bill in US Dollars, Taka, Euros, Pounds, Rupees, Dirhams and more, formatted the right way.</p></div>
-      <div class="feature"><h3>Tax, discount and part payments</h3><p>Name your tax (VAT, GST, Sales tax), give a discount, add shipping and record what's already paid.</p></div>
-      <div class="feature"><h3>Saved invoices and clients</h3><p>With a free account, every invoice is saved. Pick a client from your list instead of typing them again.</p></div>
-      <div class="feature"><h3>Track who has paid</h3><p>See what you've invoiced, what's paid and what's still owed. Overdue invoices are flagged for you.</p></div>
+    <div class="band-head">
+      <h2 id="features">Everything a professional invoice needs</h2>
+      <p class="lede">The tools you'd expect from paid invoicing software, free in your browser.</p>
+    </div>
+    <div class="feature-grid">
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></span>
+        <h3>Email invoices to clients</h3>
+        <p>Send the PDF straight from invoice-gen.net. Replies come to your own inbox, and the invoice is marked as sent.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span>
+        <h3>Clean A4 PDF</h3>
+        <p>Your logo, colours and totals on a crisp A4 page. Opens in every email app and prints cleanly.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 0 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.6-1.3-.6-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4c0-4.9-4-8.8-9-8.8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10.5" cy="7.5" r="1"/><circle cx="15" cy="7.8" r="1"/></svg></span>
+        <h3>Three invoice designs</h3>
+        <p>Classic, Modern or Minimal, each in six colours. Pick the look that fits your business.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg></span>
+        <h3>28 currencies</h3>
+        <p>Bill in US Dollars, Taka, Euros, Pounds, Rupees, Dirhams and more, formatted correctly.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 5 5 19"/><circle cx="7" cy="7" r="2.5"/><circle cx="17" cy="17" r="2.5"/></svg></span>
+        <h3>Tax, discounts and part payments</h3>
+        <p>Name your tax (VAT, GST, Sales tax), give a discount, add shipping and record what's already paid.</p>
+      </div>
+      <div class="feature">
+        <span class="feature-icon"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span>
+        <h3>Track who has paid</h3>
+        <p>With a free account, see what you've invoiced, what's paid and what's still owed. Overdue invoices are flagged.</p>
+      </div>
     </div>
   </div>
 </section>
 
-<section class="band paper" aria-labelledby="faq">
-  <div class="wrap">
-    <h2 id="faq">Questions</h2>
+<section class="band" aria-labelledby="faq">
+  <div class="wrap faq-grid">
+    <div>
+      <h2 id="faq">Questions</h2>
+      <p class="lede">Can't find your answer? Email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
+    </div>
     <div class="faq">
-      <details><summary>Is invoice-gen.net really free?</summary><p>Yes. Making invoices, downloading them as PDF and printing are free with no limit. A free account adds saved invoices, saved clients and sending invoices by email.</p></details>
-      <details><summary>Do I need an account to make an invoice?</summary><p>No. Fill in the invoice and press Download PDF. Your draft stays in your browser so you can come back to it. Create an account only when you want to save invoices or email them.</p></details>
-      <details><summary>How do I send an invoice by email?</summary><p>Log in, fill in the invoice and press Send by email. Add your client's email address and a short message. Your client receives the invoice as a PDF attachment, and their reply goes straight to your email.</p></details>
-      <details><summary>Which currencies can I use?</summary><p>28 currencies including US Dollar, Bangladeshi Taka, Euro, British Pound, Indian Rupee, UAE Dirham and Saudi Riyal. Amounts are formatted correctly for the currency you pick.</p></details>
-      <details><summary>Can I add my logo, tax and discounts?</summary><p>Yes. Add your logo, a tax or VAT rate, a percentage or fixed discount, shipping, and any amount already paid. The balance due updates as you type.</p></details>
-      <details><summary>Is my invoice data private?</summary><p>Without an account, your invoice never leaves your browser. With an account, invoices are stored in a secured database where only you can read them. We don't sell or share your data.</p></details>
+        <details><summary>Is invoice-gen.net really free?</summary><p>Yes. Making invoices, downloading them as PDF and printing are free with no limit. A free account adds saved invoices, saved clients and sending invoices by email.</p></details>
+        <details><summary>Do I need an account to make an invoice?</summary><p>No. Fill in the invoice and press Download PDF. Your draft stays in your browser so you can come back to it. Create an account only when you want to save invoices or email them.</p></details>
+        <details><summary>How do I send an invoice by email?</summary><p>Log in, fill in the invoice and press Send by email. Add your client's email address and a short message. Your client receives the invoice as a PDF attachment, and their reply goes straight to your email.</p></details>
+        <details><summary>Which currencies can I use?</summary><p>28 currencies including US Dollar, Bangladeshi Taka, Euro, British Pound, Indian Rupee, UAE Dirham and Saudi Riyal. Amounts are formatted correctly for the currency you pick.</p></details>
+        <details><summary>Can I add my logo, tax and discounts?</summary><p>Yes. Add your logo, a tax or VAT rate, a percentage or fixed discount, shipping, and any amount already paid. The balance due updates as you type.</p></details>
+        <details><summary>Is my invoice data private?</summary><p>Without an account, your invoice never leaves your browser. With an account, invoices are stored in a secured database where only you can read them. We don't sell or share your data.</p></details>
     </div>
   </div>
 </section>
 
-<section class="band" aria-labelledby="guides">
+<section class="band band-white" aria-labelledby="guides">
   <div class="wrap">
-    <h2 id="guides">Invoice guides</h2>
+    <div class="band-head"><h2 id="guides">Invoice guides</h2></div>
     <div class="guide-links">
-      <a href="/how-to-make-an-invoice/"><strong>How to make an invoice</strong><span>What to include, with a checklist you can follow.</span></a>
-      <a href="/invoice-template/"><strong>Invoice templates</strong><span>Free invoice templates you can fill in online.</span></a>
-      <a href="/freelance-invoice/"><strong>Freelance invoices</strong><span>Billing hourly or by project, and getting paid on time.</span></a>
+      <a href="/how-to-make-an-invoice/"><strong>How to make an invoice</strong><span>What to include, with a checklist you can follow.</span><em>Read the guide <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></em></a>
+      <a href="/invoice-template/"><strong>Invoice templates</strong><span>Free invoice templates you can fill in online.</span><em>See templates <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></em></a>
+      <a href="/freelance-invoice/"><strong>Freelance invoices</strong><span>Billing hourly or by project, and getting paid on time.</span><em>Read the guide <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></em></a>
     </div>
+  </div>
+</section>
+
+<section class="final-cta" aria-labelledby="final-title">
+  <div class="wrap final-inner">
+    <div>
+      <h2 id="final-title">Your next invoice is two minutes away</h2>
+      <p>Free, no sign-up needed. Download the PDF or email it to your client.</p>
+    </div>
+    <a class="btn btn-primary btn-lg" href="#create">Create your invoice <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
   </div>
 </section>
 
@@ -321,12 +459,12 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v=2"></script>
-<script src="/assets/js/core.js?v=2"></script>
+<script src="/assets/js/config.js?v=3"></script>
+<script src="/assets/js/core.js?v=3"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="/assets/js/invoice.js?v=2"></script>
-<script src="/assets/js/pdf.js?v=2"></script>
-<script src="/assets/js/app.js?v=2"></script>
+<script src="/assets/js/invoice.js?v=3"></script>
+<script src="/assets/js/pdf.js?v=3"></script>
+<script src="/assets/js/app.js?v=3"></script>
 </body>
 </html>

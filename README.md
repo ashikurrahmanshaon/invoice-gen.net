@@ -113,3 +113,13 @@ Ekhon site e login kore **Send by email** chaple client er kache PDF shoho email
 
 - Google AdSense: site live + kichu content hole apply koro; guide page gulote ad bosano bhalo (generator page clean rakho).
 - Pro plan (pore): unlimited email, recurring invoice, payment link, custom branding chhara "Made with invoice-gen" — Supabase + Stripe/bKash diye add kora jabe.
+
+## Page gulo bodlano (developer der jonno)
+
+HTML page gulo `tools/build_pages.py` aar `tools/home_section.py` theke toiri hoy. Lekha bodlate oi file e change koro, tarpor repo folder theke run koro:
+
+```
+python3 tools/build_pages.py .
+```
+
+`tools/` folder ta website e kauke dekhano hoy na (`.htaccess` block kore).

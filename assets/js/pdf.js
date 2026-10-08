@@ -40,9 +40,20 @@
 
     doc.setProperties({ title: clean((inv.title || "Invoice") + " " + inv.number), creator: "invoice-gen.net" });
 
-    // accent bar
-    doc.setFillColor(...accent);
-    doc.rect(0, 0, W, 4, "F");
+    const T = ["modern", "minimal"].indexOf(inv.template) >= 0 ? inv.template : "classic";
+    const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
+    const onBand = T === "modern";
+    const metaCount = 3 + (inv.poNumber ? 1 : 0);
+    const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
+
+    // top of the page, per design
+    if (T === "classic") {
+      doc.setFillColor(...accent);
+      doc.rect(0, 0, W, 4, "F");
+    } else if (T === "modern") {
+      doc.setFillColor(...accent);
+      doc.rect(0, 0, W, bandH, "F");
+    }
 
     // logo
     let y = 18;
@@ -55,14 +66,18 @@
           const r = Math.min(boxW / inv.logoW, boxH / inv.logoH);
           w = inv.logoW * r; h = inv.logoH * r;
         }
+        if (onBand) {
+          doc.setFillColor(255, 255, 255);
+          doc.roundedRect(L - 3, y - 3, w + 6, h + 6, 2, 2, "F");
+        }
         doc.addImage(inv.logo, fmt, L, y, w, h, undefined, "FAST");
       } catch (e) { /* skip a logo jsPDF can't read */ }
     }
 
     // title + meta (right)
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(26);
-    doc.setTextColor(...accent);
+    doc.setFont("helvetica", T === "minimal" ? "normal" : "bold");
+    doc.setFontSize(T === "minimal" ? 28 : 26);
+    doc.setTextColor(...(onBand ? [255, 255, 255] : T === "minimal" ? ink : accent));
     doc.text(clean(inv.title || "Invoice"), R, y + 8, { align: "right" });
     doc.setFontSize(9.5);
     let my = y + 17;
@@ -74,15 +89,19 @@
     if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
     meta.forEach(([k, v]) => {
       if (!v) return;
-      doc.setFont("helvetica", "normal"); doc.setTextColor(...soft);
+      doc.setFont("helvetica", "normal"); doc.setTextColor(...(onBand ? mix(accent, 0.7) : soft));
       doc.text(k, R - 42, my, { align: "right" });
-      doc.setFont("helvetica", "bold"); doc.setTextColor(...ink);
+      doc.setFont("helvetica", "bold"); doc.setTextColor(...(onBand ? [255, 255, 255] : ink));
       doc.text(clean(v), R, my, { align: "right" });
       my += 5.5;
     });
+    if (T === "minimal") {
+      doc.setDrawColor(219, 226, 234); doc.setLineWidth(0.3);
+      doc.line(L, Math.max(my, y + 30) + 2, R, Math.max(my, y + 30) + 2);
+    }
 
     // parties
-    y = Math.max(my, y + 30) + 8;
+    y = onBand ? Math.max(bandH, my + 4) + 12 : Math.max(my, y + 30) + (T === "minimal" ? 12 : 8);
     const colW = (R - L - 10) / 2;
     function party(label, p, x) {
       let py = y;
@@ -113,7 +132,9 @@
       body: body.length ? body : [["-", "", "", M(0)]],
       theme: "plain",
       styles: { font: "helvetica", fontSize: 9.5, textColor: ink, cellPadding: { top: 3.2, bottom: 3.2, left: 3, right: 3 }, lineColor: [237, 240, 244], lineWidth: { bottom: 0.3 } },
-      headStyles: { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5, lineWidth: 0 },
+      headStyles: T === "minimal"
+        ? { fillColor: false, textColor: ink, fontStyle: "bold", fontSize: 8.5, lineColor: accent, lineWidth: { bottom: 0.7 } }
+        : { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5, lineWidth: 0 },
       columnStyles: { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 18 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
       didParseCell: (d) => { if (d.section === "head" && d.column.index > 0) d.cell.styles.halign = "right"; }
     });
@@ -133,7 +154,7 @@
       doc.setTextColor(...ink); doc.text(v, R, y, { align: "right" });
       y += 6;
     });
-    doc.setDrawColor(...ink); doc.setLineWidth(0.6); doc.line(TX, y - 2, R, y - 2);
+    doc.setDrawColor(...(T === "minimal" ? [219, 226, 234] : ink)); doc.setLineWidth(T === "minimal" ? 0.3 : 0.6); doc.line(TX, y - 2, R, y - 2);
     y += 5;
     doc.setFont("helvetica", "bold"); doc.setFontSize(13);
     doc.text("Total", TX, y); doc.text(M(t.total), R, y, { align: "right" });
@@ -143,10 +164,23 @@
       doc.text("Amount paid", TX, y); doc.setTextColor(...ink); doc.text("-" + M(t.paid), R, y, { align: "right" });
       y += 6;
     }
-    doc.setFillColor(230, 235, 241);
-    doc.roundedRect(TX - 3, y - 4.5, R - TX + 6, 9, 1.5, 1.5, "F");
-    doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); doc.setTextColor(...ink);
+    if (T === "modern") {
+      doc.setFillColor(...accent);
+      doc.roundedRect(TX - 3, y - 4.5, R - TX + 6, 9, 1.5, 1.5, "F");
+      doc.setTextColor(255, 255, 255);
+    } else if (T === "minimal") {
+      doc.setDrawColor(...accent); doc.setLineWidth(0.7);
+      doc.line(TX, y - 4.5, R, y - 4.5);
+      doc.setTextColor(...accent);
+    } else {
+      doc.setFillColor(230, 235, 241);
+      doc.roundedRect(TX - 3, y - 4.5, R - TX + 6, 9, 1.5, 1.5, "F");
+      doc.setTextColor(...ink);
+    }
+    doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
     doc.text("Balance due", TX, y + 1.5); doc.text(M(t.balance), R, y + 1.5, { align: "right" });
+    const balanceY = y;
+    const balancePage = doc.getCurrentPageInfo().pageNumber;
     y += 16;
 
     // notes & terms
@@ -162,12 +196,13 @@
     block("Notes", inv.notes);
     block("Terms", inv.terms);
 
-    // paid stamp
+    // paid stamp, beside the totals
     if (inv.status === "paid") {
+      doc.setPage(balancePage);
       doc.setTextColor(14, 124, 90);
-      doc.setDrawColor(14, 124, 90);
-      doc.setFont("helvetica", "bold"); doc.setFontSize(30);
-      doc.text("PAID", R - 30, 78, { angle: 12 });
+      doc.setFont("helvetica", "bold"); doc.setFontSize(34);
+      doc.text("PAID", TX - 52, balanceY - 2, { angle: 12 });
+      doc.setPage(doc.getNumberOfPages());
     }
 
     // footer on every page
