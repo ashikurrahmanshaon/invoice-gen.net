@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My invoices | invoice-gen</title>
+<meta name="description" content="Your saved invoices and clients on invoice-gen.">
+<meta name="robots" content="noindex, nofollow">
+<link rel="canonical" href="https://invoice-gen.net/dashboard/">
+<meta name="theme-color" content="#16213a">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="invoice-gen">
+<meta property="og:title" content="My invoices | invoice-gen">
+<meta property="og:description" content="Your saved invoices and clients on invoice-gen.">
+<meta property="og:url" content="https://invoice-gen.net/dashboard/">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="My invoices | invoice-gen">
+<meta name="twitter:description" content="Your saved invoices and clients on invoice-gen.">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css?v=1">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen", "url": "https://invoice-gen.net/"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/img/icon-512.png"}</script>
+</head>
+<body>
+<a class="sr-only" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="invoice-gen home"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="2.5" width="22" height="27" rx="2.5" fill="#fff" stroke="#16213a" stroke-width="2"/><path d="M10 10h12M10 15h12M10 20h7" stroke="#16213a" stroke-width="2" stroke-linecap="round"/><circle cx="22.5" cy="22.5" r="5.5" fill="#0e7c5a"/><path d="m20 22.6 1.8 1.8 3.2-3.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>invoice<b>-gen</b></span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+    <nav class="nav" id="nav" aria-label="Main">
+      <a href="/">Invoice generator</a>
+      <a href="/invoice-template/">Templates</a>
+      <a href="/how-to-make-an-invoice/">Guide</a>
+      <a href="/dashboard/" data-auth="in" hidden>My invoices</a>
+      <a href="#" data-auth="in" data-signout hidden>Log out</a>
+      <a href="/login/" data-auth="out">Log in</a>
+      <a class="btn btn-ink btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
+    </nav>
+  </div>
+</header>
+<main id="main">
+<section class="dash">
+  <div class="wrap" id="dashMain">
+    <div class="dash-head">
+      <div>
+        <h1>Your invoices</h1>
+        <p class="hint" style="margin:6px 0 0">Logged in as <span id="who"></span></p>
+      </div>
+      <a class="btn btn-primary" href="/?new=1">New invoice</a>
+    </div>
+    <dl class="figures">
+      <div><dt>Invoiced</dt><dd id="figInvoiced">–</dd></div>
+      <div><dt>Paid</dt><dd id="figPaid">–</dd></div>
+      <div><dt>Still owed</dt><dd id="figOpen">–</dd></div>
+    </dl>
+    <div class="tabs" role="tablist" aria-label="Dashboard sections">
+      <button type="button" role="tab" data-tab="invoices" aria-selected="true">Invoices</button>
+      <button type="button" role="tab" data-tab="clients" aria-selected="false">Clients</button>
+      <button type="button" role="tab" data-tab="account" aria-selected="false">Account</button>
+    </div>
+
+    <div data-panel="invoices">
+      <div class="field" style="max-width:360px"><label for="search">Search</label><input class="input" id="search" type="search" placeholder="Invoice number or client"></div>
+      <div class="table-wrap" id="invTable" hidden>
+        <table class="data">
+          <thead><tr><th>Number</th><th>Client</th><th>Issued</th><th>Due</th><th class="num">Total</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody id="invRows"></tbody>
+        </table>
+      </div>
+      <div class="card empty" id="invEmpty" hidden>
+        <h3>No invoices yet</h3>
+        <p>Make your first invoice. It's saved here when you download, send or press Save.</p>
+        <a class="btn btn-primary" href="/?new=1">Make an invoice</a>
+      </div>
+    </div>
+
+    <div data-panel="clients" hidden>
+      <div class="split">
+        <form class="card" id="clientForm">
+          <h2 style="font-size:1.2rem">Add a client</h2>
+          <div class="field"><label for="cname">Name</label><input class="input" id="cname" name="cname" required></div>
+          <div class="field"><label for="cemail">Email</label><input class="input" id="cemail" name="cemail" type="email"></div>
+          <div class="field"><label for="cphone">Phone</label><input class="input" id="cphone" name="cphone"></div>
+          <div class="field"><label for="caddress">Address</label><textarea class="input" id="caddress" name="caddress" rows="3"></textarea></div>
+          <button class="btn btn-primary btn-block" type="submit">Add client</button>
+        </form>
+        <div>
+          <div class="table-wrap" id="clientTable" hidden>
+            <table class="data">
+              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th><span class="sr-only">Actions</span></th></tr></thead>
+              <tbody id="clientRows"></tbody>
+            </table>
+          </div>
+          <div class="card empty" id="clientEmpty" hidden><h3>No clients yet</h3><p>Add one here, or they're saved automatically when you save an invoice.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div data-panel="account" hidden>
+      <div class="split">
+        <div class="card">
+          <h2 style="font-size:1.2rem">Account</h2>
+          <p>Email: <strong id="accEmail"></strong></p>
+          <p class="hint">Your business details (name, address, logo, tax) are set on the invoice page with “Save my details for next time”.</p>
+          <button class="btn btn-ghost" data-signout type="button">Log out</button>
+        </div>
+        <form class="card" id="pwForm">
+          <h2 style="font-size:1.2rem">Change password</h2>
+          <div class="field"><label for="newpw">New password</label><input class="input" id="newpw" name="newpw" type="password" autocomplete="new-password" minlength="8"></div>
+          <button class="btn btn-ink" type="submit">Change password</button>
+          <p class="hint" style="margin-top:14px">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <div>
+      <a class="brand" href="/"><svg viewBox="0 0 32 32" aria-hidden="true"><rect x="5" y="2.5" width="22" height="27" rx="2.5" fill="#fff" stroke="#16213a" stroke-width="2"/><path d="M10 10h12M10 15h12M10 20h7" stroke="#16213a" stroke-width="2" stroke-linecap="round"/><circle cx="22.5" cy="22.5" r="5.5" fill="#0e7c5a"/><path d="m20 22.6 1.8 1.8 3.2-3.4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg><span>invoice<b>-gen</b></span></a>
+      <p style="margin-top:12px;max-width:34ch">Free invoices for freelancers and small businesses. Make one, download the PDF, or email it to your client.</p>
+      <p>&copy; <span data-year>2026</span> invoice-gen.net</p>
+    </div>
+    <div>
+      <h2>Make invoices</h2>
+      <ul>
+        <li><a href="/">Invoice generator</a></li>
+        <li><a href="/invoice-template/">Invoice templates</a></li>
+        <li><a href="/freelance-invoice/">Freelance invoice</a></li>
+        <li><a href="/how-to-make-an-invoice/">How to make an invoice</a></li>
+      </ul>
+    </div>
+    <div>
+      <h2>invoice-gen</h2>
+      <ul>
+        <li><a href="/about/">About</a></li>
+        <li><a href="/contact/">Contact</a></li>
+        <li><a href="/privacy/">Privacy policy</a></li>
+        <li><a href="/terms/">Terms of use</a></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/assets/js/config.js?v=1"></script>
+<script src="/assets/js/core.js?v=1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="/assets/js/invoice.js?v=1"></script>
+<script src="/assets/js/pdf.js?v=1"></script>
+<script src="/assets/js/dashboard.js?v=1"></script>
+</body>
+</html>
