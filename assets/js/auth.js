@@ -20,7 +20,8 @@
   function setMode(m) {
     mode = m;
     document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.mode === m)));
-    $("#authTitle").textContent = m === "login" ? "Log in" : "Create your free account";
+    $("#authTitle").textContent = m === "login" ? "Welcome back" : "Create your free account";
+    $("#authSub").textContent = m === "login" ? "Log in to see your invoices, clients and payments." : "Save every invoice, track payments and email clients. Free, no card needed.";
     $("#authSubmit").textContent = m === "login" ? "Log in" : "Create account";
     $("#password").setAttribute("autocomplete", m === "login" ? "current-password" : "new-password");
     $("#forgot").hidden = m !== "login";

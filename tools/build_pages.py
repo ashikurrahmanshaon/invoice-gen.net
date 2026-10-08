@@ -6,9 +6,9 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "4"  # asset version, bump to bust browser caches
+V = "6"  # asset version, bump to bust browser caches
 
-LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#16213a"/><path d="M19 11h19.5L49 21.5V49a3.5 3.5 0 0 1-3.5 3.5h-26.5A3.5 3.5 0 0 1 15.5 49V14.5A3.5 3.5 0 0 1 19 11z" fill="#fff"/><path d="M38.5 11v7a3.5 3.5 0 0 0 3.5 3.5h7z" fill="#c7d1e0"/><rect x="21.5" y="27" width="17" height="3.4" rx="1.7" fill="#16213a"/><rect x="21.5" y="34" width="21" height="3.4" rx="1.7" fill="#9aa6ba"/><rect x="21.5" y="41" width="11" height="3.4" rx="1.7" fill="#9aa6ba"/><circle cx="45.5" cy="45.5" r="11" fill="#0e7c5a" stroke="#16213a" stroke-width="3.2"/><path d="M40.6 45.7l3.4 3.4 6.6-7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'''
+LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1bb886"/><stop offset="1" stop-color="#086148"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igh)"/><path d="M21 12h16.5L48 22.5V48a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/><path d="M37.5 12v7.5a3 3 0 0 0 3 3H48z" fill="#bdebd9"/><rect x="23" y="26" width="14" height="3.4" rx="1.7" fill="#0b6f50"/><rect x="23" y="32.5" width="9" height="3.4" rx="1.7" fill="#0b6f50" opacity=".4"/><path d="M27 43.2l3.8 3.8 8.6-9" fill="none" stroke="#0e8a63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -32,7 +32,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="description" content="{desc}">
 {robots}
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#16213a">
+<meta name="theme-color" content="#0e8a63">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
 <meta property="og:title" content="{title}">
@@ -50,15 +50,15 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#16213a">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#0e8a63">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
-<meta name="msapplication-TileColor" content="#16213a">
+<meta name="msapplication-TileColor" content="#0e8a63">
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css?v={V}">
 <script>document.documentElement.classList.add("js");</script>
 {ld_html}
@@ -132,8 +132,13 @@ PDF_JS = f'''<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jsp
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 '''
 
-def page(path, title, desc, main, scripts="", ld=None, noindex=False):
-    html = head(title, desc, path, ld, noindex) + '<main id="main">\n' + main + "\n</main>\n" + FOOT + BASE_JS + scripts + "</body>\n</html>\n"
+def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=True):
+    h = head(title, desc, path, ld, noindex)
+    if not chrome:
+        a = h.index('<header class="site-header">'); b = h.index('</header>') + len('</header>\n')
+        h = h[:a] + h[b:]
+        h = h.replace('<body>', '<body class="app-body">')
+    html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
     out = os.path.join(ROOT, path.strip("/"), "index.html") if path != "/" else os.path.join(ROOT, "index.html")
     if path.endswith(".html"):
         out = os.path.join(ROOT, path.strip("/"))
@@ -175,113 +180,15 @@ page("/", "Free Invoice Generator: Create, Download & Email PDF Invoices | invoi
      [app_ld, faq_ld, howto_ld])
 
 # ---------------------------------------------------------------- login
-LOGIN = '''<section class="auth">
-  <div class="auth-card">
-    <h1 id="authTitle">Log in</h1>
-    <div class="tabs" role="tablist" aria-label="Log in or sign up">
-      <button type="button" role="tab" data-mode="login" aria-selected="true">Log in</button>
-      <button type="button" role="tab" data-mode="signup" aria-selected="false">Sign up</button>
-    </div>
-    <p class="form-msg" id="authMsg" hidden></p>
-    <form id="authForm" novalidate>
-      <button type="button" class="btn btn-ghost btn-block" id="googleBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.6 12.3c0-.8-.1-1.5-.2-2.3H12v4.3h5.9a5 5 0 0 1-2.2 3.3v2.8h3.6c2.1-1.9 3.3-4.8 3.3-8.1z"/><path fill="#34A853" d="M12 23c3 0 5.5-1 7.3-2.7l-3.6-2.8c-1 .7-2.2 1.1-3.7 1.1-2.9 0-5.3-1.9-6.2-4.5H2.1v2.9A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.8 14.1a6.6 6.6 0 0 1 0-4.2V7H2.1a11 11 0 0 0 0 9.9l3.7-2.8z"/><path fill="#EA4335" d="M12 5.4c1.6 0 3.1.6 4.2 1.7l3.2-3.2A11 11 0 0 0 2.1 7l3.7 2.9C6.7 7.3 9.1 5.4 12 5.4z"/></svg> Continue with Google</button>
-      <div class="divider">or with email</div>
-      <div class="field"><label for="email">Email</label><input class="input" id="email" type="email" autocomplete="email" required></div>
-      <div class="field"><label for="password">Password</label><input class="input" id="password" type="password" autocomplete="current-password" minlength="8" required></div>
-      <button class="btn btn-primary btn-block" id="authSubmit" type="submit">Log in</button>
-      <p style="display:flex;justify-content:space-between;gap:10px;margin-top:14px;font-size:.92rem">
-        <a href="#" id="magic">Email me a login link</a>
-        <a href="#" id="forgot">Forgot password?</a>
-      </p>
-    </form>
-    <form id="resetForm" hidden>
-      <div class="field"><label for="newPassword">New password</label><input class="input" id="newPassword" type="password" autocomplete="new-password" minlength="8" required></div>
-      <button class="btn btn-primary btn-block" type="submit">Save new password</button>
-    </form>
-    <p class="hint" style="margin-top:18px">You can still <a href="/">make and download invoices</a> without an account.</p>
-  </div>
-</section>'''
+import app_pages
+LOGIN = app_pages.login_markup()
 page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.net to save invoices and clients and email invoices to your clients.",
      LOGIN, f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/auth.js?v={V}"></script>\n', noindex=True)
 
 # ---------------------------------------------------------------- dashboard
-DASH = '''<section class="dash">
-  <div class="wrap" id="dashMain">
-    <div class="dash-head">
-      <div>
-        <h1>Your invoices</h1>
-        <p class="hint" style="margin:6px 0 0">Logged in as <span id="who"></span></p>
-      </div>
-      <a class="btn btn-primary" href="/?new=1">New invoice</a>
-    </div>
-    <dl class="figures">
-      <div><dt>Invoiced</dt><dd id="figInvoiced">–</dd></div>
-      <div><dt>Paid</dt><dd id="figPaid">–</dd></div>
-      <div><dt>Still owed</dt><dd id="figOpen">–</dd></div>
-    </dl>
-    <div class="tabs" role="tablist" aria-label="Dashboard sections">
-      <button type="button" role="tab" data-tab="invoices" aria-selected="true">Invoices</button>
-      <button type="button" role="tab" data-tab="clients" aria-selected="false">Clients</button>
-      <button type="button" role="tab" data-tab="account" aria-selected="false">Account</button>
-    </div>
-
-    <div data-panel="invoices">
-      <div class="field" style="max-width:360px"><label for="search">Search</label><input class="input" id="search" type="search" placeholder="Invoice number or client"></div>
-      <div class="table-wrap" id="invTable" hidden>
-        <table class="data">
-          <thead><tr><th>Number</th><th>Client</th><th>Issued</th><th>Due</th><th class="num">Total</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
-          <tbody id="invRows"></tbody>
-        </table>
-      </div>
-      <div class="card empty" id="invEmpty" hidden>
-        <h3>No invoices yet</h3>
-        <p>Make your first invoice. It's saved here when you download, send or press Save.</p>
-        <a class="btn btn-primary" href="/?new=1">Make an invoice</a>
-      </div>
-    </div>
-
-    <div data-panel="clients" hidden>
-      <div class="split">
-        <form class="card" id="clientForm">
-          <h2 style="font-size:1.2rem">Add a client</h2>
-          <div class="field"><label for="cname">Name</label><input class="input" id="cname" name="cname" required></div>
-          <div class="field"><label for="cemail">Email</label><input class="input" id="cemail" name="cemail" type="email"></div>
-          <div class="field"><label for="cphone">Phone</label><input class="input" id="cphone" name="cphone"></div>
-          <div class="field"><label for="caddress">Address</label><textarea class="input" id="caddress" name="caddress" rows="3"></textarea></div>
-          <button class="btn btn-primary btn-block" type="submit">Add client</button>
-        </form>
-        <div>
-          <div class="table-wrap" id="clientTable" hidden>
-            <table class="data">
-              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th><span class="sr-only">Actions</span></th></tr></thead>
-              <tbody id="clientRows"></tbody>
-            </table>
-          </div>
-          <div class="card empty" id="clientEmpty" hidden><h3>No clients yet</h3><p>Add one here, or they're saved automatically when you save an invoice.</p></div>
-        </div>
-      </div>
-    </div>
-
-    <div data-panel="account" hidden>
-      <div class="split">
-        <div class="card">
-          <h2 style="font-size:1.2rem">Account</h2>
-          <p>Email: <strong id="accEmail"></strong></p>
-          <p class="hint">Your business details (name, address, logo, tax) are set on the invoice page with “Save my details for next time”.</p>
-          <button class="btn btn-ghost" data-signout type="button">Log out</button>
-        </div>
-        <form class="card" id="pwForm">
-          <h2 style="font-size:1.2rem">Change password</h2>
-          <div class="field"><label for="newpw">New password</label><input class="input" id="newpw" name="newpw" type="password" autocomplete="new-password" minlength="8"></div>
-          <button class="btn btn-ink" type="submit">Change password</button>
-          <p class="hint" style="margin-top:14px">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
-        </form>
-      </div>
-    </div>
-  </div>
-</section>'''
-page("/dashboard/", "My invoices | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
-     DASH, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/pdf.js?v={V}"></script>\n<script src="/assets/js/dashboard.js?v={V}"></script>\n', noindex=True)
+DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
+page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
+     DASH, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/pdf.js?v={V}"></script>\n<script src="/assets/js/dashboard.js?v={V}"></script>\n', noindex=True, chrome=False)
 
 # ---------------------------------------------------------------- articles
 def article(path, title, desc, h1, crumbs_name, body, ld=None):

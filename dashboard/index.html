@@ -3,21 +3,21 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My invoices | invoice-gen.net</title>
+<title>Dashboard | invoice-gen.net</title>
 <meta name="description" content="Your saved invoices and clients on invoice-gen.net.">
 <meta name="robots" content="noindex, nofollow">
 <link rel="canonical" href="https://invoice-gen.net/dashboard/">
-<meta name="theme-color" content="#16213a">
+<meta name="theme-color" content="#0e8a63">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
-<meta property="og:title" content="My invoices | invoice-gen.net">
+<meta property="og:title" content="Dashboard | invoice-gen.net">
 <meta property="og:description" content="Your saved invoices and clients on invoice-gen.net.">
 <meta property="og:url" content="https://invoice-gen.net/dashboard/">
 <meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="My invoices | invoice-gen.net">
+<meta name="twitter:title" content="Dashboard | invoice-gen.net">
 <meta name="twitter:description" content="Your saved invoices and clients on invoice-gen.net.">
 <meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -25,161 +25,162 @@
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#16213a">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#0e8a63">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
-<meta name="msapplication-TileColor" content="#16213a">
+<meta name="msapplication-TileColor" content="#0e8a63">
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=4">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/css/style.css?v=6">
 <script>document.documentElement.classList.add("js");</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
 </head>
-<body>
+<body class="app-body">
 <a class="sr-only" href="#main">Skip to content</a>
-<header class="site-header">
-  <div class="wrap">
-    <a class="brand" href="/" aria-label="invoice-gen.net home"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#16213a"/><path d="M19 11h19.5L49 21.5V49a3.5 3.5 0 0 1-3.5 3.5h-26.5A3.5 3.5 0 0 1 15.5 49V14.5A3.5 3.5 0 0 1 19 11z" fill="#fff"/><path d="M38.5 11v7a3.5 3.5 0 0 0 3.5 3.5h7z" fill="#c7d1e0"/><rect x="21.5" y="27" width="17" height="3.4" rx="1.7" fill="#16213a"/><rect x="21.5" y="34" width="21" height="3.4" rx="1.7" fill="#9aa6ba"/><rect x="21.5" y="41" width="11" height="3.4" rx="1.7" fill="#9aa6ba"/><circle cx="45.5" cy="45.5" r="11" fill="#0e7c5a" stroke="#16213a" stroke-width="3.2"/><path d="M40.6 45.7l3.4 3.4 6.6-7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-name">invoice-gen<span class="tld">.net</span></span></a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span><span></span></button>
-    <nav class="nav" id="nav" aria-label="Main">
-      <a href="/">Invoice generator</a>
-      <a href="/invoice-template/">Templates</a>
-      <a href="/how-to-make-an-invoice/">Guide</a>
-      <a href="/dashboard/" data-auth="in" hidden>My invoices</a>
-      <a href="#" data-auth="in" data-signout hidden>Log out</a>
-      <a href="/login/" data-auth="out">Log in</a>
-      <a class="btn btn-ink btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
-    </nav>
-  </div>
-</header>
 <main id="main">
-<section class="dash">
-  <div class="wrap" id="dashMain">
-    <div class="dash-head">
-      <div>
-        <h1>Your invoices</h1>
-        <p class="hint" style="margin:6px 0 0">Logged in as <span id="who"></span></p>
-      </div>
-      <a class="btn btn-primary" href="/?new=1">New invoice</a>
+<div class="app" id="app">
+  <aside class="side" id="side" aria-label="Dashboard menu">
+    <a class="brand" href="/" aria-label="invoice-gen.net home"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1bb886"/><stop offset="1" stop-color="#086148"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igh)"/><path d="M21 12h16.5L48 22.5V48a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/><path d="M37.5 12v7.5a3 3 0 0 0 3 3H48z" fill="#bdebd9"/><rect x="23" y="26" width="14" height="3.4" rx="1.7" fill="#0b6f50"/><rect x="23" y="32.5" width="9" height="3.4" rx="1.7" fill="#0b6f50" opacity=".4"/><path d="M27 43.2l3.8 3.8 8.6-9" fill="none" stroke="#0e8a63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-name">invoice-gen<span class="tld">.net</span></span></a>
+    <nav class="side-nav">
+      <button type="button" class="side-link" data-tab="overview"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg><span>Overview</span></button>
+      <button type="button" class="side-link" data-tab="invoices"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg><span>Invoices</span><span class="nav-count" data-count="invoices"></span></button>
+      <button type="button" class="side-link" data-tab="clients"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2A6.5 6.5 0 0 1 21.5 20"/></svg><span>Clients</span><span class="nav-count" data-count="clients"></span></button>
+      <button type="button" class="side-link" data-tab="settings"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Settings</span></button>
+    </nav>
+    <a class="btn btn-primary btn-block side-new" href="/?new=1#create"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> New invoice</a>
+    <div class="side-user">
+      <span class="avatar" id="avatar">?</span>
+      <div class="side-user-text"><b id="who">Loading…</b><button type="button" class="link-btn" data-signout id="signOutBtn">Log out</button></div>
     </div>
-    <dl class="figures">
-      <div><dt>Invoiced</dt><dd id="figInvoiced">–</dd></div>
-      <div><dt>Paid</dt><dd id="figPaid">–</dd></div>
-      <div><dt>Still owed</dt><dd id="figOpen">–</dd></div>
-    </dl>
-    <div class="tabs" role="tablist" aria-label="Dashboard sections">
-      <button type="button" role="tab" data-tab="invoices" aria-selected="true">Invoices</button>
-      <button type="button" role="tab" data-tab="clients" aria-selected="false">Clients</button>
-      <button type="button" role="tab" data-tab="account" aria-selected="false">Account</button>
-    </div>
+  </aside>
+  <div class="side-scrim" id="scrim" hidden></div>
 
-    <div data-panel="invoices">
-      <div class="field" style="max-width:360px"><label for="search">Search</label><input class="input" id="search" type="search" placeholder="Invoice number or client"></div>
-      <div class="table-wrap" id="invTable" hidden>
-        <table class="data">
-          <thead><tr><th>Number</th><th>Client</th><th>Issued</th><th>Due</th><th class="num">Total</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
-          <tbody id="invRows"></tbody>
-        </table>
-      </div>
-      <div class="card empty" id="invEmpty" hidden>
-        <h3>No invoices yet</h3>
-        <p>Make your first invoice. It's saved here when you download, send or press Save.</p>
-        <a class="btn btn-primary" href="/?new=1">Make an invoice</a>
-      </div>
+  <div class="app-main">
+    <div class="demo-banner" id="demoBanner" hidden>
+      <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> <span id="demoText">You're looking at sample data.</span></span>
+      <a class="btn btn-sm btn-white" href="/login/?signup=1">Create free account</a>
     </div>
+    <header class="app-top">
+      <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+      <div class="app-title"><h1 id="pageTitle">Overview</h1><p id="pageSub"></p></div>
+      <a class="btn btn-primary top-new" href="/?new=1#create"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> <span>New invoice</span></a>
+    </header>
 
-    <div data-panel="clients" hidden>
-      <div class="split">
-        <form class="card" id="clientForm">
-          <h2 style="font-size:1.2rem">Add a client</h2>
-          <div class="field"><label for="cname">Name</label><input class="input" id="cname" name="cname" required></div>
-          <div class="field"><label for="cemail">Email</label><input class="input" id="cemail" name="cemail" type="email"></div>
-          <div class="field"><label for="cphone">Phone</label><input class="input" id="cphone" name="cphone"></div>
-          <div class="field"><label for="caddress">Address</label><textarea class="input" id="caddress" name="caddress" rows="3"></textarea></div>
-          <button class="btn btn-primary btn-block" type="submit">Add client</button>
-        </form>
-        <div>
-          <div class="table-wrap" id="clientTable" hidden>
-            <table class="data">
-              <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th><span class="sr-only">Actions</span></th></tr></thead>
-              <tbody id="clientRows"></tbody>
-            </table>
-          </div>
-          <div class="card empty" id="clientEmpty" hidden><h3>No clients yet</h3><p>Add one here, or they're saved automatically when you save an invoice.</p></div>
+    <section class="panel" data-panel="overview" aria-labelledby="pageTitle">
+      <div class="kpis">
+        <div class="kpi"><span class="kpi-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg></span><small>Total invoiced</small><b id="kInvoiced">–</b><em id="kInvoicedSub"></em></div>
+        <div class="kpi"><span class="kpi-ico g"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h12v4"/><path d="M3 7v11a2 2 0 0 0 2 2h15V9H5a2 2 0 0 1-2-2z"/><circle cx="16" cy="14.5" r="1.2"/></svg></span><small>Paid</small><b id="kPaid">–</b><em id="kPaidSub"></em></div>
+        <div class="kpi"><span class="kpi-ico s"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><small>Outstanding</small><b id="kOpen">–</b><em id="kOpenSub"></em></div>
+        <div class="kpi"><span class="kpi-ico r"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span><small>Overdue</small><b id="kOverdue">–</b><em id="kOverdueSub"></em></div>
+      </div>
+      <div class="ov-grid">
+        <div class="card chart-card">
+          <div class="card-head"><h2>Last 6 months</h2><div class="legend"><span class="lg-inv">Invoiced</span><span class="lg-paid">Paid</span></div></div>
+          <div class="chart" id="chart"></div>
         </div>
-      </div>
-    </div>
-
-    <div data-panel="account" hidden>
-      <div class="split">
         <div class="card">
-          <h2 style="font-size:1.2rem">Account</h2>
-          <p>Email: <strong id="accEmail"></strong></p>
-          <p class="hint">Your business details (name, address, logo, tax) are set on the invoice page with “Save my details for next time”.</p>
-          <button class="btn btn-ghost" data-signout type="button">Log out</button>
+          <div class="card-head"><h2>Needs attention</h2></div>
+          <ul class="attn" id="attention"></ul>
         </div>
-        <form class="card" id="pwForm">
-          <h2 style="font-size:1.2rem">Change password</h2>
-          <div class="field"><label for="newpw">New password</label><input class="input" id="newpw" name="newpw" type="password" autocomplete="new-password" minlength="8"></div>
-          <button class="btn btn-ink" type="submit">Change password</button>
-          <p class="hint" style="margin-top:14px">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
-        </form>
       </div>
-    </div>
+      <div class="card">
+        <div class="card-head"><h2>Recent invoices</h2><button type="button" class="link-btn" data-goto="invoices">View all</button></div>
+        <div id="recent"></div>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="invoices" hidden>
+      <div class="list-bar">
+        <div class="filters" role="tablist" aria-label="Filter by status">
+          <button type="button" class="filter" data-filter="all" aria-selected="true">All <span data-fcount="all"></span></button>
+          <button type="button" class="filter" data-filter="draft" aria-selected="false">Draft <span data-fcount="draft"></span></button>
+          <button type="button" class="filter" data-filter="sent" aria-selected="false">Sent <span data-fcount="sent"></span></button>
+          <button type="button" class="filter" data-filter="overdue" aria-selected="false">Overdue <span data-fcount="overdue"></span></button>
+          <button type="button" class="filter" data-filter="paid" aria-selected="false">Paid <span data-fcount="paid"></span></button>
+        </div>
+        <label class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search invoices</span><input class="in" id="search" type="search" placeholder="Search number or client"></label>
+      </div>
+      <div class="card flush" id="invList"></div>
+    </section>
+
+    <section class="panel" data-panel="clients" hidden>
+      <div class="list-bar">
+        <label class="search"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr-only">Search clients</span><input class="in" id="clientSearch" type="search" placeholder="Search clients"></label>
+        <button type="button" class="btn btn-primary" id="addClientBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add client</button>
+      </div>
+      <div class="client-grid" id="clientGrid"></div>
+    </section>
+
+    <section class="panel" data-panel="settings" hidden>
+      <div class="settings-grid">
+        <form class="card" id="profileForm">
+          <div class="card-head"><h2>Business details</h2></div>
+          <p class="hint">These fill in every new invoice automatically.</p>
+          <div class="grid-2">
+            <label class="f span-2"><span class="f-label">Business name</span><input class="in" name="name" placeholder="e.g. Arshaon Studio"></label>
+            <label class="f"><span class="f-label">Email</span><input class="in" name="email" type="email"></label>
+            <label class="f"><span class="f-label">Phone</span><input class="in" name="phone"></label>
+            <label class="f span-2"><span class="f-label">Address</span><textarea class="in" name="address" rows="2"></textarea></label>
+            <label class="f"><span class="f-label">Tax, VAT or BIN number</span><input class="in" name="taxId"></label>
+            <label class="f"><span class="f-label">Default currency</span><select class="in" name="currency" id="setCurrency"></select></label>
+            <label class="f"><span class="f-label">Tax name</span><input class="in" name="taxLabel" placeholder="VAT"></label>
+            <label class="f"><span class="f-label">Default tax rate (%)</span><input class="in" name="taxRate" inputmode="decimal"></label>
+            <label class="f"><span class="f-label">Payment due after (days)</span><input class="in" name="dueDays" inputmode="numeric" placeholder="14"></label>
+            <label class="f span-2"><span class="f-label">Default notes (payment details)</span><textarea class="in" name="notes" rows="3"></textarea></label>
+            <label class="f span-2"><span class="f-label">Default terms</span><textarea class="in" name="terms" rows="2"></textarea></label>
+          </div>
+          <button class="btn btn-primary" type="submit">Save business details</button>
+        </form>
+        <div class="settings-side">
+          <div class="card">
+            <div class="card-head"><h2>Account</h2></div>
+            <p class="acc-email">Signed in as <b id="accEmail"></b></p>
+            <form id="pwForm">
+              <label class="f"><span class="f-label">New password</span><input class="in" name="newpw" type="password" autocomplete="new-password" minlength="8" placeholder="At least 8 characters"></label>
+              <button class="btn btn-white" type="submit">Change password</button>
+            </form>
+          </div>
+          <div class="card">
+            <div class="card-head"><h2>Your data</h2></div>
+            <p class="hint">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a> from your account address.</p>
+            <button type="button" class="btn btn-white" data-signout><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H3"/></svg> Log out</button>
+          </div>
+        </div>
+      </div>
+    </section>
   </div>
-</section>
+</div>
+
+<dialog class="modal" id="clientModal" aria-labelledby="clientModalTitle">
+  <form id="clientForm" method="dialog">
+    <div class="modal-body">
+      <h2 id="clientModalTitle">Add a client</h2>
+      <label class="f"><span class="f-label">Name</span><input class="in" name="cname" required placeholder="Client or company name"></label>
+      <div class="grid-2">
+        <label class="f"><span class="f-label">Email</span><input class="in" name="cemail" type="email"></label>
+        <label class="f"><span class="f-label">Phone</span><input class="in" name="cphone"></label>
+      </div>
+      <label class="f"><span class="f-label">Address</span><textarea class="in" name="caddress" rows="2"></textarea></label>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-white" type="button" id="clientCancel">Cancel</button>
+      <button class="btn btn-primary" type="submit">Save client</button>
+    </div>
+  </form>
+</dialog>
 </main>
-<footer class="site-footer">
-  <div class="wrap foot-grid">
-    <div class="foot-brand">
-      <a class="brand" href="/" aria-label="invoice-gen.net home"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="15" fill="#16213a"/><path d="M19 11h19.5L49 21.5V49a3.5 3.5 0 0 1-3.5 3.5h-26.5A3.5 3.5 0 0 1 15.5 49V14.5A3.5 3.5 0 0 1 19 11z" fill="#fff"/><path d="M38.5 11v7a3.5 3.5 0 0 0 3.5 3.5h7z" fill="#c7d1e0"/><rect x="21.5" y="27" width="17" height="3.4" rx="1.7" fill="#16213a"/><rect x="21.5" y="34" width="21" height="3.4" rx="1.7" fill="#9aa6ba"/><rect x="21.5" y="41" width="11" height="3.4" rx="1.7" fill="#9aa6ba"/><circle cx="45.5" cy="45.5" r="11" fill="#0e7c5a" stroke="#16213a" stroke-width="3.2"/><path d="M40.6 45.7l3.4 3.4 6.6-7" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="brand-name">invoice-gen<span class="tld">.net</span></span></a>
-      <p>Free invoices for freelancers and small businesses. Make one, download the PDF, or email it to your client.</p>
-      <a class="btn btn-primary btn-sm" href="/">Make an invoice</a>
-    </div>
-    <div>
-      <h2>Make invoices</h2>
-      <ul>
-        <li><a href="/">Invoice generator</a></li>
-        <li><a href="/invoice-template/">Invoice templates</a></li>
-        <li><a href="/freelance-invoice/">Freelance invoice</a></li>
-        <li><a href="/how-to-make-an-invoice/">How to make an invoice</a></li>
-      </ul>
-    </div>
-    <div>
-      <h2>Account</h2>
-      <ul>
-        <li><a href="/login/?signup=1">Create free account</a></li>
-        <li><a href="/login/">Log in</a></li>
-        <li><a href="/dashboard/">My invoices</a></li>
-      </ul>
-    </div>
-    <div>
-      <h2>invoice-gen.net</h2>
-      <ul>
-        <li><a href="/about/">About</a></li>
-        <li><a href="/contact/">Contact</a></li>
-        <li><a href="/privacy/">Privacy policy</a></li>
-        <li><a href="/terms/">Terms of use</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="wrap foot-base">
-    <span>&copy; <span data-year>2026</span> invoice-gen.net. All rights reserved.</span>
-    <span>Invoices are created in your browser. <a href="/privacy/">How we handle your data</a></span>
-  </div>
-</footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v=4"></script>
-<script src="/assets/js/core.js?v=4"></script>
-<script src="/assets/js/motion.js?v=4"></script>
+<script src="/assets/js/config.js?v=6"></script>
+<script src="/assets/js/core.js?v=6"></script>
+<script src="/assets/js/motion.js?v=6"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="/assets/js/invoice.js?v=4"></script>
-<script src="/assets/js/pdf.js?v=4"></script>
-<script src="/assets/js/dashboard.js?v=4"></script>
+<script src="/assets/js/invoice.js?v=6"></script>
+<script src="/assets/js/pdf.js?v=6"></script>
+<script src="/assets/js/dashboard.js?v=6"></script>
 </body>
 </html>

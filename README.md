@@ -3,6 +3,9 @@
 Ei folder ta-i tomar puro website. Kono build lage na — sob file shorasori Hostinger e jabe.
 
 **Ki ache site e**
+- Invoice editor: bam pashe 6 ta step (Your business, Client, Details, Items, Tax, Notes), dan pashe live A4 preview, 3 ta design x 6 rong
+- Dashboard: Overview (hisab, 6 masher chart, "Needs attention"), Invoices (filter, search, mark paid, duplicate, PDF), Clients, Settings
+- Supabase connect korar age `/dashboard/` e sample data dekhay (`/dashboard/?demo=1` sobshomoy sample dekhay)
 - Invoice generator (home page): invoice er upor shorasori type, logo, 28 currency, tax/discount/shipping, paid amount, 6 colour, Paid stamp
 - PDF download, print
 - Email e invoice pathano (PDF attach hoye jay, client reply korle tomar email e ashe)
