@@ -1,1 +1,0 @@
-ALTER TABLE `invoices` ADD `currencyCode` varchar(3) DEFAULT 'BDT' NOT NULL;
