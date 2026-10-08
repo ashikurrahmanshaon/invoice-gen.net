@@ -79,7 +79,12 @@
     $("#tShip").textContent = M(t.shipping);
     $("#tTotal").textContent = M(t.total);
     $("#tPaid").textContent = t.paid ? "-" + M(t.paid) : M(0);
-    $("#tBal").textContent = M(t.balance);
+    const bal = $("#tBal"), nb = M(t.balance);
+    if (bal.textContent && bal.textContent !== nb) {
+      const row = bal.parentElement;
+      row.classList.remove("bump"); void row.offsetWidth; row.classList.add("bump");
+    }
+    bal.textContent = nb;
     return t;
   }
 
@@ -93,6 +98,15 @@
 
   function setTemplate(t, save) {
     if (IG.TEMPLATES.indexOf(t) < 0) t = "classic";
+    const reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (save && !reduce && document.startViewTransition && inv.template !== t) {
+      document.startViewTransition(() => applyTemplate(t, save));
+      return;
+    }
+    applyTemplate(t, save);
+  }
+
+  function applyTemplate(t, save) {
     inv.template = t;
     const sheet = $("#sheet");
     IG.TEMPLATES.forEach((k) => sheet.classList.toggle("t-" + k, k === t));
@@ -452,10 +466,17 @@
     $("#itemRows").addEventListener("click", (e) => {
       const b = e.target.closest("[data-remove]");
       if (!b) return;
-      inv.items.splice(+b.dataset.remove, 1);
-      if (!inv.items.length) inv.items.push({ id: IG.uid(), desc: "", qty: 1, rate: 0 });
-      renderItems();
-      changed();
+      const tr = b.closest("tr");
+      const finish = () => {
+        inv.items.splice(+b.dataset.remove, 1);
+        if (!inv.items.length) inv.items.push({ id: IG.uid(), desc: "", qty: 1, rate: 0 });
+        renderItems();
+        changed();
+      };
+      if (tr && tr.animate && !(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)) {
+        tr.classList.add("row-out");
+        setTimeout(finish, 220);
+      } else finish();
     });
     $("#itemRows").addEventListener("keydown", (e) => {
       // Enter in the last rate field adds a new line
@@ -467,6 +488,8 @@
     $("#addLine").addEventListener("click", () => {
       inv.items.push({ id: IG.uid(), desc: "", qty: 1, rate: 0 });
       renderItems();
+      const rowsNow = $$("#itemRows tr");
+      if (rowsNow.length) rowsNow[rowsNow.length - 1].classList.add("row-in");
       changed();
       const last = $$('#itemRows [data-k="desc"]').pop();
       if (last) last.focus();
@@ -576,7 +599,7 @@
     user = await (IG.headerReady || IG.getUser());
     const note = $("#cloudNote");
     if (!IG.cloudReady) {
-      note.innerHTML = "Your draft is kept in this browser. Accounts are switched off until Supabase is connected (see README).";
+      note.innerHTML = "Your draft is saved in this browser as you type.";
       $("#saveBtn").hidden = true;
       return;
     }
