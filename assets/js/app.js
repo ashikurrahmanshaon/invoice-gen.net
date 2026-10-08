@@ -511,6 +511,8 @@
 
     // actions
     $("#downloadBtn").addEventListener("click", downloadPdf);
+    $("#mDownload").addEventListener("click", downloadPdf);
+    $("#mSend").addEventListener("click", openSend);
     $("#sendBtn").addEventListener("click", openSend);
     $("#saveBtn").addEventListener("click", () => saveCloud(false));
     $("#printBtn").addEventListener("click", () => window.print());

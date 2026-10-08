@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
   const to = String(body.to ?? "").trim();
   const subject = String(body.subject ?? "").trim().slice(0, 200) || "Invoice";
   const message = String(body.message ?? "").slice(0, 5000);
-  const fromName = String(body.fromName ?? "").replace(/[<>"\r\n]/g, "").trim().slice(0, 80) || "invoice-gen";
+  const fromName = String(body.fromName ?? "").replace(/[<>"\r\n]/g, "").trim().slice(0, 80) || "invoice-gen.net";
   const replyToRaw = String(body.replyTo ?? "").trim();
   const replyTo = EMAIL_RE.test(replyToRaw) ? replyToRaw : user.email;
   const fileName = (String(body.fileName ?? "invoice.pdf").replace(/[^\w.\-]+/g, "-").slice(0, 90) || "invoice") .replace(/(\.pdf)?$/i, ".pdf");
@@ -68,14 +68,15 @@ Deno.serve(async (req) => {
   const html = `<!doctype html><html><body style="margin:0;background:#e6ebf1;font-family:Segoe UI,Arial,sans-serif;color:#16213a">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:28px 12px">
   <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:6px;border-top:5px solid #16213a">
-  <tr><td style="padding:28px 30px 8px;font-size:15px;line-height:1.6">${esc(message).replace(/\n/g, "<br>")}</td></tr>
+  <tr><td style="padding:22px 30px 0;font:700 16px Segoe UI,Arial,sans-serif;color:#16213a">${esc(fromName)}</td></tr>
+  <tr><td style="padding:14px 30px 8px;font-size:15px;line-height:1.6">${esc(message).replace(/\n/g, "<br>")}</td></tr>
   <tr><td style="padding:10px 30px 26px;font-size:13px;color:#566176">The invoice is attached as a PDF (${esc(fileName)}). Reply to this email to contact ${esc(fromName)}.</td></tr>
   </table>
-  <p style="font-size:12px;color:#8a93a5;margin:16px 0 0">Sent with <a href="https://invoice-gen.net" style="color:#566176">invoice-gen.net</a>, the free invoice generator</p>
+  <p style="font-size:12px;color:#8a93a5;margin:16px 0 0">Sent with <a href="https://invoice-gen.net" style="color:#566176;text-decoration:none"><strong style="color:#16213a">invoice-gen</strong><strong style="color:#0e7c5a">.net</strong></a>, the free invoice generator</p>
   </td></tr></table></body></html>`;
 
   const payload: Record<string, unknown> = {
-    from: `${fromName} via invoice-gen <${FROM_EMAIL}>`,
+    from: `${fromName} via invoice-gen.net <${FROM_EMAIL}>`,
     to: [to],
     reply_to: replyTo,
     subject,
