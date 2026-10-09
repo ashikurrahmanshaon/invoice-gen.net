@@ -222,121 +222,87 @@ def build(FAQ, ICON_DL, ICON_SEND):
 </dialog>
 
 """ + f'''
-<section class="band" id="features" aria-labelledby="features-title">
+<section class="band" id="how" aria-labelledby="how-title">
   <div class="wrap">
-    <div class="sec-head center reveal">
-      <span class="kicker">Features</span>
-      <h2 id="features-title">Everything you need to bill clients</h2>
-      <p class="lede">The tools paid invoicing apps charge for, free in your browser.</p>
-    </div>
-    <div class="bento">
-      <article class="bt bt-wide reveal" id="designs">
-        <div class="bt-copy"><span class="bt-ico">{I(ICONS["palette"])}</span><h3>Three designs, six colours</h3><p>Classic, Modern or Minimal. Switch any time and the PDF follows.</p>
-          <div class="bt-links"><button type="button" class="link-btn" data-use-template="classic">Use Classic</button><button type="button" class="link-btn" data-use-template="modern">Use Modern</button><button type="button" class="link-btn" data-use-template="minimal">Use Minimal</button></div>
-        </div>
-        <div class="bt-art designs-art" aria-hidden="true">
-          <span class="mini-doc t-classic"><i></i><i></i><i></i><i></i><b></b></span>
-          <span class="mini-doc t-modern"><i></i><i></i><i></i><i></i><b></b></span>
-          <span class="mini-doc t-minimal"><i></i><i></i><i></i><i></i><b></b></span>
-        </div>
-      </article>
-      <article class="bt reveal">
-        <span class="bt-ico">{I(ICONS["mail"])}</span><h3>Email it in one click</h3><p>Your client gets the PDF attached. Replies land in your inbox.</p>
-        <div class="bt-art mail-art" aria-hidden="true"><span class="env"></span><span class="plane">{I(ICONS["send"])}</span></div>
-      </article>
-      <article class="bt reveal">
-        <span class="bt-ico">{I(ICONS["globe"])}</span><h3>28 currencies</h3><p>Taka, Dollar, Euro, Pound, Rupee, Dirham and more, formatted correctly.</p>
-        <div class="bt-art cur-art" aria-hidden="true"><span>৳</span><span>$</span><span>€</span><span>£</span><span>₹</span></div>
-      </article>
-      <article class="bt reveal">
-        <span class="bt-ico">{I(ICONS["percent"])}</span><h3>Tax, discounts, deposits</h3><p>Name your tax, give a discount, record part payments. Totals update live.</p>
-      </article>
-      <article class="bt reveal">
-        <span class="bt-ico">{I(ICONS["file"])}</span><h3>Clean A4 PDF</h3><p>Crisp and print-ready with your logo. No watermark, ever.</p>
-      </article>
-      <article class="bt reveal">
-        <span class="bt-ico">{I(ICONS["lock"])}</span><h3>Private by default</h3><p>Without an account, your invoice never leaves your browser.</p>
-      </article>
-    </div>
-  </div>
-</section>
-
-<section class="band band-alt" aria-labelledby="how">
-  <div class="wrap">
-    <div class="sec-head center reveal">
-      <span class="kicker">How it works</span>
-      <h2 id="how">From blank page to sent in three steps</h2>
-    </div>
-    <ol class="steps-row">
-      <li class="reveal"><span class="sr-no">1</span><h3>Fill in the steps</h3><p>Your business, your client and what you're charging for, with a hint under every field.</p></li>
-      <li class="reveal"><span class="sr-no">2</span><h3>Pick a design</h3><p>Choose Classic, Modern or Minimal and a colour. The live preview shows the result.</p></li>
-      <li class="reveal"><span class="sr-no">3</span><h3>Download or send</h3><p>Save a PDF, print it, or email it to your client with the PDF attached.</p></li>
+    <h2 id="how-title">How to make an invoice here</h2>
+    <ol class="how">
+      <li><b>Fill in the invoice</b><span>Type your business, your client and each item straight onto the page. Totals work themselves out.</span></li>
+      <li><b>Choose a look</b><span>Pick Classic, Modern or Minimal and a colour. Add your logo if you have one.</span></li>
+      <li><b>Download or send</b><span>Save the PDF, print it, or email it to your client with the PDF attached.</span></li>
     </ol>
   </div>
 </section>
 
-<section class="band" aria-labelledby="dash-title">
-  <div class="wrap teaser">
-    <div class="teaser-copy reveal">
-      <span class="kicker">Free account</span>
-      <h2 id="dash-title">A dashboard that shows who owes you what</h2>
-      <p class="lede">Sign up free and every invoice is saved. See what's paid, outstanding and overdue at a glance, and keep your clients in one place.</p>
-      <ul class="ticks">
-        <li>{I(ICONS["check"])} Paid, outstanding and overdue totals</li>
-        <li>{I(ICONS["check"])} Monthly chart of invoiced and paid</li>
-        <li>{I(ICONS["check"])} Saved clients and business details</li>
-      </ul>
-      <div class="teaser-cta">
-        <a class="btn btn-primary" href="/login/?signup=1">Create free account</a>
-        <a class="btn btn-white" href="/dashboard/?demo=1">See a sample dashboard</a>
-      </div>
+<section class="band band-line" id="features" aria-labelledby="features-title">
+  <div class="wrap split-2">
+    <div>
+      <h2 id="features-title">What's included</h2>
+      <p class="lede">Everything below is free. A few extras need a free account, because we save your work and send email for you.</p>
     </div>
-    <div class="dash-mock reveal" aria-hidden="true">
-      <div class="dm-side"><span class="dm-logo"></span><i class="on"></i><i></i><i></i><i></i></div>
-      <div class="dm-main">
-        <div class="dm-kpis"><div><small>Invoiced</small><b>$18,420</b></div><div><small>Paid</small><b class="g">$14,960</b></div><div><small>Outstanding</small><b class="a">$3,460</b></div></div>
-        <div class="dm-chart"><span style="--h:42%"></span><span style="--h:58%"></span><span style="--h:36%"></span><span style="--h:70%"></span><span style="--h:62%"></span><span style="--h:88%"></span></div>
-        <div class="dm-list"><div><i></i><span></span><em class="p">Paid</em></div><div><i></i><span></span><em class="s">Sent</em></div><div><i></i><span></span><em class="o">Overdue</em></div></div>
-      </div>
+    <dl class="feat">
+      <div><dt>PDF download</dt><dd>A clean A4 PDF with your logo. No watermark.</dd></div>
+      <div><dt>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
+      <div><dt>28 currencies</dt><dd>Taka, US Dollar, Euro, Pound, Rupee, Dirham and more, formatted correctly.</dd></div>
+      <div><dt>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>
+      <div><dt>Quotation, receipt, proforma</dt><dd>Change the title at the top of the page and the PDF follows.</dd></div>
+      <div><dt>Email to clients <em>free account</em></dt><dd>The PDF goes as an attachment, replies come to your inbox.</dd></div>
+      <div><dt>Saved invoices and clients <em>free account</em></dt><dd>Every invoice kept, clients ready to pick next time.</dd></div>
+      <div><dt>Paid and overdue tracking <em>free account</em></dt><dd>See what's been invoiced, paid and still owed.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="band" id="designs" aria-labelledby="designs-title">
+  <div class="wrap">
+    <h2 id="designs-title">Three invoice designs</h2>
+    <div class="designs">
+      <figure><button type="button" class="doc-thumb t-classic" data-use-template="classic" aria-label="Use the Classic design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Classic</b> Colour bar on top, filled table header.</figcaption></figure>
+      <figure><button type="button" class="doc-thumb t-modern" data-use-template="modern" aria-label="Use the Modern design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Modern</b> A colour band carrying your logo and details.</figcaption></figure>
+      <figure><button type="button" class="doc-thumb t-minimal" data-use-template="minimal" aria-label="Use the Minimal design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Minimal</b> Fine rules and plenty of white space.</figcaption></figure>
     </div>
   </div>
 </section>
 
-<section class="band band-alt" aria-labelledby="faq">
-  <div class="wrap faq-grid">
-    <div class="reveal">
-      <span class="kicker">FAQ</span>
-      <h2 id="faq">Questions people ask</h2>
-      <p class="lede">Anything else? Write to <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
+<section class="band band-line" aria-labelledby="acct-title">
+  <div class="wrap split-2 acct">
+    <div>
+      <h2 id="acct-title">Keep every invoice in one place</h2>
+      <p class="lede">With a free account, invoices are saved as you work. Your dashboard shows what's paid, what's outstanding and what's overdue, and keeps a list of your clients.</p>
+      <div class="row-btns">
+        <a class="btn btn-dark" href="/login/?signup=1">Create free account</a>
+        <a class="btn btn-line" href="/dashboard/?demo=1">See a sample dashboard</a>
+      </div>
     </div>
-    <div class="faq reveal">
+    <div class="ledger" aria-hidden="true">
+      <div class="lg-head"><span>Invoice</span><span>Client</span><span>Amount</span><span>Status</span></div>
+      <div><span>INV-0044</span><span>Orbit Labs</span><span>$980.00</span><span class="st st-draft">Draft</span></div>
+      <div><span>INV-0043</span><span>Northwind</span><span>$1,900.00</span><span class="st st-sent">Sent</span></div>
+      <div><span>INV-0041</span><span>Green Leaf Cafe</span><span>$360.00</span><span class="st st-over">Overdue</span></div>
+      <div><span>INV-0040</span><span>Acme Ltd</span><span>$1,250.00</span><span class="st st-paid">Paid</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" aria-labelledby="faq">
+  <div class="wrap split-2">
+    <div>
+      <h2 id="faq">Questions</h2>
+      <p class="lede">Something else? Email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
+    </div>
+    <div class="faq">
 {faq_html}
     </div>
   </div>
 </section>
 
-<section class="band" aria-labelledby="guides">
+<section class="band band-line" aria-labelledby="guides">
   <div class="wrap">
-    <div class="sec-head reveal"><span class="kicker">Guides</span><h2 id="guides">Learn to invoice like a pro</h2></div>
-    <div class="guide-links">
-      <a class="reveal" href="/how-to-make-an-invoice/"><strong>How to make an invoice</strong><span>What to include, with a checklist you can follow.</span><em>Read guide {I(ICONS["arrow"])}</em></a>
-      <a class="reveal" href="/invoice-template/"><strong>Invoice templates</strong><span>Free templates you can fill in online.</span><em>Read guide {I(ICONS["arrow"])}</em></a>
-      <a class="reveal" href="/freelance-invoice/"><strong>Freelance invoices</strong><span>Billing hourly or by project, and getting paid on time.</span><em>Read guide {I(ICONS["arrow"])}</em></a>
-    </div>
-  </div>
-</section>
-
-<section class="cta-band" aria-labelledby="final-title">
-  <div class="wrap">
-    <div class="cta-card reveal">
-      <div class="cta-glow" aria-hidden="true"></div>
-      <h2 id="final-title">Your next invoice is two minutes away</h2>
-      <p>Free forever. No sign-up needed to start.</p>
-      <div class="cta-actions">
-        <a class="btn btn-primary btn-lg" href="#create">Create free invoice {I(ICONS["arrow"])}</a>
-        <a class="btn btn-glass btn-lg" href="/login/?signup=1">Sign up free</a>
-      </div>
-    </div>
+    <h2 id="guides">Guides</h2>
+    <ul class="guides">
+      <li><a href="/how-to-make-an-invoice/"><b>How to make an invoice</b><span>What to include, with a checklist.</span></a></li>
+      <li><a href="/invoice-template/"><b>Invoice templates</b><span>Free templates you can fill in online.</span></a></li>
+      <li><a href="/freelance-invoice/"><b>Freelance invoices</b><span>Hourly or project billing, and getting paid on time.</span></a></li>
+    </ul>
   </div>
 </section>
 '''

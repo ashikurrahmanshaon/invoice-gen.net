@@ -16,8 +16,8 @@
   IG.TEMPLATES = ["classic", "modern", "minimal"];
 
   IG.ACCENTS = [
-    ["#16213a", "Ink navy"], ["#0e7c5a", "Stamp green"], ["#2f5bd3", "Carbon blue"],
-    ["#8a2c47", "Burgundy"], ["#b4561a", "Rust"], ["#333333", "Graphite"]
+    ["#111111", "Black"], ["#1f56c4", "Blue"], ["#1d7a3e", "Green"],
+    ["#8a2c47", "Burgundy"], ["#b4561a", "Rust"], ["#4b5563", "Slate"]
   ];
 
   const pad = (n) => String(n).padStart(2, "0");
@@ -63,7 +63,7 @@
       poNumber: "",
       currency: p.currency || "USD",
       template: p.template || "classic",
-      accent: p.accent || "#16213a",
+      accent: p.accent || "#111111",
       logo: p.logo || null,
       logoW: p.logoW || 0,
       logoH: p.logoH || 0,

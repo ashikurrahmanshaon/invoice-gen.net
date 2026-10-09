@@ -6,9 +6,9 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "7"  # asset version, bump to bust browser caches
+V = "9"  # asset version, bump to bust browser caches
 
-LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1bb886"/><stop offset="1" stop-color="#086148"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igh)"/><path d="M21 12h16.5L48 22.5V48a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/><path d="M37.5 12v7.5a3 3 0 0 0 3 3H48z" fill="#bdebd9"/><rect x="23" y="26" width="14" height="3.4" rx="1.7" fill="#0b6f50"/><rect x="23" y="32.5" width="9" height="3.4" rx="1.7" fill="#0b6f50" opacity=".4"/><path d="M27 43.2l3.8 3.8 8.6-9" fill="none" stroke="#0e8a63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'''
+LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -32,7 +32,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="description" content="{desc}">
 {robots}
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#0e8a63">
+<meta name="theme-color" content="#111111">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
 <meta property="og:title" content="{title}">
@@ -50,15 +50,15 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#0e8a63">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#111111">
 <link rel="manifest" href="/site.webmanifest">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
-<meta name="msapplication-TileColor" content="#0e8a63">
+<meta name="msapplication-TileColor" content="#111111">
 <meta name="format-detection" content="telephone=no">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css?v={V}">
 <script>document.documentElement.classList.add("js");</script>
 {ld_html}
@@ -76,7 +76,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
       <a href="/dashboard/" data-auth="in" hidden>My invoices</a>
       <a href="#" data-auth="in" data-signout hidden>Log out</a>
       <a href="/login/" data-auth="out">Log in</a>
-      <a class="btn btn-ink btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
+      <a class="btn btn-dark btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
     </nav>
   </div>
 </header>
