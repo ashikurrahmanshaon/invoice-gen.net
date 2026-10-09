@@ -95,7 +95,7 @@
     if (save) changed();
   }
   function setTemplate(t, save) {
-    if (IG.TEMPLATES.indexOf(t) < 0) t = "minimal";
+    if (IG.TEMPLATES.indexOf(t) < 0) t = "classic";
     if (save && !reduce() && document.startViewTransition && inv.template !== t) {
       document.startViewTransition(() => applyTemplate(t, save));
       return;
@@ -103,7 +103,7 @@
     applyTemplate(t, save);
   }
   function applyTemplate(t, save) {
-    if (IG.TEMPLATES.indexOf(t) < 0) t = "minimal";
+    if (IG.TEMPLATES.indexOf(t) < 0) t = "classic";
     inv.template = t;
     if (save) inv.tplPicked = true;
     const sheet = $("#sheet");
@@ -540,7 +540,7 @@
       if (params.get("new") === "1") { const u = new URL(window.location.href); u.searchParams.delete("new"); window.history.replaceState(null, "", u); }
     } else {
       inv = Object.assign(IG.blankInvoice(), draft);
-      if (!inv.tplPicked) inv.template = "minimal";
+      if (!inv.tplPicked) inv.template = "classic";
     }
     const pre = IG.store.get("ig_prefill_client", null);
     if (pre) { inv.to = Object.assign({ name: "", email: "", address: "", phone: "" }, pre); IG.store.remove("ig_prefill_client"); }

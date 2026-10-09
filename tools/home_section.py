@@ -41,7 +41,7 @@ def fi(path, ph, aria, typ="text", cls="", extra=""):
 def ta(path, ph, aria, rows=2, cls=""):
     return f'<textarea class="fi {cls}" rows="{rows}" data-f="{path}" placeholder="{ph}" aria-label="{aria}"></textarea>'
 
-TPLS = [("minimal", "Minimal"), ("classic", "Classic"), ("modern", "Modern")]
+TPLS = [("classic", "Classic"), ("modern", "Modern"), ("minimal", "Minimal")]
 
 def build(FAQ, ICON_DL, ICON_SEND):
     tpl_buttons = "".join(
@@ -64,7 +64,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
 
   <div class="wrap gen-grid">
     <div class="sheet-col">
-      <div class="sheet t-minimal" id="sheet">
+      <div class="sheet t-classic" id="sheet">
         <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
         <div class="sh-top">
           <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
@@ -131,7 +131,6 @@ def build(FAQ, ICON_DL, ICON_SEND):
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
           </div>
         </div>
-        <div class="sheet-foot">Made with invoice-gen.net</div>
       </div>
     </div>
 
@@ -256,8 +255,8 @@ def build(FAQ, ICON_DL, ICON_SEND):
   <div class="wrap">
     <h2 id="designs-title">Three invoice designs</h2>
     <div class="designs">
+      <figure><button type="button" class="doc-thumb t-classic" data-use-template="classic" aria-label="Use the Classic design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Classic</b> Clean layout with a filled table header.</figcaption></figure>
       <figure><button type="button" class="doc-thumb t-minimal" data-use-template="minimal" aria-label="Use the Minimal design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Minimal</b> Fine rules and plenty of white space.</figcaption></figure>
-      <figure><button type="button" class="doc-thumb t-classic" data-use-template="classic" aria-label="Use the Classic design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Classic</b> Colour bar on top, filled table header.</figcaption></figure>
       <figure><button type="button" class="doc-thumb t-modern" data-use-template="modern" aria-label="Use the Modern design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Modern</b> A colour band carrying your logo and details.</figcaption></figure>
     </div>
   </div>

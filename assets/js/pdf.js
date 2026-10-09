@@ -47,10 +47,7 @@
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
-    if (T === "classic") {
-      doc.setFillColor(...accent);
-      doc.rect(0, 0, W, 4, "F");
-    } else if (T === "modern") {
+    if (T === "modern") {
       doc.setFillColor(...accent);
       doc.rect(0, 0, W, bandH, "F");
     }
@@ -207,10 +204,9 @@
 
     // footer on every page
     const pages = doc.getNumberOfPages();
-    for (let i = 1; i <= pages; i++) {
+    for (let i = 1; pages > 1 && i <= pages; i++) {
       doc.setPage(i);
       doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...faint);
-      doc.text("Made with invoice-gen.net", L, H - 10);
       if (pages > 1) doc.text("Page " + i + " of " + pages, R, H - 10, { align: "right" });
     }
     return doc;

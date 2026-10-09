@@ -231,7 +231,6 @@ select.fi { appearance: none; -webkit-appearance: none; padding-right: 28px; bac
 .sheet .sheet-foot { margin-top: 36px; padding-top: 12px; border-top: 1px solid var(--rule-2); font-size: .78rem; color: var(--faint); }
 .sheet .stamp { position: absolute; z-index: 3; right: 350px; bottom: 150px; border: 3px solid var(--ok); color: var(--ok); border-radius: 6px; padding: 3px 14px; font: 800 1.8rem/1 var(--font); letter-spacing: .08em; text-transform: uppercase; transform: rotate(-10deg); opacity: .85; pointer-events: none; mix-blend-mode: multiply; }
 
-.sheet.t-classic { border-top: 6px solid var(--accent); }
 .sheet.t-modern .sh-top { background: var(--accent); margin: calc(-1 * clamp(18px, 4.2vw, 46px)) calc(-1 * clamp(18px, 4.2vw, 46px)) 8px; padding: clamp(18px, 3.4vw, 32px) clamp(18px, 4.2vw, 46px); border-radius: 3px 3px 0 0; align-items: center; }
 .sheet.t-modern .fi-doc { color: #fff; }
 .sheet.t-modern .fi-doc:hover { border-color: rgba(255, 255, 255, .3); }
@@ -273,7 +272,6 @@ select.fi { appearance: none; -webkit-appearance: none; padding-right: 28px; bac
 .tpl-thumb { width: 40px; height: 52px; border-radius: 2px; background: #fff; border: 1px solid var(--rule); display: grid; align-content: start; gap: 3px; padding: 6px 5px; overflow: hidden; }
 .tpl-thumb i { display: block; height: 3px; background: #dcdcdc; }
 .tpl-thumb i:nth-child(3) { height: 5px; margin-top: 3px; }
-.tpl-thumb.t-classic { border-top: 4px solid var(--ink); }
 .tpl-thumb.t-classic i:nth-child(3) { background: var(--ink); }
 .tpl-thumb.t-modern { background: linear-gradient(var(--ink) 0 14px, #fff 14px); padding-top: 18px; }
 .tpl-thumb.t-modern i:nth-child(3) { background: var(--ink); }
@@ -398,7 +396,6 @@ select.fi { appearance: none; -webkit-appearance: none; padding-right: 28px; bac
 .doc-thumb i:nth-child(2) { width: 60%; margin-top: 8px; }
 .doc-thumb i:nth-child(3) { height: 14px; margin-top: 14px; background: var(--ink); }
 .doc-thumb b { margin-top: auto; align-self: flex-end; width: 50%; height: 18px; background: #ececec; }
-.doc-thumb.t-classic { border-top: 8px solid var(--ink); }
 .doc-thumb.t-modern { background: linear-gradient(var(--ink) 0 26%, #fff 26%); }
 .doc-thumb.t-modern i:nth-child(1) { background: #fff; }
 .doc-thumb.t-modern i:nth-child(2) { margin-top: 30%; }

@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "10"  # asset version, bump to bust browser caches
+V = "11"  # asset version, bump to bust browser caches
 
 LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
