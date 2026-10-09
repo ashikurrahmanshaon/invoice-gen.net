@@ -251,18 +251,69 @@
   }
 
   /* ---------- actions ---------- */
+  let readyFile = null;
+  function showReady(f, why) {
+    readyFile = f;
+    $("#readyName").textContent = f.name;
+    const save = $("#readySave"), open = $("#readyOpen");
+    save.href = f.url; save.setAttribute("download", f.name);
+    open.href = f.url;
+    $("#readyShare").hidden = !IG.canShareFile(f.blob, f.name);
+    $("#readyHint").textContent = IG.isInApp
+      ? "This app's browser may block downloads. Tap Share, or open invoice-gen.net in Safari or Chrome."
+      : IG.isIOS ? "On iPhone and iPad, tap Share and choose Save to Files, or open the PDF and use the share button."
+      : why || "If the download didn't start, tap Save PDF.";
+    const d = $("#pdfReady");
+    if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", "");
+  }
+  function closeReady() { const d = $("#pdfReady"); if (typeof d.close === "function") d.close(); else d.removeAttribute("open"); }
+
+  function pdfLibReady() {
+    if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable) return true;
+    IG.toast("The PDF maker is still loading. Try again in a moment.", "err");
+    return false;
+  }
+
   async function downloadPdf(e) {
-    if (!checkReady()) return;
+    if (!checkReady() || !pdfLibReady()) return;
     try {
-      IG.buildPdf(inv).save(IG.pdfFileName(inv));
+      const r = IG.savePdf(inv);
       IG.bumpNumber(inv.number);
       const b = e && e.currentTarget;
       if (b && !reduce()) { b.classList.remove("done-pop"); void b.offsetWidth; b.classList.add("done-pop"); }
-      IG.toast("PDF downloaded: " + IG.pdfFileName(inv), "ok");
+      if (r.direct) IG.toast("Downloaded " + r.name, "ok");
+      else showReady(r);
+      closeOptions();
       if (user) saveCloud(true);
     } catch (err) {
-      IG.toast(err.message, "err");
+      IG.toast("Could not make the PDF: " + err.message, "err");
     }
+  }
+
+  function previewPdf() {
+    if (!checkReady() || !pdfLibReady()) return;
+    try {
+      const r = IG.openPdf(inv);
+      if (!r.opened) showReady(r, "Your browser blocked the new tab. Use Open PDF below.");
+    } catch (err) {
+      IG.toast("Could not make the PDF: " + err.message, "err");
+    }
+  }
+
+  /* phone: options slide up from the bottom */
+  function openOptions() {
+    $("#sidePanel").classList.add("open");
+    $("#spScrim").hidden = false;
+    $("#mOptions").setAttribute("aria-expanded", "true");
+    document.documentElement.classList.add("sheet-open");
+  }
+  function closeOptions() {
+    const p = $("#sidePanel");
+    if (!p.classList.contains("open")) return;
+    p.classList.remove("open");
+    $("#spScrim").hidden = true;
+    $("#mOptions").setAttribute("aria-expanded", "false");
+    document.documentElement.classList.remove("sheet-open");
   }
 
   function newInvoice() {
@@ -282,6 +333,7 @@
   /* ---------- email ---------- */
   function openSend() {
     if (!checkReady()) return;
+    closeOptions();
     const t = IG.calc(inv);
     $("#sendTo").value = inv.to.email || "";
     $("#sendSubject").value = (inv.title || "Invoice") + " " + inv.number + " from " + inv.from.name;
@@ -330,10 +382,13 @@
   }
 
   function sendWithMailApp() {
-    try { IG.buildPdf(inv).save(IG.pdfFileName(inv)); } catch (e) { return sendError(e.message); }
+    if (!pdfLibReady()) return;
+    let r;
+    try { r = IG.savePdf(inv); } catch (e) { return sendError(e.message); }
     const href = "mailto:" + encodeURIComponent($("#sendTo").value.trim()) + "?subject=" + encodeURIComponent($("#sendSubject").value) +
       "&body=" + encodeURIComponent($("#sendMsg").value + "\n\n(The invoice PDF is attached.)");
     closeSend();
+    if (!r.direct) { showReady(r, "Save the PDF, then attach it to your email."); return; }
     IG.toast("PDF downloaded. Attach it to the email that opens.");
     window.location.href = href;
   }
@@ -446,7 +501,19 @@
     $("#sendBtn").addEventListener("click", openSend);
     $("#mSend").addEventListener("click", openSend);
     $("#saveBtn").addEventListener("click", () => saveCloud(false));
-    $("#printBtn").addEventListener("click", () => { if (checkReady()) window.print(); });
+    $("#printBtn").addEventListener("click", () => { if (checkReady()) { closeOptions(); window.print(); } });
+    $("#previewBtn").addEventListener("click", previewPdf);
+    $("#mOptions").addEventListener("click", () => ($("#sidePanel").classList.contains("open") ? closeOptions() : openOptions()));
+    $("#spClose").addEventListener("click", closeOptions);
+    $("#spScrim").addEventListener("click", closeOptions);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeOptions(); });
+    $("#readyClose").addEventListener("click", closeReady);
+    $("#readySave").addEventListener("click", () => setTimeout(closeReady, 400));
+    $("#readyShare").addEventListener("click", async () => {
+      if (!readyFile) return;
+      try { await IG.sharePdf(readyFile.blob, readyFile.name, (inv.title || "Invoice") + " " + inv.number); closeReady(); }
+      catch (e) { if (e && e.name !== "AbortError") IG.toast("Sharing didn't work here. Use Open PDF instead.", "err"); }
+    });
     $("#newBtn").addEventListener("click", newInvoice);
     $("#profileBtn").addEventListener("click", saveProfile);
     $("#sendCancel").addEventListener("click", closeSend);

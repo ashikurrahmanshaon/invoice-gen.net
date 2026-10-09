@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "6"  # asset version, bump to bust browser caches
+V = "7"  # asset version, bump to bust browser caches
 
 LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igh" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1bb886"/><stop offset="1" stop-color="#086148"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igh)"/><path d="M21 12h16.5L48 22.5V48a4 4 0 0 1-4 4H21a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/><path d="M37.5 12v7.5a3 3 0 0 0 3 3H48z" fill="#bdebd9"/><rect x="23" y="26" width="14" height="3.4" rx="1.7" fill="#0b6f50"/><rect x="23" y="32.5" width="9" height="3.4" rx="1.7" fill="#0b6f50" opacity=".4"/><path d="M27 43.2l3.8 3.8 8.6-9" fill="none" stroke="#0e8a63" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
@@ -128,8 +128,8 @@ BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/
 <script src="/assets/js/core.js?v={V}"></script>
 <script src="/assets/js/motion.js?v={V}"></script>
 '''
-PDF_JS = f'''<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+PDF_JS = '''<script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script>
+<script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
 '''
 
 def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=True):

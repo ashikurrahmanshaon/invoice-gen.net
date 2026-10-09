@@ -27,6 +27,10 @@ ICONS = {
     "file": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
 }
 
+ICONS["eye"] = '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'
+ICONS["sliders"] = '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>'
+ICONS["share"] = '<path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>'
+ICONS["ext"] = '<path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/>'
 ICONS["clock"] = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
 ICONS["user"] = '<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>'
 
@@ -131,12 +135,14 @@ def build(FAQ, ICON_DL, ICON_SEND):
       </div>
     </div>
 
-    <aside class="side-panel" aria-label="Invoice options">
+    <aside class="side-panel" id="sidePanel" aria-label="Invoice options">
+      <div class="sp-sheet-head"><span class="sp-grab" aria-hidden="true"></span><b>Invoice options</b><button type="button" class="btn btn-ink btn-sm" id="spClose">Done</button></div>
       <div class="sp-card sp-actions">
         <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button">{ICON_DL} Download PDF</button>
         <button class="btn btn-white btn-block" id="sendBtn" type="button">{ICON_SEND} Send by email</button>
         <div class="sp-row">
           <button class="sp-mini" id="saveBtn" type="button">{I(ICONS["save"])}<span>Save</span></button>
+          <button class="sp-mini" id="previewBtn" type="button">{I(ICONS["eye"])}<span>Preview</span></button>
           <button class="sp-mini" id="printBtn" type="button">{I(ICONS["print"])}<span>Print</span></button>
           <button class="sp-mini" id="newBtn" type="button">{I(ICONS["plus"])}<span>New</span></button>
         </div>
@@ -175,10 +181,27 @@ def build(FAQ, ICON_DL, ICON_SEND):
   </div>
 </section>
 
-<div class="mobile-bar" role="region" aria-label="Invoice actions">
-  <button class="btn btn-white" id="mSend" type="button">{ICON_SEND} Send</button>
-  <button class="btn btn-primary" id="mDownload" type="button">{ICON_DL} Download PDF</button>
-</div>
+<div class="sp-scrim" id="spScrim" hidden></div>
+<nav class="mobile-bar" aria-label="Invoice actions">
+  <button class="mb-btn" id="mOptions" type="button" aria-controls="sidePanel" aria-expanded="false">{I(ICONS["sliders"])}<span>Options</span></button>
+  <button class="mb-btn" id="mSend" type="button">{ICON_SEND}<span>Send</span></button>
+  <button class="btn btn-primary mb-main" id="mDownload" type="button">{ICON_DL} Download PDF</button>
+</nav>
+
+<dialog class="modal ready" id="pdfReady" aria-labelledby="readyTitle">
+  <div class="modal-body">
+    <span class="ready-ico" aria-hidden="true">{I(ICONS["check"])}</span>
+    <h2 id="readyTitle">Your PDF is ready</h2>
+    <p class="ready-name" id="readyName">invoice.pdf</p>
+    <div class="ready-actions">
+      <a class="btn btn-primary btn-lg btn-block" id="readySave" href="#" download>{ICON_DL} Save PDF</a>
+      <a class="btn btn-white btn-block" id="readyOpen" href="#" target="_blank" rel="noopener">{I(ICONS["ext"])} Open PDF</a>
+      <button class="btn btn-white btn-block" id="readyShare" type="button" hidden>{I(ICONS["share"])} Share or save to Files</button>
+    </div>
+    <p class="hint ready-hint" id="readyHint">On iPhone, tap Share, then Save to Files.</p>
+  </div>
+  <div class="modal-foot"><button class="btn btn-white" id="readyClose" type="button">Close</button></div>
+</dialog>
 
 <dialog class="modal" id="sendModal" aria-labelledby="sendTitle">
   <div class="modal-body">

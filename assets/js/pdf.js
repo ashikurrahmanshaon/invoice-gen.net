@@ -226,3 +226,58 @@
     return uri.slice(uri.indexOf(",") + 1);
   };
 })();
+
+/* Saving the PDF in every browser.
+   Desktop and Android: a normal download.
+   iPhone/iPad and in-app browsers (Facebook, Instagram, Messenger…): they often ignore
+   downloads, so we hand back a link the person taps themselves: Save, Open or Share. */
+(function () {
+  "use strict";
+  const IG = (window.IG = window.IG || {});
+  const ua = navigator.userAgent || "";
+  IG.isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  IG.isInApp = /FBAN|FBAV|FB_IAB|Instagram|Messenger|Line\/|MicroMessenger|Snapchat|TikTok|; wv\)/i.test(ua);
+  let lastUrl = null;
+
+  IG.pdfBlob = function (inv) {
+    const blob = IG.buildPdf(inv).output("blob");
+    if (lastUrl) setTimeout(((u) => () => URL.revokeObjectURL(u))(lastUrl), 60000);
+    lastUrl = URL.createObjectURL(blob);
+    return { blob, url: lastUrl, name: IG.pdfFileName(inv) };
+  };
+
+  IG.canShareFile = function (blob, name) {
+    try {
+      if (!navigator.canShare || typeof File === "undefined") return false;
+      return navigator.canShare({ files: [new File([blob], name, { type: "application/pdf" })] });
+    } catch (e) { return false; }
+  };
+
+  /* returns {direct:true} when the browser downloaded it, otherwise the file for the "ready" sheet */
+  IG.savePdf = function (inv) {
+    const f = IG.pdfBlob(inv);
+    if (IG.isIOS || IG.isInApp) return Object.assign({ direct: false }, f);
+    if (window.navigator.msSaveOrOpenBlob) { window.navigator.msSaveOrOpenBlob(f.blob, f.name); return Object.assign({ direct: true }, f); }
+    const a = document.createElement("a");
+    a.href = f.url;
+    a.download = f.name;
+    a.rel = "noopener";
+    a.style.display = "none";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => a.remove(), 0);
+    return Object.assign({ direct: true }, f);
+  };
+
+  /* open the PDF in a new tab (must be called straight from a click) */
+  IG.openPdf = function (inv) {
+    const f = IG.pdfBlob(inv);
+    const w = IG.isInApp ? null : window.open(f.url, "_blank");
+    return Object.assign({ opened: !!w }, f);
+  };
+
+  IG.sharePdf = function (blob, name, title) {
+    const file = new File([blob], name, { type: "application/pdf" });
+    return navigator.share({ files: [file], title: title || name });
+  };
+})();

@@ -34,7 +34,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=6">
+<link rel="stylesheet" href="/assets/css/style.css?v=7">
 <script>document.documentElement.classList.add("js");</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
@@ -146,12 +146,14 @@
       </div>
     </div>
 
-    <aside class="side-panel" aria-label="Invoice options">
+    <aside class="side-panel" id="sidePanel" aria-label="Invoice options">
+      <div class="sp-sheet-head"><span class="sp-grab" aria-hidden="true"></span><b>Invoice options</b><button type="button" class="btn btn-ink btn-sm" id="spClose">Done</button></div>
       <div class="sp-card sp-actions">
         <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
         <button class="btn btn-white btn-block" id="sendBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send by email</button>
         <div class="sp-row">
           <button class="sp-mini" id="saveBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg><span>Save</span></button>
+          <button class="sp-mini" id="previewBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><span>Preview</span></button>
           <button class="sp-mini" id="printBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M7 14h10v6H7z"/></svg><span>Print</span></button>
           <button class="sp-mini" id="newBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>New</span></button>
         </div>
@@ -190,10 +192,27 @@
   </div>
 </section>
 
-<div class="mobile-bar" role="region" aria-label="Invoice actions">
-  <button class="btn btn-white" id="mSend" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send</button>
-  <button class="btn btn-primary" id="mDownload" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
-</div>
+<div class="sp-scrim" id="spScrim" hidden></div>
+<nav class="mobile-bar" aria-label="Invoice actions">
+  <button class="mb-btn" id="mOptions" type="button" aria-controls="sidePanel" aria-expanded="false"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg><span>Options</span></button>
+  <button class="mb-btn" id="mSend" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg><span>Send</span></button>
+  <button class="btn btn-primary mb-main" id="mDownload" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
+</nav>
+
+<dialog class="modal ready" id="pdfReady" aria-labelledby="readyTitle">
+  <div class="modal-body">
+    <span class="ready-ico" aria-hidden="true"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
+    <h2 id="readyTitle">Your PDF is ready</h2>
+    <p class="ready-name" id="readyName">invoice.pdf</p>
+    <div class="ready-actions">
+      <a class="btn btn-primary btn-lg btn-block" id="readySave" href="#" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Save PDF</a>
+      <a class="btn btn-white btn-block" id="readyOpen" href="#" target="_blank" rel="noopener"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9"/><path d="M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg> Open PDF</a>
+      <button class="btn btn-white btn-block" id="readyShare" type="button" hidden><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/></svg> Share or save to Files</button>
+    </div>
+    <p class="hint ready-hint" id="readyHint">On iPhone, tap Share, then Save to Files.</p>
+  </div>
+  <div class="modal-foot"><button class="btn btn-white" id="readyClose" type="button">Close</button></div>
+</dialog>
 
 <dialog class="modal" id="sendModal" aria-labelledby="sendTitle">
   <div class="modal-body">
@@ -378,13 +397,13 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v=6"></script>
-<script src="/assets/js/core.js?v=6"></script>
-<script src="/assets/js/motion.js?v=6"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
-<script src="/assets/js/invoice.js?v=6"></script>
-<script src="/assets/js/pdf.js?v=6"></script>
-<script src="/assets/js/app.js?v=6"></script>
+<script src="/assets/js/config.js?v=7"></script>
+<script src="/assets/js/core.js?v=7"></script>
+<script src="/assets/js/motion.js?v=7"></script>
+<script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script>
+<script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
+<script src="/assets/js/invoice.js?v=7"></script>
+<script src="/assets/js/pdf.js?v=7"></script>
+<script src="/assets/js/app.js?v=7"></script>
 </body>
 </html>

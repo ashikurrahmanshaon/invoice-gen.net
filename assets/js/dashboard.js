@@ -228,7 +228,10 @@
       const { data, error } = await IG.cloud.from("invoices").select("data,status").eq("id", r.id).single();
       if (error) return IG.toast(error.message, "err");
       const inv = Object.assign(IG.blankInvoice(), data.data, { status: data.status });
-      try { IG.buildPdf(inv).save(IG.pdfFileName(inv)); } catch (e) { IG.toast(e.message, "err"); }
+      try {
+        const f = IG.savePdf(inv);
+        if (!f.direct) { const w = window.open(f.url, "_blank"); if (!w) location.href = f.url; }
+      } catch (e) { IG.toast(e.message, "err"); }
       return;
     }
     if (what === "paid" || what === "sent") {
