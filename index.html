@@ -60,253 +60,133 @@
   </div>
 </header>
 <main id="main">
-<section class="hero" aria-labelledby="hero-title">
-  <div class="hero-bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
-  <div class="wrap hero-inner">
-    <a class="pill reveal" href="#features"><span class="pill-tag">New</span> Three invoice designs in six colours <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
-    <h1 id="hero-title" class="reveal">Create professional invoices in minutes, free</h1>
-    <p class="hero-lede reveal">Fill in a few simple steps, watch your invoice build itself, then download the PDF or email it to your client. No sign-up, no watermark, 28 currencies.</p>
-    <div class="hero-cta reveal">
-      <a class="btn btn-primary btn-lg" href="#create">Create free invoice <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg></a>
-      <a class="btn btn-white btn-lg" href="/dashboard/?demo=1">See the dashboard</a>
+<section class="gen" id="create" aria-labelledby="gen-title">
+  <div class="wrap gen-head">
+    <div>
+      <h1 id="gen-title">Free Invoice Generator</h1>
+      <p>Fill in the invoice below, then download it as a PDF or email it to your client. No sign-up needed.</p>
     </div>
-    <ul class="hero-checks reveal">
-      <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> No sign-up needed</li>
-      <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> No watermark</li>
+    <ul class="gen-ticks" aria-label="What you get">
+      <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> Free, no watermark</li>
       <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> PDF and email</li>
+      <li><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg> 28 currencies</li>
     </ul>
-
-    <div class="mock reveal" id="heroMock" aria-hidden="true">
-      <div class="mock-bar"><span></span><span></span><span></span><em>invoice-gen.net</em></div>
-      <div class="mock-body">
-        <div class="mock-form">
-          <div class="mf-step done"><i><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i><b>Your business</b><small>Arshaon Studio</small></div>
-          <div class="mf-step done"><i><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></i><b>Client</b><small>Acme Ltd</small></div>
-          <div class="mf-step open"><i>4</i><b>Items</b></div>
-          <div class="mf-fields">
-            <div class="mf-row"><span class="mf-in" data-mtype="Brand identity design"></span><span class="mf-in sm" data-mtype="900"></span></div>
-            <div class="mf-row"><span class="mf-in" data-mtype="Landing page design"></span><span class="mf-in sm" data-mtype="250"></span></div>
-            <div class="mf-row"><span class="mf-in" data-mtype="Social media kit"></span><span class="mf-in sm" data-mtype="100"></span></div>
-          </div>
-          <div class="mf-step"><i>5</i><b>Tax and payment</b></div>
-          <div class="mf-btn" id="mockBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</div>
-        </div>
-        <div class="mock-paper">
-          <div class="mp-top"><span class="mp-logo">AS</span><div><b>Invoice</b><small>INV-0042</small></div></div>
-          <div class="mp-parties"><div><small>From</small><b>Arshaon Studio</b><span>Dhaka, Bangladesh</span></div><div><small>Bill to</small><b>Acme Ltd</b><span>London, UK</span></div></div>
-          <div class="mp-head"><span>Description</span><span>Amount</span></div>
-          <div class="mp-row" data-mrow="0"><span>Brand identity design</span><span>$900.00</span></div>
-          <div class="mp-row" data-mrow="1"><span>Landing page design</span><span>$250.00</span></div>
-          <div class="mp-row" data-mrow="2"><span>Social media kit</span><span>$100.00</span></div>
-          <div class="mp-total"><span>Balance due</span><b id="mockTotal">$1,250.00</b></div>
-        </div>
-      </div>
-      <div class="float f-sent"><span class="f-ico"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg></span><span><b>Invoice sent</b><small>to accounts@acme.com</small></span></div>
-      <div class="float f-paid"><span class="f-ico paid"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span><b>Marked as paid</b><small>$1,250.00 from Acme Ltd</small></span></div>
-    </div>
   </div>
-</section>
 
-<section class="editor-sec" id="create" aria-labelledby="create-title">
-  <div class="wrap">
-    <div class="sec-head center reveal">
-      <span class="kicker">Invoice generator</span>
-      <h2 id="create-title">Create your invoice</h2>
-      <p class="lede">Fill in the steps and watch the invoice update as you type. The preview matches your PDF exactly.</p>
-    </div>
-
-    <div class="editor" id="editor" data-view="edit">
-      <div class="ed-top">
-        <div class="progress" aria-live="polite">
-          <div class="progress-track"><span id="progBar"></span></div>
-          <span class="progress-text" id="progText">0 of 3 required steps done</span>
-        </div>
-        <div class="ed-actions">
-          <button class="icon-btn" id="newBtn" type="button" title="New invoice" aria-label="New invoice"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-          <button class="icon-btn" id="saveBtn" type="button" title="Save to your account" aria-label="Save to your account"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg></button>
-          <button class="icon-btn" id="printBtn" type="button" title="Print" aria-label="Print"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M7 14h10v6H7z"/></svg></button>
-          <button class="btn btn-white" id="sendBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send</button>
-          <button class="btn btn-primary" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
-        </div>
-      </div>
-
-      <div class="ed-tabs" role="tablist" aria-label="Editor view">
-        <button type="button" role="tab" data-view="edit" aria-selected="true"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="m13 7 4 4"/></svg> Edit</button>
-        <button type="button" role="tab" data-view="preview" aria-selected="false"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg> Preview</button>
-      </div>
-
-      <div class="ed-body">
-        <div class="ed-form" id="edForm">
-          <section class="step open" data-step="business" id="step-business">
-            <button type="button" class="step-head" aria-expanded="true" aria-controls="step-business-body">
-              <span class="step-no" aria-hidden="true"><span>1</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Your business<span class="req-badge">Required</span></b><small data-summary="business">Who the invoice is from</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-business-body">
-              <div class="step-inner">
-                <div class="logo-row">
-                  <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Upload your logo">
-                    <img id="logoImg" alt="Your logo" hidden>
-                    <span class="logo-empty" id="logoHint"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg><b>Upload logo</b><small>PNG or JPG</small></span>
-                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
-                  </div>
-                  <div class="logo-help"><p>Your logo appears at the top of the invoice. Drag an image here or click to choose.</p><button type="button" class="link-btn" id="logoRemove" hidden>Remove logo</button></div>
-                </div>
-                <div class="grid-2">
-                  <label class="f span-2"><span class="f-label">Business name</span><input class="in" data-f="from.name" placeholder="e.g. Arshaon Studio" autocomplete="organization" data-required="business"></label>
-                  <label class="f "><span class="f-label">Email</span><input class="in" type="email" data-f="from.email" placeholder="you@business.com" autocomplete="email"><small class="f-hint">Clients reply to this address.</small></label>
-                  <label class="f "><span class="f-label">Phone</span><input class="in" data-f="from.phone" placeholder="+880 1700 000000" autocomplete="tel"></label>
-                  <label class="f span-2"><span class="f-label">Address</span><textarea class="in" rows="2" data-f="from.address" placeholder="Street, city, country"></textarea></label>
-                  <label class="f span-2"><span class="f-label">Tax, VAT or BIN number</span><input class="in" data-f="from.taxId" placeholder="Optional"><small class="f-hint">Shown under your address when filled in.</small></label>
-                </div>
-                <button type="button" class="btn btn-soft btn-sm" id="profileBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg> Use these details on every new invoice</button>
-              </div>
-            </div>
-          </section>
-          <section class="step" data-step="client" id="step-client">
-            <button type="button" class="step-head" aria-expanded="false" aria-controls="step-client-body">
-              <span class="step-no" aria-hidden="true"><span>2</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Client<span class="req-badge">Required</span></b><small data-summary="client">Who you're billing</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-client-body">
-              <div class="step-inner">
-                <div class="client-pick" id="clientPick" hidden>
-                  <label class="f "><span class="f-label">Choose a saved client</span><select class="in" id="clientSelect"></select></label>
-                </div>
-                <div class="grid-2">
-                  <label class="f span-2"><span class="f-label">Client or company name</span><input class="in" data-f="to.name" placeholder="e.g. Acme Ltd" data-required="client"></label>
-                  <label class="f "><span class="f-label">Client email</span><input class="in" type="email" data-f="to.email" placeholder="client@company.com"><small class="f-hint">Needed to email the invoice.</small></label>
-                  <label class="f "><span class="f-label">Phone</span><input class="in" data-f="to.phone" placeholder="Optional"></label>
-                  <label class="f span-2"><span class="f-label">Address</span><textarea class="in" rows="2" data-f="to.address" placeholder="Client address"></textarea></label>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section class="step" data-step="details" id="step-details">
-            <button type="button" class="step-head" aria-expanded="false" aria-controls="step-details-body">
-              <span class="step-no" aria-hidden="true"><span>3</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Invoice details</b><small data-summary="details">Number, dates and currency</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-details-body">
-              <div class="step-inner">
-                <div class="chips" role="group" aria-label="Document type">
-                  <span class="chips-label">Type</span>
-                  <button type="button" class="chip" data-title="Invoice">Invoice</button>
-                  <button type="button" class="chip" data-title="Quotation">Quotation</button>
-                  <button type="button" class="chip" data-title="Proforma Invoice">Proforma</button>
-                  <button type="button" class="chip" data-title="Receipt">Receipt</button>
-                </div>
-                <div class="grid-2">
-                  <label class="f "><span class="f-label">Title</span><input class="in" data-f="title" placeholder="Invoice"></label>
-                  <label class="f "><span class="f-label">Invoice number</span><input class="in" id="f-number" data-f="number" autocomplete="off"><small class="f-hint">Counts up automatically.</small></label>
-                  <label class="f "><span class="f-label">Issue date</span><input class="in" type="date" data-f="issueDate"></label>
-                  <label class="f "><span class="f-label">Due date</span><input class="in" type="date" data-f="dueDate"></label>
-                  <div class="chips span-2" role="group" aria-label="Quick due date">
-                    <span class="chips-label">Due</span>
-                    <button type="button" class="chip" data-due="0">On receipt</button>
-                    <button type="button" class="chip" data-due="7">In 7 days</button>
-                    <button type="button" class="chip" data-due="15">In 15 days</button>
-                    <button type="button" class="chip" data-due="30">In 30 days</button>
-                  </div>
-                  <label class="f "><span class="f-label">Currency</span><select class="in" id="currency"></select></label>
-                  <label class="f "><span class="f-label">PO or reference</span><input class="in" data-f="poNumber" placeholder="Optional"></label>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section class="step" data-step="items" id="step-items">
-            <button type="button" class="step-head" aria-expanded="false" aria-controls="step-items-body">
-              <span class="step-no" aria-hidden="true"><span>4</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Items<span class="req-badge">Required</span></b><small data-summary="items">Products or services you're charging for</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-items-body">
-              <div class="step-inner">
-                <div class="items-head" aria-hidden="true"><span>Description</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
-                <div class="item-rows" id="itemRows"></div>
-                <button type="button" class="add-line" id="addLine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add item</button>
-                <p class="tip">Tip: press Enter in the last Rate box to add another line.</p>
-              </div>
-            </div>
-          </section>
-          <section class="step" data-step="payment" id="step-payment">
-            <button type="button" class="step-head" aria-expanded="false" aria-controls="step-payment-body">
-              <span class="step-no" aria-hidden="true"><span>5</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Tax, discount and payment</b><small data-summary="payment">Totals and payment status</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-payment-body">
-              <div class="step-inner">
-                <div class="grid-2">
-                  <label class="f "><span class="f-label">Tax name</span><input class="in" data-f="taxLabel" placeholder="VAT, GST or Tax"></label>
-                  <label class="f "><span class="f-label">Tax rate (%)</span><input class="in" data-f="taxRate" inputmode="decimal" placeholder="0"></label>
-                  <div class="f"><span class="f-label" id="discLabel">Discount</span>
-                    <span class="in-group"><input class="in" data-f="discount" inputmode="decimal" placeholder="0" aria-labelledby="discLabel">
-                    <span class="seg" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span>
-                  </div>
-                  <label class="f "><span class="f-label">Shipping</span><input class="in" data-f="shipping" inputmode="decimal" placeholder="0"></label>
-                  <label class="f "><span class="f-label">Amount already paid</span><input class="in" data-f="paid" inputmode="decimal" placeholder="0"><small class="f-hint">Deposits or part payments.</small></label>
-                  <label class="f "><span class="f-label">Status</span><select class="in" id="status"><option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid (adds a PAID stamp)</option></select></label>
-                </div>
-                <div class="sum-box" aria-live="polite">
-                  <div><span>Subtotal</span><b id="tSub"></b></div>
-                  <div><span>Discount</span><b id="tDisc"></b></div>
-                  <div><span>Tax</span><b id="tTax"></b></div>
-                  <div><span>Shipping</span><b id="tShip"></b></div>
-                  <div class="sum-total"><span>Total</span><b id="tTotal"></b></div>
-                  <div><span>Paid</span><b id="tPaid"></b></div>
-                  <div class="sum-due"><span>Balance due</span><b id="tBal"></b></div>
-                </div>
-              </div>
-            </div>
-          </section>
-          <section class="step" data-step="notes" id="step-notes">
-            <button type="button" class="step-head" aria-expanded="false" aria-controls="step-notes-body">
-              <span class="step-no" aria-hidden="true"><span>6</span><svg class="ico step-tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>
-              <span class="step-title"><b>Notes and terms</b><small data-summary="notes">Payment details for your client</small></span>
-              <svg class="ico step-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
-            </button>
-            <div class="step-body" id="step-notes-body">
-              <div class="step-inner">
-                <div class="chips" role="group" aria-label="Insert payment details">
-                  <span class="chips-label">Insert</span>
-                  <button type="button" class="chip" data-insert="bank">Bank transfer</button>
-                  <button type="button" class="chip" data-insert="mobile">bKash / Nagad</button>
-                  <button type="button" class="chip" data-insert="online">PayPal / Payoneer</button>
-                </div>
-                  <label class="f "><span class="f-label">Notes</span><textarea class="in" rows="4" data-f="notes" placeholder="Payment details or a thank-you note"></textarea><small class="f-hint">Your client sees this under the totals.</small></label>
-                  <label class="f "><span class="f-label">Terms</span><textarea class="in" rows="2" data-f="terms"></textarea></label>
-              </div>
-            </div>
-          </section>
-          <p class="cloud-note" id="cloudNote">Your draft is saved in this browser as you type.</p>
-        </div>
-
-        <div class="ed-preview" id="edPreview">
-          <div class="pv-bar">
-            <div class="pv-group">
-              <span class="pv-label" id="tplLabel">Design</span>
-              <div class="seg seg-lg" id="tplPicker" role="group" aria-labelledby="tplLabel">
-                <button type="button" class="tpl-btn" data-template="classic" aria-pressed="false">Classic</button>
-                <button type="button" class="tpl-btn" data-template="modern" aria-pressed="false">Modern</button>
-                <button type="button" class="tpl-btn" data-template="minimal" aria-pressed="false">Minimal</button>
-              </div>
-            </div>
-            <div class="pv-group">
-              <span class="pv-label" id="accentLabel">Colour</span>
-              <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
+  <div class="wrap gen-grid">
+    <div class="sheet-col">
+      <div class="sheet t-classic" id="sheet">
+        <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
+        <div class="sh-top">
+          <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
+            <img id="logoImg" alt="Your logo" hidden>
+            <span class="logo-empty" id="logoHint"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg><b>+ Add your logo</b></span>
+            <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
+          </div>
+          <div class="sh-title">
+            <input class="fi fi-doc" data-f="title" placeholder="Invoice" aria-label="Document title">
+            <div class="sh-meta">
+              <label for="f-number">Invoice no.</label><input class="fi " data-f="number" placeholder="INV-0001" aria-label="Invoice number" id="f-number" autocomplete="off">
+              <label for="f-issue">Date</label><input class="fi " type="date" data-f="issueDate" placeholder="" aria-label="Issue date" id="f-issue">
+              <label for="f-due">Due date</label><input class="fi " type="date" data-f="dueDate" placeholder="" aria-label="Due date" id="f-due">
+              <label for="f-po">PO / ref.</label><input class="fi " data-f="poNumber" placeholder="Optional" aria-label="PO or reference" id="f-po">
             </div>
           </div>
-          <div class="pv-stage" id="pvStage">
-            <div class="pv-page" id="pvPage" role="img" aria-label="Invoice preview"></div>
-          </div>
-          <p class="pv-caption">A4 preview. Your PDF matches this layout.</p>
         </div>
+        <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
+
+        <div class="sh-parties">
+          <div class="party">
+            <span class="sh-label">From</span>
+            <input class="fi fi-strong" data-f="from.name" placeholder="Your business name *" aria-label="Your business name" autocomplete="organization" data-req>
+            <input class="fi " type="email" data-f="from.email" placeholder="Email" aria-label="Your email" autocomplete="email">
+            <textarea class="fi " rows="2" data-f="from.address" placeholder="Address" aria-label="Your address"></textarea>
+            <input class="fi " data-f="from.phone" placeholder="Phone" aria-label="Your phone" autocomplete="tel">
+            <input class="fi " data-f="from.taxId" placeholder="Tax / VAT / BIN no. (optional)" aria-label="Your tax number">
+          </div>
+          <div class="party">
+            <span class="sh-label">Bill to</span>
+            <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
+            <input class="fi fi-strong" data-f="to.name" placeholder="Client name *" aria-label="Client name" data-req>
+            <input class="fi " type="email" data-f="to.email" placeholder="Client email" aria-label="Client email">
+            <textarea class="fi " rows="2" data-f="to.address" placeholder="Client address" aria-label="Client address"></textarea>
+            <input class="fi " data-f="to.phone" placeholder="Phone (optional)" aria-label="Client phone">
+          </div>
+        </div>
+
+        <div class="sh-items">
+          <div class="items-head" aria-hidden="true"><span>Item</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
+          <div class="item-rows" id="itemRows"></div>
+          <button type="button" class="add-line" id="addLine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add line item</button>
+        </div>
+
+        <div class="sh-bottom">
+          <div class="sh-notes">
+            <span class="sh-label">Notes</span>
+            <textarea class="fi " rows="3" data-f="notes" placeholder="Payment details, bank account, bKash number or a thank-you note" aria-label="Notes"></textarea>
+            <div class="note-chips" role="group" aria-label="Insert payment details">
+              <button type="button" class="chip" data-insert="bank">+ Bank details</button>
+              <button type="button" class="chip" data-insert="mobile">+ bKash / Nagad</button>
+              <button type="button" class="chip" data-insert="online">+ PayPal / Payoneer</button>
+            </div>
+            <span class="sh-label">Terms</span>
+            <textarea class="fi " rows="2" data-f="terms" placeholder="Payment terms" aria-label="Terms"></textarea>
+          </div>
+          <div class="sh-totals" aria-live="polite">
+            <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
+            <div class="t-row t-adj"><span>Discount</span><span class="t-in"><input class="fi " data-f="discount" placeholder="0" aria-label="Discount" inputmode="decimal"><span class="seg seg-xs" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span><b id="tDisc"></b></div>
+            <div class="t-row t-adj"><span class="t-tax"><input class="fi fi-label" data-f="taxLabel" placeholder="Tax" aria-label="Tax name"></span><span class="t-in"><input class="fi " data-f="taxRate" placeholder="0" aria-label="Tax rate in percent" inputmode="decimal"><em>%</em></span><b id="tTax"></b></div>
+            <div class="t-row t-adj"><span>Shipping</span><span class="t-in"><input class="fi " data-f="shipping" placeholder="0" aria-label="Shipping" inputmode="decimal"></span><b id="tShip"></b></div>
+            <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
+            <div class="t-row t-adj"><span>Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
+            <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+          </div>
+        </div>
+        <div class="sheet-foot">Made with invoice-gen.net</div>
       </div>
     </div>
+
+    <aside class="side-panel" aria-label="Invoice options">
+      <div class="sp-card sp-actions">
+        <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
+        <button class="btn btn-white btn-block" id="sendBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send by email</button>
+        <div class="sp-row">
+          <button class="sp-mini" id="saveBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/></svg><span>Save</span></button>
+          <button class="sp-mini" id="printBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 8V4h10v4M7 17H5a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><path d="M7 14h10v6H7z"/></svg><span>Print</span></button>
+          <button class="sp-mini" id="newBtn" type="button"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>New</span></button>
+        </div>
+        <p class="sp-note" id="cloudNote">Your draft is saved in this browser as you type.</p>
+      </div>
+
+      <div class="sp-card">
+        <h2 class="sp-h" id="tplLabel">Design</h2>
+        <div class="tpl-picker" id="tplPicker" role="group" aria-labelledby="tplLabel"><button type="button" class="tpl-btn" data-template="classic" aria-pressed="false"><span class="tpl-thumb t-classic" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Classic</span></button><button type="button" class="tpl-btn" data-template="modern" aria-pressed="false"><span class="tpl-thumb t-modern" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Modern</span></button><button type="button" class="tpl-btn" data-template="minimal" aria-pressed="false"><span class="tpl-thumb t-minimal" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>Minimal</span></button></div>
+        <h2 class="sp-h" id="accentLabel">Colour</h2>
+        <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
+      </div>
+
+      <div class="sp-card">
+        <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
+        <label class="sp-field"><span class="sp-h">Payment due</span>
+          <select class="in" id="dueIn">
+            <option value="">Custom date</option>
+            <option value="0">On receipt</option>
+            <option value="7">In 7 days</option>
+            <option value="14">In 14 days</option>
+            <option value="15">In 15 days</option>
+            <option value="30">In 30 days</option>
+          </select>
+        </label>
+        <label class="sp-field"><span class="sp-h">Status</span>
+          <select class="in" id="status">
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid (adds a PAID stamp)</option>
+          </select>
+        </label>
+        <button type="button" class="link-btn sp-profile" id="profileBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg> Use my details on every new invoice</button>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -319,7 +199,7 @@
   <div class="modal-body">
     <h2 id="sendTitle">Email this invoice</h2>
     <p class="form-msg err" id="sendErr" hidden></p>
-    <p class="form-msg ok" id="sendLoginNote" hidden><a id="sendLoginLink" href="/login/?signup=1&amp;next=%2F%23create">Create a free account</a> to send from invoice-gen.net. Your invoice stays here while you sign up. Or use your own email app below.</p>
+    <p class="form-msg ok" id="sendLoginNote" hidden><a id="sendLoginLink" href="/login/?signup=1&amp;next=%2F">Create a free account</a> to send from invoice-gen.net. Your invoice stays here while you sign up. Or use your own email app below.</p>
     <label class="f"><span class="f-label">Client's email</span><input class="in" id="sendTo" type="email" autocomplete="off" placeholder="client@company.com"></label>
     <label class="f"><span class="f-label">Subject</span><input class="in" id="sendSubject"></label>
     <label class="f"><span class="f-label">Message</span><textarea class="in" id="sendMsg" rows="6"></textarea></label>
@@ -332,6 +212,7 @@
     <button class="btn btn-primary" id="sendNow" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg> Send invoice</button>
   </div>
 </dialog>
+
 
 <section class="band" id="features" aria-labelledby="features-title">
   <div class="wrap">

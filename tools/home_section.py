@@ -1,7 +1,7 @@
 # Home page markup for invoice-gen.net (imported by build_pages.py)
-# Layout: SaaS hero with an animated product mock, the invoice editor
-# (guided steps on the left, live A4 preview on the right), features,
-# steps, dashboard teaser, FAQ and a closing call to action.
+# Layout: the generator comes first. A short H1 header, then the invoice
+# itself as the form (type straight onto the page) with a sticky side panel
+# for download, email, design, colour and currency. Marketing sections below.
 
 def I(path, cls="ico"):
     return ('<svg class="' + cls + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" '
@@ -27,241 +27,151 @@ ICONS = {
     "file": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
 }
 
-def step(n, key, title, sub, body, required=False):
-    req = '<span class="req-badge">Required</span>' if required else ''
-    first = n == 1
-    return f'''
-          <section class="step{' open' if first else ''}" data-step="{key}" id="step-{key}">
-            <button type="button" class="step-head" aria-expanded="{'true' if first else 'false'}" aria-controls="step-{key}-body">
-              <span class="step-no" aria-hidden="true"><span>{n}</span>{I(ICONS["check"], "ico step-tick")}</span>
-              <span class="step-title"><b>{title}{req}</b><small data-summary="{key}">{sub}</small></span>
-              {I(ICONS["chev"], "ico step-chev")}
-            </button>
-            <div class="step-body" id="step-{key}-body">
-              <div class="step-inner">{body}
-              </div>
-            </div>
-          </section>'''
+ICONS["clock"] = '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'
+ICONS["user"] = '<circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/>'
 
-def field(label, inner, hint="", cls=""):
-    h = f'<small class="f-hint">{hint}</small>' if hint else ''
-    return f'\n                  <label class="f {cls}"><span class="f-label">{label}</span>{inner}{h}</label>'
+def fi(path, ph, aria, typ="text", cls="", extra=""):
+    t = '' if typ == "text" else f' type="{typ}"'
+    return f'<input class="fi {cls}"{t} data-f="{path}" placeholder="{ph}" aria-label="{aria}"{extra}>'
+
+def ta(path, ph, aria, rows=2, cls=""):
+    return f'<textarea class="fi {cls}" rows="{rows}" data-f="{path}" placeholder="{ph}" aria-label="{aria}"></textarea>'
+
+TPLS = [("classic", "Classic"), ("modern", "Modern"), ("minimal", "Minimal")]
 
 def build(FAQ, ICON_DL, ICON_SEND):
-    business = (
-        '''
-                <div class="logo-row">
-                  <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Upload your logo">
-                    <img id="logoImg" alt="Your logo" hidden>
-                    <span class="logo-empty" id="logoHint">''' + I(ICONS["image"]) + '''<b>Upload logo</b><small>PNG or JPG</small></span>
-                    <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
-                  </div>
-                  <div class="logo-help"><p>Your logo appears at the top of the invoice. Drag an image here or click to choose.</p><button type="button" class="link-btn" id="logoRemove" hidden>Remove logo</button></div>
-                </div>
-                <div class="grid-2">'''
-        + field("Business name", '<input class="in" data-f="from.name" placeholder="e.g. Arshaon Studio" autocomplete="organization" data-required="business">', "", "span-2")
-        + field("Email", '<input class="in" type="email" data-f="from.email" placeholder="you@business.com" autocomplete="email">', "Clients reply to this address.")
-        + field("Phone", '<input class="in" data-f="from.phone" placeholder="+880 1700 000000" autocomplete="tel">')
-        + field("Address", '<textarea class="in" rows="2" data-f="from.address" placeholder="Street, city, country"></textarea>', "", "span-2")
-        + field("Tax, VAT or BIN number", '<input class="in" data-f="from.taxId" placeholder="Optional">', "Shown under your address when filled in.", "span-2")
-        + '''
-                </div>
-                <button type="button" class="btn btn-soft btn-sm" id="profileBtn">''' + I(ICONS["save"]) + ''' Use these details on every new invoice</button>''')
-
-    client = (
-        '''
-                <div class="client-pick" id="clientPick" hidden>'''
-        + field("Choose a saved client", '<select class="in" id="clientSelect"></select>')
-        + '''
-                </div>
-                <div class="grid-2">'''
-        + field("Client or company name", '<input class="in" data-f="to.name" placeholder="e.g. Acme Ltd" data-required="client">', "", "span-2")
-        + field("Client email", '<input class="in" type="email" data-f="to.email" placeholder="client@company.com">', "Needed to email the invoice.")
-        + field("Phone", '<input class="in" data-f="to.phone" placeholder="Optional">')
-        + field("Address", '<textarea class="in" rows="2" data-f="to.address" placeholder="Client address"></textarea>', "", "span-2")
-        + '''
-                </div>''')
-
-    details = (
-        '''
-                <div class="chips" role="group" aria-label="Document type">
-                  <span class="chips-label">Type</span>
-                  <button type="button" class="chip" data-title="Invoice">Invoice</button>
-                  <button type="button" class="chip" data-title="Quotation">Quotation</button>
-                  <button type="button" class="chip" data-title="Proforma Invoice">Proforma</button>
-                  <button type="button" class="chip" data-title="Receipt">Receipt</button>
-                </div>
-                <div class="grid-2">'''
-        + field("Title", '<input class="in" data-f="title" placeholder="Invoice">')
-        + field("Invoice number", '<input class="in" id="f-number" data-f="number" autocomplete="off">', "Counts up automatically.")
-        + field("Issue date", '<input class="in" type="date" data-f="issueDate">')
-        + field("Due date", '<input class="in" type="date" data-f="dueDate">')
-        + '''
-                  <div class="chips span-2" role="group" aria-label="Quick due date">
-                    <span class="chips-label">Due</span>
-                    <button type="button" class="chip" data-due="0">On receipt</button>
-                    <button type="button" class="chip" data-due="7">In 7 days</button>
-                    <button type="button" class="chip" data-due="15">In 15 days</button>
-                    <button type="button" class="chip" data-due="30">In 30 days</button>
-                  </div>'''
-        + field("Currency", '<select class="in" id="currency"></select>')
-        + field("PO or reference", '<input class="in" data-f="poNumber" placeholder="Optional">')
-        + '''
-                </div>''')
-
-    items = '''
-                <div class="items-head" aria-hidden="true"><span>Description</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
-                <div class="item-rows" id="itemRows"></div>
-                <button type="button" class="add-line" id="addLine">''' + I(ICONS["plus"]) + ''' Add item</button>
-                <p class="tip">Tip: press Enter in the last Rate box to add another line.</p>'''
-
-    payment = (
-        '''
-                <div class="grid-2">'''
-        + field("Tax name", '<input class="in" data-f="taxLabel" placeholder="VAT, GST or Tax">')
-        + field("Tax rate (%)", '<input class="in" data-f="taxRate" inputmode="decimal" placeholder="0">')
-        + '''
-                  <div class="f"><span class="f-label" id="discLabel">Discount</span>
-                    <span class="in-group"><input class="in" data-f="discount" inputmode="decimal" placeholder="0" aria-labelledby="discLabel">
-                    <span class="seg" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span>
-                  </div>'''
-        + field("Shipping", '<input class="in" data-f="shipping" inputmode="decimal" placeholder="0">')
-        + field("Amount already paid", '<input class="in" data-f="paid" inputmode="decimal" placeholder="0">', "Deposits or part payments.")
-        + field("Status", '<select class="in" id="status"><option value="draft">Draft</option><option value="sent">Sent</option><option value="paid">Paid (adds a PAID stamp)</option></select>')
-        + '''
-                </div>
-                <div class="sum-box" aria-live="polite">
-                  <div><span>Subtotal</span><b id="tSub"></b></div>
-                  <div><span>Discount</span><b id="tDisc"></b></div>
-                  <div><span>Tax</span><b id="tTax"></b></div>
-                  <div><span>Shipping</span><b id="tShip"></b></div>
-                  <div class="sum-total"><span>Total</span><b id="tTotal"></b></div>
-                  <div><span>Paid</span><b id="tPaid"></b></div>
-                  <div class="sum-due"><span>Balance due</span><b id="tBal"></b></div>
-                </div>''')
-
-    notes = (
-        '''
-                <div class="chips" role="group" aria-label="Insert payment details">
-                  <span class="chips-label">Insert</span>
-                  <button type="button" class="chip" data-insert="bank">Bank transfer</button>
-                  <button type="button" class="chip" data-insert="mobile">bKash / Nagad</button>
-                  <button type="button" class="chip" data-insert="online">PayPal / Payoneer</button>
-                </div>'''
-        + field("Notes", '<textarea class="in" rows="4" data-f="notes" placeholder="Payment details or a thank-you note"></textarea>', "Your client sees this under the totals.")
-        + field("Terms", '<textarea class="in" rows="2" data-f="terms"></textarea>'))
-
-    steps = (step(1, "business", "Your business", "Who the invoice is from", business, True)
-             + step(2, "client", "Client", "Who you're billing", client, True)
-             + step(3, "details", "Invoice details", "Number, dates and currency", details)
-             + step(4, "items", "Items", "Products or services you're charging for", items, True)
-             + step(5, "payment", "Tax, discount and payment", "Totals and payment status", payment)
-             + step(6, "notes", "Notes and terms", "Payment details for your client", notes))
-
+    tpl_buttons = "".join(
+        f'<button type="button" class="tpl-btn" data-template="{k}" aria-pressed="false"><span class="tpl-thumb t-{k}" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>{n}</span></button>'
+        for k, n in TPLS)
     faq_html = "\n".join(f'          <details class="qa"><summary>{q}</summary><div class="qa-body"><p>{a}</p></div></details>' for q, a in FAQ)
 
-    return f'''<section class="hero" aria-labelledby="hero-title">
-  <div class="hero-bg" aria-hidden="true"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>
-  <div class="wrap hero-inner">
-    <a class="pill reveal" href="#features"><span class="pill-tag">New</span> Three invoice designs in six colours {I(ICONS["arrow"])}</a>
-    <h1 id="hero-title" class="reveal">Create professional invoices in minutes, free</h1>
-    <p class="hero-lede reveal">Fill in a few simple steps, watch your invoice build itself, then download the PDF or email it to your client. No sign-up, no watermark, 28 currencies.</p>
-    <div class="hero-cta reveal">
-      <a class="btn btn-primary btn-lg" href="#create">Create free invoice {I(ICONS["arrow"])}</a>
-      <a class="btn btn-white btn-lg" href="/dashboard/?demo=1">See the dashboard</a>
+    return f"""<section class="gen" id="create" aria-labelledby="gen-title">
+  <div class="wrap gen-head">
+    <div>
+      <h1 id="gen-title">Free Invoice Generator</h1>
+      <p>Fill in the invoice below, then download it as a PDF or email it to your client. No sign-up needed.</p>
     </div>
-    <ul class="hero-checks reveal">
-      <li>{I(ICONS["check"])} No sign-up needed</li>
-      <li>{I(ICONS["check"])} No watermark</li>
+    <ul class="gen-ticks" aria-label="What you get">
+      <li>{I(ICONS["check"])} Free, no watermark</li>
       <li>{I(ICONS["check"])} PDF and email</li>
+      <li>{I(ICONS["check"])} 28 currencies</li>
     </ul>
-
-    <div class="mock reveal" id="heroMock" aria-hidden="true">
-      <div class="mock-bar"><span></span><span></span><span></span><em>invoice-gen.net</em></div>
-      <div class="mock-body">
-        <div class="mock-form">
-          <div class="mf-step done"><i>{I(ICONS["check"])}</i><b>Your business</b><small>Arshaon Studio</small></div>
-          <div class="mf-step done"><i>{I(ICONS["check"])}</i><b>Client</b><small>Acme Ltd</small></div>
-          <div class="mf-step open"><i>4</i><b>Items</b></div>
-          <div class="mf-fields">
-            <div class="mf-row"><span class="mf-in" data-mtype="Brand identity design"></span><span class="mf-in sm" data-mtype="900"></span></div>
-            <div class="mf-row"><span class="mf-in" data-mtype="Landing page design"></span><span class="mf-in sm" data-mtype="250"></span></div>
-            <div class="mf-row"><span class="mf-in" data-mtype="Social media kit"></span><span class="mf-in sm" data-mtype="100"></span></div>
-          </div>
-          <div class="mf-step"><i>5</i><b>Tax and payment</b></div>
-          <div class="mf-btn" id="mockBtn">{I(ICONS["download"])} Download PDF</div>
-        </div>
-        <div class="mock-paper">
-          <div class="mp-top"><span class="mp-logo">AS</span><div><b>Invoice</b><small>INV-0042</small></div></div>
-          <div class="mp-parties"><div><small>From</small><b>Arshaon Studio</b><span>Dhaka, Bangladesh</span></div><div><small>Bill to</small><b>Acme Ltd</b><span>London, UK</span></div></div>
-          <div class="mp-head"><span>Description</span><span>Amount</span></div>
-          <div class="mp-row" data-mrow="0"><span>Brand identity design</span><span>$900.00</span></div>
-          <div class="mp-row" data-mrow="1"><span>Landing page design</span><span>$250.00</span></div>
-          <div class="mp-row" data-mrow="2"><span>Social media kit</span><span>$100.00</span></div>
-          <div class="mp-total"><span>Balance due</span><b id="mockTotal">$1,250.00</b></div>
-        </div>
-      </div>
-      <div class="float f-sent"><span class="f-ico">{I(ICONS["send"])}</span><span><b>Invoice sent</b><small>to accounts@acme.com</small></span></div>
-      <div class="float f-paid"><span class="f-ico paid">{I(ICONS["check"])}</span><span><b>Marked as paid</b><small>$1,250.00 from Acme Ltd</small></span></div>
-    </div>
   </div>
-</section>
 
-<section class="editor-sec" id="create" aria-labelledby="create-title">
-  <div class="wrap">
-    <div class="sec-head center reveal">
-      <span class="kicker">Invoice generator</span>
-      <h2 id="create-title">Create your invoice</h2>
-      <p class="lede">Fill in the steps and watch the invoice update as you type. The preview matches your PDF exactly.</p>
-    </div>
-
-    <div class="editor" id="editor" data-view="edit">
-      <div class="ed-top">
-        <div class="progress" aria-live="polite">
-          <div class="progress-track"><span id="progBar"></span></div>
-          <span class="progress-text" id="progText">0 of 3 required steps done</span>
-        </div>
-        <div class="ed-actions">
-          <button class="icon-btn" id="newBtn" type="button" title="New invoice" aria-label="New invoice">{I(ICONS["plus"])}</button>
-          <button class="icon-btn" id="saveBtn" type="button" title="Save to your account" aria-label="Save to your account">{I(ICONS["save"])}</button>
-          <button class="icon-btn" id="printBtn" type="button" title="Print" aria-label="Print">{I(ICONS["print"])}</button>
-          <button class="btn btn-white" id="sendBtn" type="button">{ICON_SEND} Send</button>
-          <button class="btn btn-primary" id="downloadBtn" type="button">{ICON_DL} Download PDF</button>
-        </div>
-      </div>
-
-      <div class="ed-tabs" role="tablist" aria-label="Editor view">
-        <button type="button" role="tab" data-view="edit" aria-selected="true">{I(ICONS["pen"])} Edit</button>
-        <button type="button" role="tab" data-view="preview" aria-selected="false">{I(ICONS["eye"])} Preview</button>
-      </div>
-
-      <div class="ed-body">
-        <div class="ed-form" id="edForm">{steps}
-          <p class="cloud-note" id="cloudNote">Your draft is saved in this browser as you type.</p>
-        </div>
-
-        <div class="ed-preview" id="edPreview">
-          <div class="pv-bar">
-            <div class="pv-group">
-              <span class="pv-label" id="tplLabel">Design</span>
-              <div class="seg seg-lg" id="tplPicker" role="group" aria-labelledby="tplLabel">
-                <button type="button" class="tpl-btn" data-template="classic" aria-pressed="false">Classic</button>
-                <button type="button" class="tpl-btn" data-template="modern" aria-pressed="false">Modern</button>
-                <button type="button" class="tpl-btn" data-template="minimal" aria-pressed="false">Minimal</button>
-              </div>
-            </div>
-            <div class="pv-group">
-              <span class="pv-label" id="accentLabel">Colour</span>
-              <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
+  <div class="wrap gen-grid">
+    <div class="sheet-col">
+      <div class="sheet t-classic" id="sheet">
+        <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
+        <div class="sh-top">
+          <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
+            <img id="logoImg" alt="Your logo" hidden>
+            <span class="logo-empty" id="logoHint">{I(ICONS["image"])}<b>+ Add your logo</b></span>
+            <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
+          </div>
+          <div class="sh-title">
+            {fi("title", "Invoice", "Document title", cls="fi-doc")}
+            <div class="sh-meta">
+              <label for="f-number">Invoice no.</label>{fi("number", "INV-0001", "Invoice number", extra=' id="f-number" autocomplete="off"')}
+              <label for="f-issue">Date</label>{fi("issueDate", "", "Issue date", "date", extra=' id="f-issue"')}
+              <label for="f-due">Due date</label>{fi("dueDate", "", "Due date", "date", extra=' id="f-due"')}
+              <label for="f-po">PO / ref.</label>{fi("poNumber", "Optional", "PO or reference", extra=' id="f-po"')}
             </div>
           </div>
-          <div class="pv-stage" id="pvStage">
-            <div class="pv-page" id="pvPage" role="img" aria-label="Invoice preview"></div>
-          </div>
-          <p class="pv-caption">A4 preview. Your PDF matches this layout.</p>
         </div>
+        <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
+
+        <div class="sh-parties">
+          <div class="party">
+            <span class="sh-label">From</span>
+            {fi("from.name", "Your business name *", "Your business name", cls="fi-strong", extra=' autocomplete="organization" data-req')}
+            {fi("from.email", "Email", "Your email", "email", extra=' autocomplete="email"')}
+            {ta("from.address", "Address", "Your address")}
+            {fi("from.phone", "Phone", "Your phone", extra=' autocomplete="tel"')}
+            {fi("from.taxId", "Tax / VAT / BIN no. (optional)", "Your tax number")}
+          </div>
+          <div class="party">
+            <span class="sh-label">Bill to</span>
+            <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
+            {fi("to.name", "Client name *", "Client name", cls="fi-strong", extra=' data-req')}
+            {fi("to.email", "Client email", "Client email", "email")}
+            {ta("to.address", "Client address", "Client address")}
+            {fi("to.phone", "Phone (optional)", "Client phone")}
+          </div>
+        </div>
+
+        <div class="sh-items">
+          <div class="items-head" aria-hidden="true"><span>Item</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
+          <div class="item-rows" id="itemRows"></div>
+          <button type="button" class="add-line" id="addLine">{I(ICONS["plus"])} Add line item</button>
+        </div>
+
+        <div class="sh-bottom">
+          <div class="sh-notes">
+            <span class="sh-label">Notes</span>
+            {ta("notes", "Payment details, bank account, bKash number or a thank-you note", "Notes", 3)}
+            <div class="note-chips" role="group" aria-label="Insert payment details">
+              <button type="button" class="chip" data-insert="bank">+ Bank details</button>
+              <button type="button" class="chip" data-insert="mobile">+ bKash / Nagad</button>
+              <button type="button" class="chip" data-insert="online">+ PayPal / Payoneer</button>
+            </div>
+            <span class="sh-label">Terms</span>
+            {ta("terms", "Payment terms", "Terms", 2)}
+          </div>
+          <div class="sh-totals" aria-live="polite">
+            <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
+            <div class="t-row t-adj"><span>Discount</span><span class="t-in">{fi("discount", "0", "Discount", extra=' inputmode="decimal"')}<span class="seg seg-xs" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span><b id="tDisc"></b></div>
+            <div class="t-row t-adj"><span class="t-tax">{fi("taxLabel", "Tax", "Tax name", cls="fi-label")}</span><span class="t-in">{fi("taxRate", "0", "Tax rate in percent", extra=' inputmode="decimal"')}<em>%</em></span><b id="tTax"></b></div>
+            <div class="t-row t-adj"><span>Shipping</span><span class="t-in">{fi("shipping", "0", "Shipping", extra=' inputmode="decimal"')}</span><b id="tShip"></b></div>
+            <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
+            <div class="t-row t-adj"><span>Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
+            <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+          </div>
+        </div>
+        <div class="sheet-foot">Made with invoice-gen.net</div>
       </div>
     </div>
+
+    <aside class="side-panel" aria-label="Invoice options">
+      <div class="sp-card sp-actions">
+        <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button">{ICON_DL} Download PDF</button>
+        <button class="btn btn-white btn-block" id="sendBtn" type="button">{ICON_SEND} Send by email</button>
+        <div class="sp-row">
+          <button class="sp-mini" id="saveBtn" type="button">{I(ICONS["save"])}<span>Save</span></button>
+          <button class="sp-mini" id="printBtn" type="button">{I(ICONS["print"])}<span>Print</span></button>
+          <button class="sp-mini" id="newBtn" type="button">{I(ICONS["plus"])}<span>New</span></button>
+        </div>
+        <p class="sp-note" id="cloudNote">Your draft is saved in this browser as you type.</p>
+      </div>
+
+      <div class="sp-card">
+        <h2 class="sp-h" id="tplLabel">Design</h2>
+        <div class="tpl-picker" id="tplPicker" role="group" aria-labelledby="tplLabel">{tpl_buttons}</div>
+        <h2 class="sp-h" id="accentLabel">Colour</h2>
+        <div class="swatches" id="swatches" role="group" aria-labelledby="accentLabel"></div>
+      </div>
+
+      <div class="sp-card">
+        <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
+        <label class="sp-field"><span class="sp-h">Payment due</span>
+          <select class="in" id="dueIn">
+            <option value="">Custom date</option>
+            <option value="0">On receipt</option>
+            <option value="7">In 7 days</option>
+            <option value="14">In 14 days</option>
+            <option value="15">In 15 days</option>
+            <option value="30">In 30 days</option>
+          </select>
+        </label>
+        <label class="sp-field"><span class="sp-h">Status</span>
+          <select class="in" id="status">
+            <option value="draft">Draft</option>
+            <option value="sent">Sent</option>
+            <option value="paid">Paid (adds a PAID stamp)</option>
+          </select>
+        </label>
+        <button type="button" class="link-btn sp-profile" id="profileBtn">{I(ICONS["user"])} Use my details on every new invoice</button>
+      </div>
+    </aside>
   </div>
 </section>
 
@@ -274,7 +184,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
   <div class="modal-body">
     <h2 id="sendTitle">Email this invoice</h2>
     <p class="form-msg err" id="sendErr" hidden></p>
-    <p class="form-msg ok" id="sendLoginNote" hidden><a id="sendLoginLink" href="/login/?signup=1&amp;next=%2F%23create">Create a free account</a> to send from invoice-gen.net. Your invoice stays here while you sign up. Or use your own email app below.</p>
+    <p class="form-msg ok" id="sendLoginNote" hidden><a id="sendLoginLink" href="/login/?signup=1&amp;next=%2F">Create a free account</a> to send from invoice-gen.net. Your invoice stays here while you sign up. Or use your own email app below.</p>
     <label class="f"><span class="f-label">Client's email</span><input class="in" id="sendTo" type="email" autocomplete="off" placeholder="client@company.com"></label>
     <label class="f"><span class="f-label">Subject</span><input class="in" id="sendSubject"></label>
     <label class="f"><span class="f-label">Message</span><textarea class="in" id="sendMsg" rows="6"></textarea></label>
@@ -288,6 +198,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
   </div>
 </dialog>
 
+""" + f'''
 <section class="band" id="features" aria-labelledby="features-title">
   <div class="wrap">
     <div class="sec-head center reveal">
