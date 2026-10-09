@@ -107,7 +107,7 @@
       if (r.status === "paid") m.paid += Number(r.total || 0);
     });
     if (!months.some((m) => m.inv > 0)) {
-      $("#chart").innerHTML = '<div class="chart-empty"><b>No sent invoices in the last six months</b><span>Send or download an invoice and it shows up here by month.</span></div>';
+      $("#chart").innerHTML = '<div class="chart-empty"><b>No sent invoices in the last six months</b><span>Invoices you send or mark as paid show up here by month.</span></div>';
       return;
     }
     const max = Math.max(1, ...months.map((m) => m.inv));

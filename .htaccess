@@ -1,3 +1,4 @@
+AddType font/woff2 .woff2
 # invoice-gen.net — Apache settings for Hostinger
 Options -Indexes
 DirectoryIndex index.html

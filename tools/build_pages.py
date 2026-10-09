@@ -6,10 +6,10 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "14"  # asset version, bump to bust browser caches
+V = "15"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
-LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="24.5" y="27" width="15" height="27" rx="2" fill="#fff"/><rect x="24.5" y="9" width="15" height="13" rx="2" fill="#ffd400"/></svg>'''
+LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d7cff"/><stop offset="1" stop-color="#1f45e0"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igg)"/><circle cx="32" cy="14.5" r="6" fill="#3be3bd"/><path d="M24 28a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v23l-2.67-2.6-2.66 2.6-2.67-2.6L32 51l-2.67-2.6-2.66 2.6-2.67-2.6L24 51z" fill="#fff"/></svg>'
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -33,33 +33,31 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="description" content="{desc}">
 {robots}
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#111111">
+<meta name="theme-color" content="#0a1222">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE}/assets/img/og-image.png">
+<meta property="og:image" content="{SITE}/assets/img/og-image.png?v={V}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{desc}">
-<meta name="twitter:image" content="{SITE}/assets/img/og-image.png">
+<meta name="twitter:image" content="{SITE}/assets/img/og-image.png?v={V}">
 <link rel="icon" href="/favicon.ico?v={V}" sizes="48x48">
 <link rel="icon" href="/favicon.svg?v={V}" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png?v={V}" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png?v={V}" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v={V}">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#111111">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#2b5cff">
 <link rel="manifest" href="/site.webmanifest?v={V}">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
-<meta name="msapplication-TileColor" content="#111111">
+<meta name="msapplication-TileColor" content="#0a1222">
 <meta name="format-detection" content="telephone=no">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/style.css?v={V}">
 {SESSION_JS}
 {ld_html}

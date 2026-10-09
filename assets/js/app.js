@@ -541,6 +541,7 @@
     } else {
       inv = Object.assign(IG.blankInvoice(), draft);
       if (!inv.tplPicked) inv.template = "classic";
+      if (!inv.tplPicked && /^#111111$/i.test(inv.accent || "")) inv.accent = "#2b5cff";
     }
     const pre = IG.store.get("ig_prefill_client", null);
     if (pre) { inv.to = Object.assign({ name: "", email: "", address: "", phone: "" }, pre); IG.store.remove("ig_prefill_client"); }
