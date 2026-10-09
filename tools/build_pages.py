@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "11"  # asset version, bump to bust browser caches
+V = "12"  # asset version, bump to bust browser caches
 
 LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
@@ -224,7 +224,7 @@ article("/how-to-make-an-invoice/", "How to Make an Invoice: Step-by-Step Guide 
     <li><strong>Your client's details:</strong> name or company, address and email.</li>
     <li><strong>Each item or service</strong> with a short description, quantity, rate and line amount.</li>
     <li><strong>Subtotal, tax, discount and total</strong>, clearly shown.</li>
-    <li><strong>How to pay:</strong> bank details, mobile banking number or payment link.</li>
+    <li><strong>How to pay:</strong> bank details, PayPal or a payment link.</li>
   </ul>
   <h2>Step by step</h2>
   <ol>
@@ -300,13 +300,28 @@ article("/freelance-invoice/", "Freelance Invoice Generator: Bill Clients and Ge
 ''' + CTA)
 
 article("/about/", "About invoice-gen.net", "invoice-gen.net is a free invoice generator for freelancers and small businesses.",
-        "About invoice-gen.net", "About", '''  <p>invoice-gen.net is a free online invoice generator. It's made for freelancers, small shops and growing businesses who need a professional invoice without buying accounting software.</p>
-  <p>You can make and download invoices without an account. A free account adds saved invoices, a client list and sending invoices by email.</p>
-  <p>Questions or ideas? <a href="/contact/">Get in touch</a>.</p>''')
+        "About invoice-gen.net", "About", '''  <p class="lead">invoice-gen.net is a free online invoice generator for freelancers, small shops and growing businesses that need a professional invoice without buying accounting software.</p>
+  <div class="facts">
+    <div><b>Free to use</b><span>Make, download and print invoices with no account and no watermark.</span></div>
+    <div><b>Built for speed</b><span>Type straight onto the invoice. Totals, tax and the balance due work themselves out.</span></div>
+    <div><b>Your data stays yours</b><span>Without an account, invoices never leave your browser. With one, only you can see them.</span></div>
+  </div>
+  <h2>Free account</h2>
+  <p>A free account adds saved invoices, a client list, paid and overdue tracking, and sending invoices to clients by email with the PDF attached.</p>
+  <h2>Get in touch</h2>
+  <p>Questions or ideas for the next feature? <a href="/contact/">Contact us</a>.</p>
+''' + CTA)
 
 article("/contact/", "Contact invoice-gen.net", "Contact the invoice-gen.net team for help or feedback.",
-        "Contact", "Contact", '''  <p>For help, feedback or business enquiries, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>. We usually reply within two working days.</p>
-  <p>To delete your account and all your saved invoices, email us from the address you signed up with.</p>''')
+        "Contact", "Contact", '''  <p class="lead">Help, feedback or business enquiries: we read every message.</p>
+  <div class="contact-card">
+    <div><span class="cc-label">Email</span><a class="cc-mail" href="mailto:support@invoice-gen.net">support@invoice-gen.net</a><span class="cc-note">We usually reply within two working days.</span></div>
+    <a class="btn btn-dark" href="mailto:support@invoice-gen.net">Send an email</a>
+  </div>
+  <h2>Delete your account</h2>
+  <p>To delete your account and all your saved invoices, email us from the address you signed up with. We will confirm once everything is removed.</p>
+  <h2>Before you write</h2>
+  <p>Most questions are answered in the <a href="/#faq">FAQ</a> and the <a href="/how-to-make-an-invoice/">invoice guide</a>.</p>''')
 
 article("/privacy/", "Privacy Policy | invoice-gen.net", "How invoice-gen.net collects, uses and protects your information.",
         "Privacy policy", "Privacy policy", '''  <p><em>Last updated: 8 October 2026</em></p>

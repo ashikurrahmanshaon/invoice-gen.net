@@ -240,7 +240,7 @@
   async function saveProfile() {
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
       name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
-      currency: inv.currency, accent: inv.accent, template: inv.template, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
+      currency: inv.currency, accent: inv.accent, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
       taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms
     });
     IG.store.set("ig_profile", p);
@@ -320,7 +320,7 @@
   function newInvoice() {
     if (!window.confirm("Start a new invoice? Your business details and logo stay; the client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
-    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, template: inv.template, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate };
+    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate };
     inv = Object.assign(IG.blankInvoice(), keep);
     const url = new URL(window.location.href);
     url.searchParams.delete("id");

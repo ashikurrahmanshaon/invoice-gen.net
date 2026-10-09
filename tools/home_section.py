@@ -251,17 +251,6 @@ def build(FAQ, ICON_DL, ICON_SEND):
   </div>
 </section>
 
-<section class="band" id="designs" aria-labelledby="designs-title">
-  <div class="wrap">
-    <h2 id="designs-title">Three invoice designs</h2>
-    <div class="designs">
-      <figure><button type="button" class="doc-thumb t-classic" data-use-template="classic" aria-label="Use the Classic design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Classic</b> Clean layout with a filled table header.</figcaption></figure>
-      <figure><button type="button" class="doc-thumb t-minimal" data-use-template="minimal" aria-label="Use the Minimal design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Minimal</b> Fine rules and plenty of white space.</figcaption></figure>
-      <figure><button type="button" class="doc-thumb t-modern" data-use-template="modern" aria-label="Use the Modern design"><i></i><i></i><i></i><i></i><i></i><b></b></button><figcaption><b>Modern</b> A colour band carrying your logo and details.</figcaption></figure>
-    </div>
-  </div>
-</section>
-
 <section class="band band-line" aria-labelledby="acct-title">
   <div class="wrap split-2 acct">
     <div>
@@ -282,7 +271,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
   </div>
 </section>
 
-<section class="band" aria-labelledby="faq">
+<section class="band band-line" aria-labelledby="faq">
   <div class="wrap split-2">
     <div>
       <h2 id="faq">Questions</h2>

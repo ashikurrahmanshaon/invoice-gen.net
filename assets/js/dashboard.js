@@ -127,7 +127,7 @@
     const now = new Date();
     for (let i = 5; i >= 0; i--) {
       const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      months.push({ key: d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"), label: d.toLocaleDateString("en-GB", { month: "short" }), inv: 0, paid: 0 });
+      months.push({ key: d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"), label: d.toLocaleDateString("en-US", { month: "short" }), inv: 0, paid: 0 });
     }
     list.forEach((r) => {
       if (r.status === "draft" || !r.issue_date) return;
@@ -138,7 +138,7 @@
     });
     const max = Math.max(1, ...months.map((m) => m.inv));
     const raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
-    const stepN = [1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 10].map((m) => m * mag).find((m) => m >= raw);
+    const stepN = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((m) => m >= raw);
     const top = stepN * 4;
     const box = $("#chart"); const W = Math.max(300, Math.round(box.clientWidth || 600)), H = W < 460 ? 200 : 240, L = 46, B = 28, T = 12, R = 6;
     const cw = (W - L - R) / months.length, bw = Math.min(22, cw / 3.2);
@@ -152,8 +152,8 @@
     months.forEach((m, i) => {
       const cx = L + cw * i + cw / 2;
       const hi = H - B - y(m.inv), hp = H - B - y(m.paid);
-      g += '<rect class="b-inv" x="' + (cx - bw - 2) + '" y="' + y(m.inv) + '" width="' + bw + '" height="' + Math.max(0, hi) + '" rx="5" style="--d:' + i * 60 + 'ms"><title>' + m.label + ": invoiced " + IG.money(m.inv, cur) + "</title></rect>";
-      g += '<rect class="b-paid" x="' + (cx + 2) + '" y="' + y(m.paid) + '" width="' + bw + '" height="' + Math.max(0, hp) + '" rx="5" style="--d:' + (i * 60 + 30) + 'ms"><title>' + m.label + ": paid " + IG.money(m.paid, cur) + "</title></rect>";
+      g += '<rect class="b-inv" x="' + (cx - bw - 2) + '" y="' + y(m.inv) + '" width="' + bw + '" height="' + Math.max(0, hi) + '" rx="2" style="--d:' + i * 60 + 'ms"><title>' + m.label + ": invoiced " + IG.money(m.inv, cur) + "</title></rect>";
+      g += '<rect class="b-paid" x="' + (cx + 2) + '" y="' + y(m.paid) + '" width="' + bw + '" height="' + Math.max(0, hp) + '" rx="2" style="--d:' + (i * 60 + 30) + 'ms"><title>' + m.label + ": paid " + IG.money(m.paid, cur) + "</title></rect>";
       g += '<text x="' + cx + '" y="' + (H - 8) + '" class="ax" text-anchor="middle">' + m.label + "</text>";
     });
     $("#chart").innerHTML = '<svg viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="Invoiced and paid per month, last six months, in ' + cur + '">' + g + "</svg>";

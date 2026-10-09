@@ -53,9 +53,9 @@ def login_markup():
       <li>{I(ICONS["check"])} Free, with no card needed</li>
     </ul>
     <div class="auth-card-mini" aria-hidden="true">
-      <div><span>INV-0042, Acme Ltd</span><span class="tag">Paid</span></div>
-      <div><span>Balance due</span><b>$0.00</b></div>
-      <div><span>INV-0043, Northwind</span><span class="tag">Sent</span></div>
+      <div><span><b>Acme Ltd</b><small>INV-0042</small></span><span>$1,250.00</span><span class="st st-paid">Paid</span></div>
+      <div><span><b>Northwind</b><small>INV-0043</small></span><span>$1,900.00</span><span class="st st-sent">Sent</span></div>
+      <div><span><b>Green Leaf Cafe</b><small>INV-0041</small></span><span>$360.00</span><span class="st st-over">Overdue</span></div>
     </div>
   </aside>
 </section>'''
@@ -89,6 +89,7 @@ def dash_markup(LOGO_SVG, WORDMARK):
     </div>
     <header class="app-top">
       <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu">{I(ICONS["menu"])}</button>
+      <a class="brand m-brand" href="/" aria-label="invoice-gen.net home">{LOGO_SVG}{WORDMARK}</a>
       <div class="app-title"><h1 id="pageTitle">Overview</h1><p id="pageSub"></p></div>
       <a class="btn btn-primary top-new" href="/?new=1#create">{I(ICONS["plus"])} <span>New invoice</span></a>
     </header>

@@ -33,7 +33,7 @@
     if (!iso) return "";
     const d = new Date(iso + "T00:00:00");
     if (isNaN(d)) return iso;
-    return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+    return d.getDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getMonth()] + " " + d.getFullYear();
   };
 
   IG.uid = function () {
@@ -62,7 +62,7 @@
       dueDate: IG.addDays(today, p.dueDays != null ? p.dueDays : 14),
       poNumber: "",
       currency: p.currency || "USD",
-      template: p.template || "classic",
+      template: (p.tplPicked && p.template) || "classic",
       accent: p.accent || "#111111",
       logo: p.logo || null,
       logoW: p.logoW || 0,

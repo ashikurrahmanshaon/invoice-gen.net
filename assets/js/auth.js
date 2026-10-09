@@ -13,6 +13,10 @@
   function msg(text, kind) {
     const box = $("#authMsg");
     box.textContent = text;
+    if (kind === "soon") {
+      box.innerHTML = "Accounts open very soon. You can already make, download and print invoices for free, no account needed. <a href=\"/#create\">Open the invoice generator</a>";
+      kind = "info";
+    }
     box.className = "form-msg " + (kind || "err");
     box.hidden = !text;
   }
@@ -98,18 +102,21 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
+    if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");
     if (!IG.cloudReady) {
-      $("#authForm").hidden = true;
-      msg("Accounts are not switched on yet. The site owner needs to add the Supabase keys in assets/js/config.js.");
+      // Accounts are off until Supabase keys are added in assets/js/config.js.
+      if (window.console) console.info("invoice-gen: add Supabase keys in assets/js/config.js to switch on accounts.");
+      const soon = (e) => { if (e) e.preventDefault(); msg("x", "soon"); };
+      $("#authForm").addEventListener("submit", soon);
+      ["#magic", "#forgot", "#googleBtn"].forEach((s) => $(s).addEventListener("click", soon));
       return;
     }
-    document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
     $("#authForm").addEventListener("submit", submit);
     $("#magic").addEventListener("click", magicLink);
     $("#forgot").addEventListener("click", forgot);
     $("#googleBtn").addEventListener("click", google);
     $("#resetForm").addEventListener("submit", setNewPassword);
-    if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");
 
     IG.cloud.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") {
