@@ -6,10 +6,10 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "13"  # asset version, bump to bust browser caches
+V = "14"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
-LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
+LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="24.5" y="27" width="15" height="27" rx="2" fill="#fff"/><rect x="24.5" y="9" width="15" height="13" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -46,13 +46,13 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{desc}">
 <meta name="twitter:image" content="{SITE}/assets/img/og-image.png">
-<link rel="icon" href="/favicon.ico" sizes="48x48">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg" color="#111111">
-<link rel="manifest" href="/site.webmanifest">
+<link rel="icon" href="/favicon.ico?v={V}" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v={V}" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v={V}" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v={V}" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v={V}">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#111111">
+<link rel="manifest" href="/site.webmanifest?v={V}">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#111111">
