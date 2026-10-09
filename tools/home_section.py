@@ -52,13 +52,14 @@ def build(FAQ, ICON_DL, ICON_SEND):
     return f"""<section class="gen" id="create" aria-labelledby="gen-title">
   <div class="wrap gen-head">
     <div>
+      <span class="gen-pill"><b>Free</b> No sign-up, no watermark</span>
       <h1 id="gen-title">Free Invoice Generator</h1>
-      <p>Fill in the invoice below, then download it as a PDF or email it to your client. No sign-up needed.</p>
+      <p>Create a professional invoice in seconds. Add your logo, then download a polished PDF or email it straight to your client.</p>
     </div>
     <ul class="gen-ticks" aria-label="What you get">
-      <li>{I(ICONS["check"])} Free, no watermark</li>
-      <li>{I(ICONS["check"])} PDF and email</li>
+      <li>{I(ICONS["check"])} PDF in one click</li>
       <li>{I(ICONS["check"])} 28 currencies</li>
+      <li>{I(ICONS["check"])} Private by default</li>
     </ul>
   </div>
 
@@ -257,7 +258,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
       <h2 id="acct-title">Keep every invoice in one place</h2>
       <p class="lede">With a free account, invoices are saved as you work. Your dashboard shows what's paid, what's outstanding and what's overdue, and keeps a list of your clients.</p>
       <div class="row-btns">
-        <a class="btn btn-dark" href="/login/?signup=1">Create free account</a>
+        <a class="btn btn-primary" href="/login/?signup=1">Create free account</a>
         <a class="btn btn-line" href="/login/">Log in</a>
       </div>
     </div>

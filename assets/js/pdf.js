@@ -170,9 +170,9 @@
       doc.line(TX, y - 4.5, R, y - 4.5);
       doc.setTextColor(...accent);
     } else {
-      doc.setFillColor(230, 235, 241);
+      doc.setFillColor(...mix(accent, 0.9));
       doc.roundedRect(TX - 3, y - 4.5, R - TX + 6, 9, 1.5, 1.5, "F");
-      doc.setTextColor(...ink);
+      doc.setTextColor(...accent);
     }
     doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
     doc.text("Balance due", TX, y + 1.5); doc.text(M(t.balance), R, y + 1.5, { align: "right" });

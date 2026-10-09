@@ -6,10 +6,10 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "15"  # asset version, bump to bust browser caches
+V = "16"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
-LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4d7cff"/><stop offset="1" stop-color="#1f45e0"/></linearGradient></defs><rect width="64" height="64" rx="16" fill="url(#igg)"/><circle cx="32" cy="14.5" r="6" fill="#3be3bd"/><path d="M24 28a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v23l-2.67-2.6-2.66 2.6-2.67-2.6L32 51l-2.67-2.6-2.66 2.6-2.67-2.6L24 51z" fill="#fff"/></svg>'
+LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#3f7bff"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#igg)"/><path d="M21.6 16h15.2l8.8 8.8V45a3.2 3.2 0 0 1-3.2 3.2H21.6a3.2 3.2 0 0 1-3.2-3.2V19.2a3.2 3.2 0 0 1 3.2-3.2z" fill="#fff"/><path d="M36.8 16v8.8h8.8z" fill="#d9d2ff"/><path d="m25.2 34.6 4.6 4.6 9.2-10" fill="none" stroke="#5b4dff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -33,7 +33,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="description" content="{desc}">
 {robots}
 <link rel="canonical" href="{url}">
-<meta name="theme-color" content="#0a1222">
+<meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
 <meta property="og:title" content="{title}">
@@ -51,13 +51,13 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="icon" href="/favicon-32.png?v={V}" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png?v={V}" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v={V}">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#2b5cff">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#5b4dff">
 <link rel="manifest" href="/site.webmanifest?v={V}">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
-<meta name="msapplication-TileColor" content="#0a1222">
+<meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
-<link rel="preload" href="/assets/fonts/Geist-Variable.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/css/style.css?v={V}">
 {SESSION_JS}
 {ld_html}
