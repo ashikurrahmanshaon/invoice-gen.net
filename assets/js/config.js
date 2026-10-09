@@ -11,10 +11,11 @@
  * log in, saved invoices and email sending need Supabase.
  */
 window.IG_CONFIG = {
-  SUPABASE_URL: "",       // e.g. "https://abcdefghijk.supabase.co"
-  SUPABASE_ANON_KEY: "",  // e.g. "eyJhbGciOiJIUzI1NiIsInR5cCI6..."
+  SUPABASE_URL: "https://qmzwikvsmvdzirurzkxb.supabase.co",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtendpa3ZzbXZkemlydXJ6a3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MjUyNjksImV4cCI6MjEwNzEwMTI2OX0.cV3XHbPJFPUmJbkVaF2VeF-JFOWfpXU9hd_RF4BlFrA",
   SITE_URL: "https://invoice-gen.net",
   SITE_NAME: "invoice-gen.net",
   SUPPORT_EMAIL: "support@invoice-gen.net",
+  GOOGLE_LOGIN: false,    // turn on after enabling Google in Supabase → Authentication → Providers
   DAILY_EMAIL_LIMIT: 20   // keep the same number as in the send-invoice function
 };

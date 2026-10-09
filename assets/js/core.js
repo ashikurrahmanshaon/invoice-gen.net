@@ -77,6 +77,7 @@
       });
     }
     const user = await IG.getUser();
+    document.documentElement.classList.toggle("has-session", !!user);
     document.querySelectorAll('[data-auth="in"]').forEach((el) => (el.hidden = !user));
     document.querySelectorAll('[data-auth="out"]').forEach((el) => (el.hidden = !!user));
     document.querySelectorAll("[data-signout]").forEach((el) =>

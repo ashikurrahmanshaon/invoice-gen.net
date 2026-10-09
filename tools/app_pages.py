@@ -41,7 +41,7 @@ def login_markup():
         <label class="f"><span class="f-label">New password</span><input class="in" id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label>
         <button class="btn btn-primary btn-block" type="submit">Save new password</button>
       </form>
-      <p class="hint auth-foot">You can also <a href="/#create">make and download invoices</a> without an account, or <a href="/dashboard/?demo=1">look around a sample dashboard</a>.</p>
+      <p class="hint auth-foot">You can also <a href="/#create">make and download invoices</a> without an account. Your saved invoices are private to you.</p>
     </div>
   </div>
   <aside class="auth-side" aria-label="Why create an account">
@@ -83,10 +83,6 @@ def dash_markup(LOGO_SVG, WORDMARK):
   <div class="side-scrim" id="scrim" hidden></div>
 
   <div class="app-main">
-    <div class="demo-banner" id="demoBanner" hidden>
-      <span>{I(ICONS["alert"])} <span id="demoText">You're looking at sample data.</span></span>
-      <a class="btn btn-sm btn-white" href="/login/?signup=1">Create free account</a>
-    </div>
     <header class="app-top">
       <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu">{I(ICONS["menu"])}</button>
       <a class="brand m-brand" href="/" aria-label="invoice-gen.net home">{LOGO_SVG}{WORDMARK}</a>

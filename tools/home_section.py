@@ -258,7 +258,7 @@ def build(FAQ, ICON_DL, ICON_SEND):
       <p class="lede">With a free account, invoices are saved as you work. Your dashboard shows what's paid, what's outstanding and what's overdue, and keeps a list of your clients.</p>
       <div class="row-btns">
         <a class="btn btn-dark" href="/login/?signup=1">Create free account</a>
-        <a class="btn btn-line" href="/dashboard/?demo=1">See a sample dashboard</a>
+        <a class="btn btn-line" href="/login/">Log in</a>
       </div>
     </div>
     <div class="ledger" aria-hidden="true">

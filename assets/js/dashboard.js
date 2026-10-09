@@ -1,5 +1,5 @@
 /* invoice-gen.net — dashboard: overview, invoices, clients, settings.
-   With ?demo=1 (or before accounts are connected) it shows clearly-labelled sample data. */
+   Only for logged-in users: anyone else is sent to the login page. */
 (function () {
   "use strict";
   const IG = window.IG;
@@ -9,7 +9,7 @@
   const today = IG.isoDate(new Date());
   const reduce = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  let user = null, demo = false;
+  let user = null;
   let invoices = [], clients = [], profile = {};
   let filter = "all";
 
@@ -20,35 +20,6 @@
     settings: ["Settings", "Your business details and account."]
   };
 
-  /* ---------- sample data ---------- */
-  function sampleData() {
-    const d = (offset) => IG.addDays(today, offset);
-    const cl = [
-      { id: "c1", name: "Acme Ltd", email: "accounts@acme.com", phone: "+44 20 7946 0000", address: "221 Baker Street, London" },
-      { id: "c2", name: "Northwind Traders", email: "billing@northwind.io", phone: "", address: "Seattle, USA" },
-      { id: "c3", name: "Bright Pixel Agency", email: "finance@brightpixel.co", phone: "", address: "Toronto, Canada" },
-      { id: "c4", name: "Green Leaf Cafe", email: "hello@greenleaf.cafe", phone: "", address: "Melbourne, Australia" },
-      { id: "c5", name: "Orbit Labs", email: "ap@orbitlabs.dev", phone: "", address: "Berlin, Germany" }
-    ];
-    const rows = [
-      ["INV-0031", "Acme Ltd", -168, 1200, "paid"], ["INV-0032", "Northwind Traders", -150, 850, "paid"],
-      ["INV-0033", "Bright Pixel Agency", -131, 640, "paid"], ["INV-0034", "Orbit Labs", -112, 1800, "paid"],
-      ["INV-0035", "Acme Ltd", -96, 950, "paid"], ["INV-0036", "Green Leaf Cafe", -80, 420, "paid"],
-      ["INV-0037", "Northwind Traders", -66, 2100, "paid"], ["INV-0038", "Orbit Labs", -52, 1500, "paid"],
-      ["INV-0039", "Bright Pixel Agency", -41, 780, "sent"], ["INV-0040", "Acme Ltd", -30, 1250, "paid"],
-      ["INV-0041", "Green Leaf Cafe", -24, 360, "sent"], ["INV-0042", "Acme Ltd", -12, 1250, "sent"],
-      ["INV-0043", "Northwind Traders", -6, 1900, "sent"], ["INV-0044", "Orbit Labs", -2, 980, "draft"]
-    ];
-    const inv = rows.map((r, i) => {
-      const c = cl.find((x) => x.name === r[1]);
-      return { id: "d" + i, number: r[0], client_name: r[1], client_email: c.email, issue_date: d(r[2]), due_date: d(r[2] + 14),
-        currency: "USD", total: r[3], balance: r[4] === "paid" ? 0 : r[3], status: r[4], created_at: d(r[2]) };
-    }).reverse();
-    const prof = { name: "Northline Studio", email: "hello@northline.studio", phone: "+1 415 555 0134", address: "548 Market Street, San Francisco, CA", currency: "USD", taxLabel: "VAT", taxRate: 5, dueDays: 14 };
-    return { inv, cl, prof };
-  }
-
-  /* ---------- helpers ---------- */
   function eff(r) {
     if (r.status === "sent" && r.due_date && r.due_date < today && Number(r.balance) > 0) return "overdue";
     return r.status;
@@ -76,7 +47,6 @@
     if (diff === -1) return "yesterday";
     return diff > 0 ? "in " + diff + " days" : Math.abs(diff) + " days ago";
   }
-  function demoNote() { IG.toast("Sample data: changes aren't saved. Create a free account to track your own invoices."); }
 
   /* ---------- overview ---------- */
   function renderOverview() {
@@ -91,7 +61,7 @@
     countUp($("#kPaid"), sum(paid, "total"), cur);
     countUp($("#kOpen"), sum(open, "balance"), cur);
     countUp($("#kOverdue"), sum(late, "balance"), cur);
-    $("#kInvoicedSub").textContent = nonDraft.length + (nonDraft.length === 1 ? " invoice" : " invoices") + (others ? ", plus " + others + " in other currencies" : "");
+    $("#kInvoicedSub").textContent = nonDraft.length + (nonDraft.length === 1 ? " invoice sent" : " invoices sent") + (others ? ", plus " + others + " in other currencies" : "");
     $("#kPaidSub").textContent = paid.length + " paid";
     $("#kOpenSub").textContent = open.length + " waiting for payment";
     $("#kOverdueSub").textContent = late.length ? late.length + " past the due date" : "Nothing overdue";
@@ -114,7 +84,7 @@
 
     const h = new Date().getHours();
     const greet = h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening";
-    const name = (profile.name || (user && user.email) || "").split("@")[0];
+    const name = (profile.name || "").trim();
     TITLES.overview[1] = greet + (name ? ", " + name : "") + ". Here's where your money stands.";
     if (currentTab() === "overview") $("#pageSub").textContent = TITLES.overview[1];
   }
@@ -136,9 +106,13 @@
       m.inv += Number(r.total || 0);
       if (r.status === "paid") m.paid += Number(r.total || 0);
     });
+    if (!months.some((m) => m.inv > 0)) {
+      $("#chart").innerHTML = '<div class="chart-empty"><b>No sent invoices in the last six months</b><span>Send or download an invoice and it shows up here by month.</span></div>';
+      return;
+    }
     const max = Math.max(1, ...months.map((m) => m.inv));
     const raw = max / 4, mag = Math.pow(10, Math.floor(Math.log10(raw)));
-    const stepN = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((m) => m >= raw);
+    const stepN = Math.max(1, [1, 2, 2.5, 5, 10].map((m) => m * mag).find((m) => m >= raw));
     const top = stepN * 4;
     const box = $("#chart"); const W = Math.max(300, Math.round(box.clientWidth || 600)), H = W < 460 ? 200 : 240, L = 46, B = 28, T = 12, R = 6;
     const cw = (W - L - R) / months.length, bw = Math.min(22, cw / 3.2);
@@ -210,12 +184,6 @@
   }
 
   async function act(what, r) {
-    if (demo) {
-      if (what === "paid" || what === "sent") { r.status = what; r.balance = what === "paid" ? 0 : r.total; renderAll(); }
-      if (what === "del") { invoices = invoices.filter((x) => x !== r); renderAll(); }
-      if (what === "pdf") return IG.toast("Sample data has no PDF. Create an invoice to download one.");
-      return demoNote();
-    }
     if (what === "del") {
       if (!window.confirm("Delete invoice " + r.number + "? This can't be undone.")) return;
       const { error } = await IG.cloud.from("invoices").delete().eq("id", r.id);
@@ -301,10 +269,7 @@
   }
 
   async function load() {
-    if (demo) {
-      const s = sampleData();
-      invoices = s.inv; clients = s.cl; profile = s.prof;
-    } else {
+    {
       const [a, b, c] = await Promise.all([
         IG.cloud.from("invoices").select("id,number,client_name,client_email,issue_date,due_date,currency,total,balance,status,created_at").order("created_at", { ascending: false }),
         IG.cloud.from("clients").select("*").order("name"),
@@ -352,8 +317,7 @@
       if (!name) return IG.toast("Add the client's name.", "err");
       if (f.cemail.value && !IG.validEmail(f.cemail.value)) return IG.toast("That email address doesn't look right.", "err");
       const row = { name, email: f.cemail.value.trim() || null, phone: f.cphone.value.trim() || null, address: f.caddress.value.trim() || null };
-      if (demo) { clients.push(Object.assign({ id: "c" + Date.now() }, row)); }
-      else {
+      {
         const { data, error } = await IG.cloud.from("clients").insert(Object.assign({ user_id: user.id }, row)).select().single();
         if (error) return IG.toast("Could not add client: " + error.message, "err");
         clients.push(data);
@@ -373,10 +337,8 @@
       if (del) {
         const c = clients.find((x) => x.id === del.dataset.delClient);
         if (!window.confirm("Delete " + c.name + "? Invoices you already made stay as they are.")) return;
-        if (!demo) {
-          const { error } = await IG.cloud.from("clients").delete().eq("id", c.id);
-          if (error) return IG.toast(error.message, "err");
-        }
+        const { error } = await IG.cloud.from("clients").delete().eq("id", c.id);
+        if (error) return IG.toast(error.message, "err");
         clients = clients.filter((x) => x !== c);
         renderAll();
       }
@@ -392,7 +354,6 @@
       p.currency = f.currency.value;
       p.taxRate = f.taxRate.value ? Number(f.taxRate.value) || 0 : 0;
       p.dueDays = f.dueDays.value ? Math.max(0, parseInt(f.dueDays.value, 10) || 0) : 14;
-      if (demo) { profile = p; return demoNote(); }
       const { error } = await IG.cloud.from("profiles").upsert({ id: user.id, data: p, updated_at: new Date().toISOString() });
       if (error) return IG.toast("Could not save: " + error.message, "err");
       profile = p;
@@ -402,7 +363,6 @@
     });
     $("#pwForm").addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (demo) return demoNote();
       const pw = e.target.newpw.value;
       if (pw.length < 8) return IG.toast("Use a password of at least 8 characters.", "err");
       const { error } = await IG.cloud.auth.updateUser({ password: pw });
@@ -414,24 +374,14 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
     bind();
-    const params = new URLSearchParams(location.search);
-    demo = params.get("demo") === "1" || !IG.cloudReady;
-    if (!demo) {
-      user = await (IG.headerReady || IG.getUser());
-      if (!user) { location.replace("/login/?next=" + encodeURIComponent("/dashboard/")); return; }
-    }
-    const email = demo ? "hello@northline.studio" : user.email;
-    $("#who").textContent = email;
-    $("#accEmail").textContent = email;
-    $("#avatar").textContent = email.charAt(0).toUpperCase();
-    if (demo) {
-      $("#demoBanner").hidden = false;
-      $("#demoText").textContent = IG.cloudReady
-        ? "You're looking at sample data. Create a free account to track your own invoices."
-        : "Sample data. Your own dashboard appears here once accounts are switched on.";
-      $("#signOutBtn").hidden = true;
-    }
+    if (!IG.cloudReady) { location.replace("/login/?next=%2Fdashboard%2F"); return; }
+    user = await (IG.headerReady || IG.getUser());
+    if (!user) { location.replace("/login/?next=" + encodeURIComponent("/dashboard/" + location.hash)); return; }
+    $("#who").textContent = user.email;
+    $("#accEmail").textContent = user.email;
+    $("#avatar").textContent = user.email.charAt(0).toUpperCase();
     showTab(location.hash.slice(1) || "overview", false);
     await load();
+    document.body.classList.add("app-ready");
   });
 })();

@@ -102,6 +102,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    if (!(window.IG_CONFIG || {}).GOOGLE_LOGIN) { $("#googleBtn").hidden = true; const dv = document.querySelector(".auth-card .divider"); if (dv) dv.hidden = true; }
     document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
     if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");
     if (!IG.cloudReady) {

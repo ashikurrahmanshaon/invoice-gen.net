@@ -34,10 +34,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
-<script>document.documentElement.classList.add("js");</script>
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
+<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
+<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent("/dashboard/"+location.hash));</script>
 </head>
 <body class="app-body">
 <a class="sr-only" href="#main">Skip to content</a>
@@ -60,10 +61,6 @@
   <div class="side-scrim" id="scrim" hidden></div>
 
   <div class="app-main">
-    <div class="demo-banner" id="demoBanner" hidden>
-      <span><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 2 18a2 2 0 0 0 1.7 3h16.6a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg> <span id="demoText">You're looking at sample data.</span></span>
-      <a class="btn btn-sm btn-white" href="/login/?signup=1">Create free account</a>
-    </div>
     <header class="app-top">
       <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
       <a class="brand m-brand" href="/" aria-label="invoice-gen.net home"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg><span class="brand-name">invoice-gen<span class="tld">.net</span></span></a>
@@ -174,14 +171,14 @@
   </form>
 </dialog>
 </main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v=12"></script>
-<script src="/assets/js/core.js?v=12"></script>
-<script src="/assets/js/motion.js?v=12"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/js/config.js?v=13"></script>
+<script src="/assets/js/core.js?v=13"></script>
+<script src="/assets/js/motion.js?v=13"></script>
 <script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script>
 <script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
-<script src="/assets/js/invoice.js?v=12"></script>
-<script src="/assets/js/pdf.js?v=12"></script>
-<script src="/assets/js/dashboard.js?v=12"></script>
+<script src="/assets/js/invoice.js?v=13"></script>
+<script src="/assets/js/pdf.js?v=13"></script>
+<script src="/assets/js/dashboard.js?v=13"></script>
 </body>
 </html>

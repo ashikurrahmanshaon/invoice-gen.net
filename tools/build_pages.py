@@ -6,7 +6,8 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "12"  # asset version, bump to bust browser caches
+V = "13"  # asset version, bump to bust browser caches
+SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
 LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
@@ -60,7 +61,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css?v={V}">
-<script>document.documentElement.classList.add("js");</script>
+{SESSION_JS}
 {ld_html}
 </head>
 <body>
@@ -73,8 +74,8 @@ def head(title, desc, path, extra_ld=None, noindex=False):
       <a href="/"{' aria-current="page"' if path == "/" else ""}>Invoice generator</a>
       <a href="/invoice-template/"{' aria-current="page"' if path == "/invoice-template/" else ""}>Templates</a>
       <a href="/how-to-make-an-invoice/"{' aria-current="page"' if path == "/how-to-make-an-invoice/" else ""}>Guide</a>
-      <a href="/dashboard/" data-auth="in" hidden>My invoices</a>
       <a href="#" data-auth="in" data-signout hidden>Log out</a>
+      <a class="btn btn-dark btn-sm" href="/dashboard/" data-auth="in" hidden>Dashboard</a>
       <a href="/login/" data-auth="out">Log in</a>
       <a class="btn btn-dark btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
     </nav>
@@ -123,7 +124,7 @@ FOOT = '''<footer class="site-footer">
 </footer>
 '''
 
-BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="/assets/js/config.js?v={V}"></script>
 <script src="/assets/js/core.js?v={V}"></script>
 <script src="/assets/js/motion.js?v={V}"></script>
@@ -138,6 +139,8 @@ def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=Tru
         a = h.index('<header class="site-header">'); b = h.index('</header>') + len('</header>\n')
         h = h[:a] + h[b:]
         h = h.replace('<body>', '<body class="app-body">')
+        # dashboard: no saved login in this browser -> straight to the login page, before anything renders
+        h = h.replace('</head>', '<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent("/dashboard/"+location.hash));</script>\n</head>')
     html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
     out = os.path.join(ROOT, path.strip("/"), "index.html") if path != "/" else os.path.join(ROOT, "index.html")
     if path.endswith(".html"):

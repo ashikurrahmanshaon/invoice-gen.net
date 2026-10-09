@@ -34,8 +34,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
-<script>document.documentElement.classList.add("js");</script>
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
+<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
 </head>
@@ -49,8 +49,8 @@
       <a href="/">Invoice generator</a>
       <a href="/invoice-template/">Templates</a>
       <a href="/how-to-make-an-invoice/">Guide</a>
-      <a href="/dashboard/" data-auth="in" hidden>My invoices</a>
       <a href="#" data-auth="in" data-signout hidden>Log out</a>
+      <a class="btn btn-dark btn-sm" href="/dashboard/" data-auth="in" hidden>Dashboard</a>
       <a href="/login/" data-auth="out">Log in</a>
       <a class="btn btn-dark btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
     </nav>
@@ -98,9 +98,9 @@
     <span>Invoices are created in your browser. <a href="/privacy/">How we handle your data</a></span>
   </div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v=12"></script>
-<script src="/assets/js/core.js?v=12"></script>
-<script src="/assets/js/motion.js?v=12"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="/assets/js/config.js?v=13"></script>
+<script src="/assets/js/core.js?v=13"></script>
+<script src="/assets/js/motion.js?v=13"></script>
 </body>
 </html>

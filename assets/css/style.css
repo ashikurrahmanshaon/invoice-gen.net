@@ -732,3 +732,18 @@ select.fi { appearance: none; -webkit-appearance: none; padding-right: 28px; bac
 .row .pill-s, .ledger .st { min-width: 64px; text-align: center; }
 .cc-actions .link-btn.danger { color: var(--muted); text-decoration: none; font-size: .88rem; }
 .cc-actions .link-btn.danger:hover { color: var(--bad); text-decoration: underline; text-decoration-color: currentColor; text-decoration-thickness: 1px; }
+
+/* logged-in header without a flash: a saved session shows the account links straight away */
+html.has-session .nav [data-auth="out"] { display: none !important; }
+html.has-session .nav a[data-auth="in"][hidden] { display: block !important; }
+html.has-session .nav a.btn[data-auth="in"][hidden] { display: inline-flex !important; }
+/* dashboard waits for the account check before showing anything */
+.app-body:not(.app-ready) .app { visibility: hidden; }
+.app-body:not(.app-ready)::after { content: ""; position: fixed; top: 50%; left: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border: 3px solid var(--rule); border-top-color: var(--ink); border-radius: 50%; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.app-ready .app { animation: appIn .25s var(--ease) both; }
+@keyframes appIn { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .app-ready .app { animation: none; } }
+
+.chart-empty { min-height: 200px; display: grid; place-content: center; text-align: center; gap: 4px; color: var(--muted); font-size: .93rem; border: 1px dashed var(--rule); border-radius: var(--r); padding: 20px; }
+.chart-empty b { color: var(--ink); font-weight: 600; }
