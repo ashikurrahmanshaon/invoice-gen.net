@@ -16,6 +16,5 @@ window.IG_CONFIG = {
   SITE_URL: "https://invoice-gen.net",
   SITE_NAME: "invoice-gen.net",
   SUPPORT_EMAIL: "support@invoice-gen.net",
-  GOOGLE_LOGIN: false,    // turn on after enabling Google in Supabase → Authentication → Providers
   DAILY_EMAIL_LIMIT: 20   // keep the same number as in the send-invoice function
 };

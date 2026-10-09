@@ -30,8 +30,8 @@ def login_markup():
       </div>
       <p class="form-msg" id="authMsg" hidden></p>
       <form id="authForm" novalidate>
-        <button type="button" class="btn btn-white btn-block" id="googleBtn">{GOOGLE} Continue with Google</button>
-        <div class="divider">or with email</div>
+        <button type="button" class="btn btn-white btn-block" id="googleBtn" hidden>{GOOGLE} Continue with Google</button>
+        <div class="divider" id="googleDivider" hidden>or with email</div>
         <label class="f"><span class="f-label">Email</span><input class="in" id="email" type="email" autocomplete="email" placeholder="you@business.com" required></label>
         <label class="f"><span class="f-label">Password</span><input class="in" id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required></label>
         <button class="btn btn-primary btn-block btn-lg" id="authSubmit" type="submit">Log in</button>

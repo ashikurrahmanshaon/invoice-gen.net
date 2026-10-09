@@ -83,6 +83,19 @@
     msg("Password reset link sent to " + email + ".", "ok");
   }
 
+  // The Google button appears by itself once Google is switched on in Supabase (Authentication → Providers).
+  async function showGoogleIfEnabled() {
+    const cfg = window.IG_CONFIG || {};
+    if (!IG.cloudReady || !cfg.SUPABASE_URL) return;
+    try {
+      const r = await fetch(cfg.SUPABASE_URL.replace(/\/$/, "") + "/auth/v1/settings", { headers: { apikey: cfg.SUPABASE_ANON_KEY } });
+      const s = await r.json();
+      const on = !!(s && s.external && s.external.google);
+      $("#googleBtn").hidden = !on;
+      $("#googleDivider").hidden = !on;
+    } catch (e) { /* stay hidden */ }
+  }
+
   async function google() {
     const { error } = await IG.cloud.auth.signInWithOAuth({
       provider: "google",
@@ -102,7 +115,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
-    if (!(window.IG_CONFIG || {}).GOOGLE_LOGIN) { $("#googleBtn").hidden = true; const dv = document.querySelector(".auth-card .divider"); if (dv) dv.hidden = true; }
+    showGoogleIfEnabled();
     document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
     if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");
     if (!IG.cloudReady) {
