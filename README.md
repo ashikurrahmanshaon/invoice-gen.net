@@ -42,7 +42,7 @@ Pore jokhon-i kono file change korbe: GitHub Desktop e **Commit → Push origin*
 
 ## Step 2 — Supabase (login + database)
 
-1. https://supabase.com → **Start your project** → GitHub diye signup → **New project**. Name `invoice-gen`, region **Singapore** (Bangladesh er kache), ekta strong database password rekhe dao. Free plan.
+1. https://supabase.com → **Start your project** → GitHub diye signup → **New project**. Name `invoice-gen`, region **East US (North Virginia)** (US/Europe user der jonno fast), ekta strong database password rekhe dao. Free plan.
 2. Bam pashe **SQL Editor → New query** → `supabase/schema.sql` file er sob lekha copy-paste → **Run**. "Success" dekhabe.
 3. **Project Settings → API** theke copy koro:
    - **Project URL**
@@ -101,9 +101,9 @@ Ekhon site e login kore **Send by email** chaple client er kache PDF shoho email
 2. **Sitemaps** → `sitemap.xml` likhe **Submit**.
 3. **URL inspection** → `https://invoice-gen.net/` → **Request indexing**.
 4. Bing Webmaster Tools e o same (Search Console theke import kora jay).
-5. Rank barate: protimash 2–4 ta notun guide page (jemon "invoice vs receipt", "how to invoice in Bangladesh", "VAT invoice format", "Upwork/Fiverr client invoice") — `how-to-make-an-invoice/` folder copy kore lekha bodlao, `sitemap.xml` e URL add koro. Facebook group, Reddit, freelancer community te share koro — backlink ashbe.
+5. Rank barate: protimash 2–4 ta notun guide page (jemon "invoice vs receipt", "how to invoice as a freelancer", "VAT invoice format", "Upwork/Fiverr client invoice") — `how-to-make-an-invoice/` folder copy kore lekha bodlao, `sitemap.xml` e URL add koro. Facebook group, Reddit, freelancer community te share koro — backlink ashbe.
 
-> Shotti kotha: "free invoice generator" khub competitive keyword. Site technically SEO-ready, kintu rank ashe content + backlink + shomoy (3–6 mash) diye. Shuru te "invoice generator Bangladesh", "BDT invoice", "freelance invoice USD" er moto chhoto keyword target koro.
+> Shotti kotha: "free invoice generator" khub competitive keyword. Site technically SEO-ready, kintu rank ashe content + backlink + shomoy (3–6 mash) diye. Shuru te "free invoice template for freelancers", "invoice generator no sign up", "simple invoice maker pdf" er moto chhoto keyword target koro.
 
 ## Change kora
 
@@ -115,7 +115,7 @@ Ekhon site e login kore **Send by email** chaple client er kache PDF shoho email
 ## Pore taka income (monetize)
 
 - Google AdSense: site live + kichu content hole apply koro; guide page gulote ad bosano bhalo (generator page clean rakho).
-- Pro plan (pore): unlimited email, recurring invoice, payment link, custom branding chhara "Made with invoice-gen" — Supabase + Stripe/bKash diye add kora jabe.
+- Pro plan (pore): unlimited email, recurring invoice, payment link, custom branding chhara "Made with invoice-gen" — Supabase + Stripe diye add kora jabe.
 
 ## Page gulo bodlano (developer der jonno)
 

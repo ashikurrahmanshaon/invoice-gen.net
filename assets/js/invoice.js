@@ -4,16 +4,16 @@
   const IG = (window.IG = window.IG || {});
 
   IG.CURRENCIES = [
-    ["USD", "US Dollar"], ["BDT", "Bangladeshi Taka"], ["EUR", "Euro"], ["GBP", "British Pound"],
-    ["INR", "Indian Rupee"], ["PKR", "Pakistani Rupee"], ["AED", "UAE Dirham"], ["SAR", "Saudi Riyal"],
-    ["CAD", "Canadian Dollar"], ["AUD", "Australian Dollar"], ["SGD", "Singapore Dollar"], ["MYR", "Malaysian Ringgit"],
-    ["JPY", "Japanese Yen"], ["CNY", "Chinese Yuan"], ["NGN", "Nigerian Naira"], ["KES", "Kenyan Shilling"],
+    ["USD", "US Dollar"], ["EUR", "Euro"], ["GBP", "British Pound"], ["CAD", "Canadian Dollar"],
+    ["AUD", "Australian Dollar"], ["CHF", "Swiss Franc"], ["JPY", "Japanese Yen"], ["SGD", "Singapore Dollar"],
+    ["AED", "UAE Dirham"], ["SAR", "Saudi Riyal"], ["INR", "Indian Rupee"], ["BDT", "Bangladeshi Taka"],
+    ["NZD", "New Zealand Dollar"], ["CNY", "Chinese Yuan"], ["NGN", "Nigerian Naira"], ["KES", "Kenyan Shilling"],
     ["ZAR", "South African Rand"], ["PHP", "Philippine Peso"], ["IDR", "Indonesian Rupiah"], ["NPR", "Nepalese Rupee"],
-    ["LKR", "Sri Lankan Rupee"], ["CHF", "Swiss Franc"], ["SEK", "Swedish Krona"], ["BRL", "Brazilian Real"],
+    ["MYR", "Malaysian Ringgit"], ["PKR", "Pakistani Rupee"], ["SEK", "Swedish Krona"], ["BRL", "Brazilian Real"],
     ["MXN", "Mexican Peso"], ["TRY", "Turkish Lira"], ["QAR", "Qatari Riyal"], ["KWD", "Kuwaiti Dinar"]
   ];
 
-  IG.TEMPLATES = ["classic", "modern", "minimal"];
+  IG.TEMPLATES = ["minimal", "classic", "modern"];
 
   IG.ACCENTS = [
     ["#111111", "Black"], ["#1f56c4", "Blue"], ["#1d7a3e", "Green"],
@@ -62,7 +62,7 @@
       dueDate: IG.addDays(today, p.dueDays != null ? p.dueDays : 14),
       poNumber: "",
       currency: p.currency || "USD",
-      template: p.template || "classic",
+      template: p.template || "minimal",
       accent: p.accent || "#111111",
       logo: p.logo || null,
       logoW: p.logoW || 0,

@@ -144,11 +144,11 @@ def dash_markup(LOGO_SVG, WORDMARK):
           <div class="card-head"><h2>Business details</h2></div>
           <p class="hint">These fill in every new invoice automatically.</p>
           <div class="grid-2">
-            <label class="f span-2"><span class="f-label">Business name</span><input class="in" name="name" placeholder="e.g. Arshaon Studio"></label>
+            <label class="f span-2"><span class="f-label">Business name</span><input class="in" name="name" placeholder="e.g. Northline Studio"></label>
             <label class="f"><span class="f-label">Email</span><input class="in" name="email" type="email"></label>
             <label class="f"><span class="f-label">Phone</span><input class="in" name="phone"></label>
             <label class="f span-2"><span class="f-label">Address</span><textarea class="in" name="address" rows="2"></textarea></label>
-            <label class="f"><span class="f-label">Tax, VAT or BIN number</span><input class="in" name="taxId"></label>
+            <label class="f"><span class="f-label">Tax or VAT ID</span><input class="in" name="taxId"></label>
             <label class="f"><span class="f-label">Default currency</span><select class="in" name="currency" id="setCurrency"></select></label>
             <label class="f"><span class="f-label">Tax name</span><input class="in" name="taxLabel" placeholder="VAT"></label>
             <label class="f"><span class="f-label">Default tax rate (%)</span><input class="in" name="taxRate" inputmode="decimal"></label>

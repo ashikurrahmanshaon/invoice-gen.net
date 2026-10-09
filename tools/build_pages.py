@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "9"  # asset version, bump to bust browser caches
+V = "10"  # asset version, bump to bust browser caches
 
 LOGO_SVG = '''<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#111"/><rect x="26" y="27" width="12" height="25" rx="2" fill="#fff"/><rect x="26" y="11" width="12" height="11" rx="2" fill="#ffd400"/></svg>'''
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
@@ -155,7 +155,7 @@ FAQ = [
     ("Is invoice-gen.net really free?", "Yes. Making invoices, downloading them as PDF and printing are free with no limit. A free account adds saved invoices, saved clients and sending invoices by email."),
     ("Do I need an account to make an invoice?", "No. Fill in the invoice and press Download PDF. Your draft stays in your browser so you can come back to it. Create an account only when you want to save invoices or email them."),
     ("How do I send an invoice by email?", "Log in, fill in the invoice and press Send by email. Add your client's email address and a short message. Your client receives the invoice as a PDF attachment, and their reply goes straight to your email."),
-    ("Which currencies can I use?", "28 currencies including US Dollar, Bangladeshi Taka, Euro, British Pound, Indian Rupee, UAE Dirham and Saudi Riyal. Amounts are formatted correctly for the currency you pick."),
+    ("Which currencies can I use?", "28 currencies including US Dollar, Euro, British Pound, Canadian Dollar, Australian Dollar, Swiss Franc, Japanese Yen and Indian Rupee. Amounts are formatted correctly for the currency you pick."),
     ("Can I add my logo, tax and discounts?", "Yes. Add your logo, a tax or VAT rate, a percentage or fixed discount, shipping, and any amount already paid. The balance due updates as you type."),
     ("Is my invoice data private?", "Without an account, your invoice never leaves your browser. With an account, invoices are stored in a secured database where only you can read them. We don't sell or share your data."),
 ]

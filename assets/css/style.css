@@ -676,3 +676,8 @@ select.fi { appearance: none; -webkit-appearance: none; padding-right: 28px; bac
 .ledger > div > span:nth-child(3) { text-align: right; }
 .ledger > div > span:nth-child(4) { justify-self: end; }
 @media (max-width: 860px) { .designs { grid-template-columns: 1fr; } .ledger > div { grid-template-columns: 80px 1fr 76px; } }
+
+/* Paper feel: filled fields read like printed text; empty ones stay as soft boxes to fill in. */
+:where(.sheet .sh-top, .sheet .party, .sheet .item-rows, .sheet .sh-notes) .fi:not(:placeholder-shown):not(:hover):not(:focus) { border-color: transparent; background: transparent; }
+:where(.sheet .sh-top, .sheet .party, .sheet .item-rows, .sheet .sh-notes) .fi:placeholder-shown:not(:focus) { background: #fafaf8; border-color: #e4e4e0; }
+.sheet .fi { transition: border-color .15s, background-color .15s, box-shadow .15s; }

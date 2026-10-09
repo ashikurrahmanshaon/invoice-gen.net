@@ -26,8 +26,8 @@
     const cl = [
       { id: "c1", name: "Acme Ltd", email: "accounts@acme.com", phone: "+44 20 7946 0000", address: "221 Baker Street, London" },
       { id: "c2", name: "Northwind Traders", email: "billing@northwind.io", phone: "", address: "Seattle, USA" },
-      { id: "c3", name: "Bright Pixel Agency", email: "finance@brightpixel.co", phone: "", address: "Dhaka, Bangladesh" },
-      { id: "c4", name: "Green Leaf Cafe", email: "hello@greenleaf.cafe", phone: "", address: "Chattogram, Bangladesh" },
+      { id: "c3", name: "Bright Pixel Agency", email: "finance@brightpixel.co", phone: "", address: "Toronto, Canada" },
+      { id: "c4", name: "Green Leaf Cafe", email: "hello@greenleaf.cafe", phone: "", address: "Melbourne, Australia" },
       { id: "c5", name: "Orbit Labs", email: "ap@orbitlabs.dev", phone: "", address: "Berlin, Germany" }
     ];
     const rows = [
@@ -44,7 +44,7 @@
       return { id: "d" + i, number: r[0], client_name: r[1], client_email: c.email, issue_date: d(r[2]), due_date: d(r[2] + 14),
         currency: "USD", total: r[3], balance: r[4] === "paid" ? 0 : r[3], status: r[4], created_at: d(r[2]) };
     }).reverse();
-    const prof = { name: "Arshaon Studio", email: "hello@arshaon.com", phone: "+880 1700 000000", address: "Dhanmondi, Dhaka", currency: "USD", taxLabel: "VAT", taxRate: 5, dueDays: 14 };
+    const prof = { name: "Northline Studio", email: "hello@northline.studio", phone: "+1 415 555 0134", address: "548 Market Street, San Francisco, CA", currency: "USD", taxLabel: "VAT", taxRate: 5, dueDays: 14 };
     return { inv, cl, prof };
   }
 
@@ -420,7 +420,7 @@
       user = await (IG.headerReady || IG.getUser());
       if (!user) { location.replace("/login/?next=" + encodeURIComponent("/dashboard/")); return; }
     }
-    const email = demo ? "hello@arshaon.com" : user.email;
+    const email = demo ? "hello@northline.studio" : user.email;
     $("#who").textContent = email;
     $("#accEmail").textContent = email;
     $("#avatar").textContent = email.charAt(0).toUpperCase();
