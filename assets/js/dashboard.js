@@ -193,6 +193,7 @@
       return IG.toast("Invoice " + r.number + " deleted.");
     }
     if (what === "pdf") {
+      try { await IG.loadPdf(); } catch (e) { return IG.toast("The PDF maker could not load. Try again.", "err"); }
       const { data, error } = await IG.cloud.from("invoices").select("data,status").eq("id", r.id).single();
       if (error) return IG.toast(error.message, "err");
       const inv = Object.assign(IG.blankInvoice(), data.data, { status: data.status });
@@ -375,6 +376,7 @@
 
   document.addEventListener("DOMContentLoaded", async () => {
     bind();
+    await IG.loadCloud();
     if (!IG.cloudReady) { location.replace("/login/?next=%2Fdashboard%2F"); return; }
     user = await (IG.headerReady || IG.getUser());
     if (!user) { location.replace("/login/?next=" + encodeURIComponent("/dashboard/" + location.hash)); return; }
@@ -384,5 +386,15 @@
     showTab(location.hash.slice(1) || "overview", false);
     await load();
     document.body.classList.add("app-ready");
+    // live updates: refresh when an invoice changes elsewhere, and whenever the tab comes back into view
+    try {
+      if (typeof IG.cloud.channel === "function") {
+        let t = null;
+        IG.cloud.channel("invoices-" + user.id)
+          .on("postgres_changes", { event: "*", schema: "public", table: "invoices", filter: "user_id=eq." + user.id }, () => { clearTimeout(t); t = setTimeout(load, 400); })
+          .subscribe();
+      }
+    } catch (e) { /* realtime not enabled: focus refresh below still works */ }
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") load(); });
   });
 })();

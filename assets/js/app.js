@@ -117,6 +117,8 @@
     if (txt) txt.textContent = n === 3 ? "Ready to download" : n + " of 3 done";
     if (box) box.classList.toggle("ready", n === 3);
     const mb = $(".mobile-bar"); if (mb) mb.style.setProperty("--prog", n / 3);
+    $$("[data-section]").forEach((el) => el.classList.toggle("sec-done", !!steps[el.dataset.section]));
+    const ih = $("#itemsHint"); if (ih) ih.hidden = steps.items;
   }
   function update() {
     docLabels();
@@ -213,14 +215,28 @@
   }
 
   /* ---------- saving ---------- */
+  let autoTimer = null;
   function changed() {
     clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => IG.store.set("ig_draft", inv), 300);
+    saveTimer = setTimeout(() => IG.draft.set(inv), 300);
+    // logged in: save to the account automatically once the basics are filled in
+    if (user && inv.from.name.trim() && inv.to.name.trim()) {
+      clearTimeout(autoTimer);
+      setStatus("saving");
+      const run = async () => { if (cloudSaving) { autoTimer = setTimeout(run, 800); return; } const ok = await saveCloud(true); setStatus(ok ? "saved" : "error"); };
+      autoTimer = setTimeout(run, 1200);
+    }
+  }
+  function setStatus(s) {
+    const n = $("#cloudNote"); if (!n || !user) return;
+    const map = { saving: "Saving to your account…", saved: "Saved to your account just now", error: "Not saved. Check your connection." };
+    n.dataset.state = s;
+    n.innerHTML = '<span class="dot"></span>' + map[s] + ' <a href="/dashboard/">Dashboard</a>';
   }
 
   async function saveCloud(quiet) {
     if (!IG.cloud || !user) {
-      if (!quiet) { IG.store.set("ig_draft", inv); window.location.href = "/login/?next=" + encodeURIComponent("/"); }
+      if (!quiet) { IG.draft.set(inv); window.location.href = "/login/?next=" + encodeURIComponent("/"); }
       return false;
     }
     if (cloudSaving) return false;
@@ -237,7 +253,7 @@
         : await IG.cloud.from("invoices").insert(row).select("id").single();
       if (res.error) throw res.error;
       inv.id = res.data.id;
-      IG.store.set("ig_draft", inv);
+      IG.draft.set(inv);
       IG.bumpNumber(inv.number);
       const url = new URL(window.location.href);
       url.searchParams.set("id", inv.id);
@@ -318,14 +334,13 @@
   }
   function closeReady() { const d = $("#pdfReady"); if (typeof d.close === "function") d.close(); else d.removeAttribute("open"); }
 
-  function pdfLibReady() {
-    if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable) return true;
-    IG.toast("The PDF maker is still loading. Try again in a moment.", "err");
-    return false;
+  async function pdfLibReady() {
+    try { await IG.loadPdf(); return true; }
+    catch (e) { IG.toast("The PDF maker could not load. Check your connection and try again.", "err"); return false; }
   }
 
   async function downloadPdf(e) {
-    if (!checkReady() || !pdfLibReady()) return;
+    if (!checkReady() || !(await pdfLibReady())) return;
     try {
       const r = IG.savePdf(inv);
       IG.bumpNumber(inv.number);
@@ -340,8 +355,8 @@
     }
   }
 
-  function previewPdf() {
-    if (!checkReady() || !pdfLibReady()) return;
+  async function previewPdf() {
+    if (!checkReady() || !(await pdfLibReady())) return;
     try {
       const r = IG.openPdf(inv);
       if (!r.opened) showReady(r, "Your browser blocked the new tab. Use Open PDF below.");
@@ -431,8 +446,8 @@
     }
   }
 
-  function sendWithMailApp() {
-    if (!pdfLibReady()) return;
+  async function sendWithMailApp() {
+    if (!(await pdfLibReady())) return;
     let r;
     try { r = IG.savePdf(inv); } catch (e) { return sendError(e.message); }
     const href = "mailto:" + encodeURIComponent($("#sendTo").value.trim()) + "?subject=" + encodeURIComponent($("#sendSubject").value) +
@@ -611,20 +626,24 @@
     $("#sendCancel").addEventListener("click", closeSend);
     $("#sendNow").addEventListener("click", sendNow);
     $("#sendMailApp").addEventListener("click", sendWithMailApp);
-    $("#sendLoginLink").addEventListener("click", () => IG.store.set("ig_draft", inv));
+    $("#sendLoginLink").addEventListener("click", () => IG.draft.set(inv));
 
     document.addEventListener("keydown", (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
         e.preventDefault();
-        if (user) saveCloud(false); else { IG.store.set("ig_draft", inv); IG.toast("Draft saved in this browser. Log in to save it to your account."); }
+        saveCloud(false);
       }
     });
   }
 
   async function start() {
     bind();
+    // warm up the PDF maker: on the first tap in the invoice, or once the page is idle
+    const warm = () => IG.loadPdf().catch(() => {});
+    $("#create").addEventListener("focusin", warm, { once: true });
+    (window.requestIdleCallback || ((f) => setTimeout(f, 2500)))(warm, { timeout: 4000 });
     const params = new URLSearchParams(window.location.search);
-    const draft = IG.store.get("ig_draft", null);
+    const draft = IG.draft.get();
     if (params.get("new") === "1" || !draft || !draft.items) {
       inv = IG.blankInvoice();
       if (draft && draft.from) { inv.from = draft.from; inv.logo = draft.logo; inv.logoW = draft.logoW; inv.logoH = draft.logoH; }
@@ -648,18 +667,19 @@
 
     user = await (IG.headerReady || IG.getUser());
     const note = $("#cloudNote");
-    if (!IG.cloudReady) { $("#saveBtn").hidden = true; return; }
+    if (!IG.cfgReady) { $("#saveBtn").hidden = true; return; }
     if (!user) {
-      note.innerHTML = '<a href="/login/?signup=1">Create a free account</a> to save invoices and email them to clients.';
+      note.innerHTML = 'Nothing is stored until you download it. <a href="/login/?signup=1">Create a free account</a> to keep invoices and email them.';
       return;
     }
-    note.innerHTML = "Logged in as <strong>" + esc(user.email) + '</strong>. <a href="/dashboard/">Dashboard</a>';
+    note.innerHTML = '<span class="dot"></span>Logged in as <strong>' + esc(user.email) + '</strong>. Changes save to your account automatically. <a href="/dashboard/">Dashboard</a>';
+    note.dataset.state = "saved";
 
     const id = params.get("id"), dup = params.get("dup");
     if (id) {
       const { data, error } = await IG.cloud.from("invoices").select("id,data,status").eq("id", id).maybeSingle();
       if (error || !data) IG.toast("That invoice could not be opened. It may have been deleted.", "err");
-      else { inv = Object.assign(IG.blankInvoice(), data.data, { id: data.id, status: data.status }); fillFields(); IG.store.set("ig_draft", inv); }
+      else { inv = Object.assign(IG.blankInvoice(), data.data, { id: data.id, status: data.status }); fillFields(); IG.draft.set(inv); }
     } else if (dup) {
       const { data } = await IG.cloud.from("invoices").select("data").eq("id", dup).maybeSingle();
       if (data) {

@@ -4,15 +4,48 @@
   const cfg = window.IG_CONFIG || {};
   const IG = (window.IG = window.IG || {});
 
-  IG.cloudReady = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY && window.supabase && window.supabase.createClient);
-  IG.cloud = IG.cloudReady
-    ? window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
-        auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-      })
-    : null;
+  // Accounts are loaded only when needed, so first visits stay light and fast.
+  const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+  IG.cfgReady = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
+  IG.cloudReady = false;
+  IG.cloud = null;
+  IG.hasSession = function () { return document.documentElement.classList.contains("has-session"); };
+  IG.loadCloud = function () {
+    if (IG._cloudP) return IG._cloudP;
+    IG._cloudP = new Promise((resolve) => {
+      if (!IG.cfgReady) return resolve(null);
+      const make = () => {
+        try {
+          IG.cloud = window.supabase.createClient(cfg.SUPABASE_URL, cfg.SUPABASE_ANON_KEY, {
+            auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+          });
+          IG.cloudReady = true;
+        } catch (e) { IG.cloud = null; }
+        resolve(IG.cloud);
+      };
+      if (window.supabase && window.supabase.createClient) return make();
+      const s = document.createElement("script");
+      s.src = SUPABASE_JS; s.async = true;
+      s.onload = make; s.onerror = () => resolve(null);
+      document.head.appendChild(s);
+    });
+    return IG._cloudP;
+  };
+
+  /* drafts live for this tab only (cleared when the tab is closed) */
+  IG.draft = {
+    get() { try { const v = sessionStorage.getItem("ig_draft"); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+    set(v) { try { sessionStorage.setItem("ig_draft", JSON.stringify(v)); } catch (e) { /* ignore */ } },
+    remove() { try { sessionStorage.removeItem("ig_draft"); } catch (e) { /* ignore */ } }
+  };
+  try { localStorage.removeItem("ig_draft"); } catch (e) { /* old permanent drafts */ }
 
   IG.getUser = async function () {
-    if (!IG.cloud) return null;
+    if (!IG.cloud) {
+      if (!IG.hasSession()) return null;
+      await IG.loadCloud();
+      if (!IG.cloud) return null;
+    }
     try {
       const { data } = await IG.cloud.auth.getSession();
       return (data && data.session && data.session.user) || null;

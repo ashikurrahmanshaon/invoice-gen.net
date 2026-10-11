@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "22"  # asset version, bump to bust browser caches
+V = "23"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
 LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#059669"/><g transform="translate(32 32) scale(1.24) translate(-32 -32)"><path d="M23 15h18a3 3 0 0 1 3 3v31l-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4V18a3 3 0 0 1 3-3z" fill="#fff"/><path d="m26.2 31.8 4.2 4.2 8.2-8.6" fill="none" stroke="#059669" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>'
@@ -21,6 +21,15 @@ TOOLS = [
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
 TOOLS_MENU = "".join(f'<a href="{u}"><span class="np-ico">{TOOL_ICON}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS)
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
+
+
+# ---------------------------------------------------------------- css: minified copy for the live site
+import re as _re
+_css = open(os.path.join(ROOT, "assets/css/style.css"), encoding="utf-8").read()
+_css = _re.sub(r"/\*.*?\*/", "", _css, flags=_re.S)
+_css = _re.sub(r"\s+", " ", _css)
+_css = _re.sub(r"\s*([{};,>])\s*", r"\1", _css).replace(";}", "}")
+open(os.path.join(ROOT, "assets/css/style.min.css"), "w", encoding="utf-8").write(_css.strip())
 
 def head(title, desc, path, extra_ld=None, noindex=False):
     url = SITE + path
@@ -68,7 +77,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.css?v={V}">
+<link rel="stylesheet" href="/assets/css/style.min.css?v={V}">
 {SESSION_JS}
 {ld_html}
 </head>
@@ -149,8 +158,7 @@ FOOT = '''<footer class="site-footer">
 </footer>
 '''
 
-BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-<script src="/assets/js/config.js?v={V}" defer></script>
+BASE_JS = f'''<script src="/assets/js/config.js?v={V}" defer></script>
 <script src="/assets/js/core.js?v={V}" defer></script>
 <script src="/assets/js/motion.js?v={V}" defer></script>
 '''
@@ -204,13 +212,13 @@ HOME = home_section.build(FAQ, ICON_DL, ICON_SEND)
 
 page("/", "Free Invoice Generator: Create, Download & Email PDF Invoices | invoice-gen.net",
      "Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.",
-     HOME, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n',
+     HOME, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n',
      [app_ld, faq_ld, howto_ld])
 
 # ---------------------------------------------------------------- keyword tool pages
 # Each page is the full working generator, opened with its own document type,
 # plus a short guide and FAQ written for that search.
-GEN_JS = PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n'
+GEN_JS = f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n'
 
 def guide_band(h2, intro, cols):
     items = "".join(f'<div><dt>{t}</dt><dd>{d}</dd></div>' for t, d in cols)
@@ -313,7 +321,7 @@ page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.ne
 # ---------------------------------------------------------------- dashboard
 DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
 page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
-     DASH, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
+     DASH, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
 
 # ---------------------------------------------------------------- articles
 def article(path, title, desc, h1, crumbs_name, body, ld=None):

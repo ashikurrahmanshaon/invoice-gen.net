@@ -88,16 +88,16 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
         <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
 
         <div class="sh-parties">
-          <div class="party">
-            <span class="sh-label">From</span>
+          <div class="party" data-section="from">
+            <span class="sh-label"><span class="sh-step"><i>1</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>From <small>your business</small></span>
             {fi("from.name", "Your business name *", "Your business name", cls="fi-strong", extra=' autocomplete="organization" data-req')}
             {fi("from.email", "Email", "Your email", "email", extra=' autocomplete="email"')}
             {ta("from.address", "Address", "Your address")}
             {fi("from.phone", "Phone", "Your phone", extra=' autocomplete="tel"')}
             {fi("from.taxId", "Tax / VAT ID (optional)", "Your tax number")}
           </div>
-          <div class="party">
-            <span class="sh-label">Bill to</span>
+          <div class="party" data-section="to">
+            <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
             <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
             {fi("to.name", "Client name *", "Client name", cls="fi-strong", extra=' data-req')}
             {fi("to.email", "Client email", "Client email", "email")}
@@ -106,9 +106,11 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
           </div>
         </div>
 
-        <div class="sh-items">
+        <div class="sh-items" data-section="items">
+          <span class="sh-label"><span class="sh-step"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Items <small>what you are charging for</small></span>
           <div class="items-head" aria-hidden="true"><span>Item</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
+          <p class="items-hint" id="itemsHint">Describe the work, then enter how many and the price. The amount and totals work themselves out.</p>
           <button type="button" class="add-line" id="addLine">{I(ICONS["plus"])} Add line item</button>
         </div>
 
@@ -157,7 +159,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
           <button class="sp-mini" id="printBtn" type="button">{I(ICONS["print"])}<span>Print</span></button>
           <button class="sp-mini" id="newBtn" type="button">{I(ICONS["plus"])}<span>New</span></button>
         </div>
-        <p class="sp-note" id="cloudNote">Your draft is saved in this browser as you type.</p>
+        <p class="sp-note" id="cloudNote">Nothing is stored until you download it.</p>
       </div>
 
       <div class="sp-card">
@@ -245,9 +247,9 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
   <div class="wrap">
     <h2 id="how-title">How it works</h2>
     <ol class="how">
-      <li><b>Fill it in</b><span>Type your business, your client and each item straight onto the page. Totals work themselves out.</span></li>
-      <li><b>Choose a look</b><span>Pick Classic, Modern or Minimal and a colour. Add your logo if you have one.</span></li>
-      <li><b>Download or send</b><span>Save the PDF, print it, or email it to your client with the PDF attached.</span></li>
+      <li><span class="how-art" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="14" y="8" width="38" height="52" rx="6" fill="#fff" stroke="#059669" stroke-width="2.2"/><path d="M22 20h18M22 28h22M22 36h12" stroke="#a7f3d0" stroke-width="4"/><rect x="30" y="44" width="16" height="6" rx="3" fill="#d1fae5"/><path d="m44 52 14-14 6 6-14 14-8 2z" fill="#d1fae5" stroke="#059669" stroke-width="2.2"/><path d="m54 42 6 6" stroke="#059669" stroke-width="2.2"/></svg></span><b>Fill it in</b><span>Type your business, your client and each item straight onto the page. Totals work themselves out.</span></li>
+      <li><span class="how-art" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="16" width="30" height="40" rx="5" fill="#d1fae5" stroke="#059669" stroke-width="2" transform="rotate(-8 23 36)"/><rect x="22" y="12" width="30" height="40" rx="5" fill="#fff" stroke="#059669" stroke-width="2.2"/><rect x="22" y="12" width="30" height="10" rx="5" fill="#059669"/><path d="M28 30h18M28 37h12" stroke="#a7f3d0" stroke-width="4"/><circle cx="54" cy="52" r="10" fill="#fff" stroke="#059669" stroke-width="2.2"/><circle cx="50" cy="50" r="2" fill="#059669" stroke="none"/><circle cx="57" cy="49" r="2" fill="#f59e0b" stroke="none"/><circle cx="54" cy="56" r="2" fill="#3b82f6" stroke="none"/></svg></span><b>Choose a look</b><span>Pick Classic, Modern or Minimal and a colour. Add your logo if you have one.</span></li>
+      <li><span class="how-art" aria-hidden="true"><svg viewBox="0 0 72 72" fill="none" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="10" width="34" height="46" rx="6" fill="#fff" stroke="#059669" stroke-width="2.2"/><path d="M18 22h18M18 30h14" stroke="#a7f3d0" stroke-width="4"/><path d="M27 36v12m0 0-5-5m5 5 5-5" stroke="#059669" stroke-width="2.4"/><path d="m40 40 24-10-8 26-6-9-10-7z" fill="#d1fae5" stroke="#059669" stroke-width="2.2"/><path d="m50 47 14-17" stroke="#059669" stroke-width="2.2"/></svg></span><b>Download or send</b><span>Save the PDF, print it, or email it to your client with the PDF attached.</span></li>
     </ol>
   </div>
 </section>
@@ -259,14 +261,14 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
       <p class="lede">Everything below is free. A few extras need a free account, because we save your work and send email for you.</p>
     </div>
     <dl class="feat">
-      <div><dt>PDF download</dt><dd>A clean A4 PDF with your logo. No watermark.</dd></div>
-      <div><dt>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
-      <div><dt>28 currencies</dt><dd>US Dollar, Euro, Pound, Canadian and Australian Dollar, Yen and more, formatted correctly.</dd></div>
-      <div><dt>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>
-      <div><dt>Quotation, receipt, proforma</dt><dd>Change the title at the top of the page and the PDF follows.</dd></div>
-      <div><dt>Email to clients <em>free account</em></dt><dd>The PDF goes as an attachment, replies come to your inbox.</dd></div>
-      <div><dt>Saved invoices and clients <em>free account</em></dt><dd>Every invoice kept, clients ready to pick next time.</dd></div>
-      <div><dt>Paid and overdue tracking <em>free account</em></dt><dd>See what's been invoiced, paid and still owed.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="#d1fae5"/><path d="M14 3v5h5M12 11v6m0 0-2.5-2.5M12 17l2.5-2.5"/></svg></span>PDF download</dt><dd>A clean A4 PDF with your logo. No watermark.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="2" fill="#d1fae5"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2" fill="#d1fae5"/></svg></span>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies</dt><dd>US Dollar, Euro, Pound, Canadian and Australian Dollar, Yen and more, formatted correctly.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9z" fill="#d1fae5"/><circle cx="8" cy="8" r="1.5"/><path d="m10 15 5-5"/></svg></span>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z" fill="#d1fae5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>Quotation, receipt, proforma</dt><dd>Change the title at the top of the page and the PDF follows.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2" fill="#d1fae5"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/></svg></span>Email to clients <em>free account</em></dt><dd>The PDF goes as an attachment, replies come to your inbox.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.5" fill="#d1fae5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14.2A6.5 6.5 0 0 1 21.5 20"/></svg></span>Saved invoices and clients <em>free account</em></dt><dd>Every invoice kept, clients ready to pick next time.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="4" height="9" rx="1" fill="#d1fae5"/><rect x="10" y="7" width="4" height="13" rx="1"/><rect x="17" y="3" width="4" height="17" rx="1" fill="#d1fae5"/></svg></span>Paid and overdue tracking <em>free account</em></dt><dd>See what's been invoiced, paid and still owed.</dd></div>
     </dl>
   </div>
 </section>

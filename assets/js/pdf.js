@@ -25,6 +25,19 @@
     return f === "jpg" || f === "jpeg" ? "JPEG" : f.toUpperCase();
   }
 
+  /* The PDF library (about 400 KB) loads only when it is about to be needed */
+  IG.loadPdf = function () {
+    if (window.jspdf && window.jspdf.jsPDF && window.jspdf.jsPDF.API && window.jspdf.jsPDF.API.autoTable) return Promise.resolve();
+    if (IG._pdfP) return IG._pdfP;
+    const add = (src) => new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = src; s.async = false;
+      s.onload = res; s.onerror = () => rej(new Error("load failed")); document.head.appendChild(s);
+    });
+    IG._pdfP = add("/assets/vendor/jspdf.umd.min.js?v=2.5.1").then(() => add("/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2"))
+      .catch((e) => { IG._pdfP = null; throw e; });
+    return IG._pdfP;
+  };
+
   IG.buildPdf = function (inv) {
     if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("The PDF tool did not load. Check your internet connection and reload the page.");
     const { jsPDF } = window.jspdf;

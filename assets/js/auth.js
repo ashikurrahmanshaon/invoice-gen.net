@@ -115,6 +115,7 @@
   }
 
   document.addEventListener("DOMContentLoaded", async () => {
+    await IG.loadCloud();
     showGoogleIfEnabled();
     document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
     if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");

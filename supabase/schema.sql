@@ -92,3 +92,9 @@ create policy "read own email log" on public.email_log
 drop policy if exists "insert own email log" on public.email_log;
 create policy "insert own email log" on public.email_log
   for insert to authenticated with check ((select auth.uid()) = user_id);
+
+-- live dashboard: send invoice changes to the open dashboard (run once; safe to repeat)
+do $$ begin
+  alter publication supabase_realtime add table public.invoices;
+exception when duplicate_object then null;
+end $$;
