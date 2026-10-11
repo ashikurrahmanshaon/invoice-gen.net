@@ -546,7 +546,7 @@
     } else {
       inv = Object.assign(IG.blankInvoice(), draft);
       if (!inv.tplPicked) inv.template = "classic";
-      if (!inv.tplPicked && /^#(111111|2b5cff|5b4dff)$/i.test(inv.accent || "")) inv.accent = "#0b0f0c";
+      if (!inv.tplPicked && /^#(111111|2b5cff|5b4dff|0b0f0c)$/i.test(inv.accent || "")) inv.accent = "#1d4ed8";
     }
     // keyword pages (quote, receipt, estimate...) open with their own document title
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
