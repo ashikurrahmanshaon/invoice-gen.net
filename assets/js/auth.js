@@ -52,7 +52,9 @@
         });
         if (error) throw error;
         if (data.session) window.location.href = nextUrl();
-        else msg("Check your inbox and click the link we sent to " + email + " to finish creating your account.", "ok");
+        else if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0)
+          msg("That email already has an account. Log in, or press Continue with Google if you signed up with Google.");
+        else msg("Check your inbox (and the spam folder) and click the link we sent to " + email + " to finish creating your account. It can take a minute to arrive.", "ok");
       }
     } catch (err) {
       const m = err.message || "";
