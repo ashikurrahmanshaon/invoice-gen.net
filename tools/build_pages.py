@@ -6,10 +6,10 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "17"  # asset version, bump to bust browser caches
+V = "18"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
-LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7457ff"/><stop offset="1" stop-color="#3b5bff"/></linearGradient><linearGradient id="igs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#igg)"/><rect width="64" height="64" rx="18" fill="url(#igs)"/><rect x="24" y="12.5" width="24" height="31" rx="4" fill="#fff" fill-opacity=".34"/><path d="M20 18.5h14.5l7.5 7.5v20a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V22.5a4 4 0 0 1 4-4z" fill="#fff"/><path d="M34.5 18.5V26h7.5z" fill="#c9c0ff"/><rect x="21" y="30" width="11" height="3" rx="1.5" fill="#d9d3ff"/><rect x="21" y="36" width="15" height="3" rx="1.5" fill="#d9d3ff"/><rect x="29" y="42.5" width="8.5" height="3.6" rx="1.8" fill="#5b4dff"/></svg>'
+LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0b0f0c"/><rect x="24.5" y="12" width="23" height="30" rx="4" fill="#fff" fill-opacity=".2"/><path d="M20 18h14l8 8v20a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4z" fill="#fff"/><path d="M34 18v8h8z" fill="#c9d3cd"/><rect x="21" y="30" width="11" height="3" rx="1.5" fill="#d5ddd8"/><rect x="21" y="36" width="15" height="3" rx="1.5" fill="#d5ddd8"/><rect x="28.5" y="42.5" width="9" height="3.6" rx="1.8" fill="#22c55e"/></svg>'
 
 TOOLS = [
     ("/", "Invoice generator", "Bill a client and get paid"),
@@ -61,7 +61,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="icon" href="/favicon-32.png?v={V}" sizes="32x32" type="image/png">
 <link rel="icon" href="/assets/img/favicon-16.png?v={V}" sizes="16x16" type="image/png">
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v={V}">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#5b4dff">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v={V}" color="#0b0f0c">
 <link rel="manifest" href="/site.webmanifest?v={V}">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
