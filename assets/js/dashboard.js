@@ -279,6 +279,7 @@
       invoices = a.data || []; clients = b.data || [];
       profile = (c.data && c.data.data) || IG.store.get("ig_profile", {}) || {};
     }
+    IG.setRegion(profile.region || IG.guessRegion());
     fillSettings();
     renderAll();
   }

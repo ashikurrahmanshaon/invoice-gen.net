@@ -34,15 +34,47 @@
       const v = getPath(inv, el.dataset.f);
       el.value = v == null ? "" : v;
     });
+    IG.setRegion(inv.region);
+    $("#region").value = inv.region;
+    regionHint();
     $("#currency").value = inv.currency;
     $("#status").value = inv.status || "draft";
+    renderFields();
     syncDueIn();
     $$("[data-disc]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.disc === (inv.discountType === "%" ? "%" : "flat"))));
     setAccent(inv.accent, false);
     applyTemplate(inv.template, false);
     showLogo();
     renderItems();
+    unitLabels();
     $$("#sheet textarea").forEach(autosize);
+  }
+
+  /* ---------- region, units, extra fields ---------- */
+  function regionHint() {
+    const h = $("#regionHint"); if (!h) return;
+    const R = IG.REGIONS[inv.region] || IG.REGIONS.us;
+    h.textContent = IG.money(1234.5, inv.currency) + ", " + IG.formatDate(IG.isoDate(new Date()), inv.region) + ", " + (R.paper === "letter" ? "US Letter" : "A4") + " paper";
+  }
+  function unitLabels() {
+    const U = IG.UNITS[inv.unit] || IG.UNITS.qty;
+    $$("#unitSeg [data-unit]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.unit === (inv.unit || "qty"))));
+    const hq = $("#hQty"), hr = $("#hRate");
+    if (hq) hq.textContent = U.q; if (hr) hr.textContent = U.r;
+    $$(".ir-qty .ir-l").forEach((e) => (e.textContent = U.q));
+    $$(".ir-rate .ir-l").forEach((e) => (e.textContent = U.r));
+  }
+  function renderFields() {
+    const box = $("#metaExtra"); if (!box) return;
+    inv.fields = Array.isArray(inv.fields) ? inv.fields : [];
+    box.innerHTML = inv.fields.map((f, i) =>
+      '<input class="fi mf-l" data-fi="' + i + '" data-fk="label" placeholder="Field name" aria-label="Field name ' + (i + 1) + '">' +
+      '<span class="mf-v"><input class="fi" data-fi="' + i + '" data-fk="value" placeholder="Value" aria-label="Field value ' + (i + 1) + '">' +
+      '<button type="button" class="mf-x" data-fx="' + i + '" aria-label="Remove field ' + (i + 1) + '" title="Remove field"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg></button></span>').join("");
+    inv.fields.forEach((f, i) => {
+      $('[data-fi="' + i + '"][data-fk="label"]', box).value = f.label || "";
+      $('[data-fi="' + i + '"][data-fk="value"]', box).value = f.value || "";
+    });
   }
 
   function syncDueIn() {
@@ -68,6 +100,7 @@
       $('[data-k="rate"]', row).value = it.rate ? it.rate : "";
       autosize($('[data-k="desc"]', row));
     });
+    unitLabels();
     update();
   }
 
@@ -83,6 +116,7 @@
     if (bar) bar.style.width = (n / 3) * 100 + "%";
     if (txt) txt.textContent = n === 3 ? "Ready to download" : n + " of 3 done";
     if (box) box.classList.toggle("ready", n === 3);
+    const mb = $(".mobile-bar"); if (mb) mb.style.setProperty("--prog", n / 3);
   }
   function update() {
     docLabels();
@@ -255,7 +289,7 @@
   async function saveProfile() {
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
       name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
-      currency: inv.currency, accent: inv.accent, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
+      currency: inv.currency, region: inv.region, accent: inv.accent, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
       taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms
     });
     IG.store.set("ig_profile", p);
@@ -335,7 +369,7 @@
   function newInvoice() {
     if (!window.confirm("Start a new invoice? Your business details and logo stay; the client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
-    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate };
+    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate };
     inv = Object.assign(IG.blankInvoice(), keep);
     const url = new URL(window.location.href);
     url.searchParams.delete("id");
@@ -486,7 +520,7 @@
     // side panel
     const cur = $("#currency");
     cur.innerHTML = IG.CURRENCIES.map(([c, n]) => '<option value="' + c + '">' + c + " — " + n + "</option>").join("");
-    cur.addEventListener("change", () => { inv.currency = cur.value; update(); changed(); });
+    cur.addEventListener("change", () => { inv.currency = cur.value; regionHint(); update(); changed(); });
     $("#dueIn").addEventListener("change", (e) => {
       if (e.target.value === "") return $('[data-f="dueDate"]').focus();
       inv.dueDate = IG.addDays(inv.issueDate, +e.target.value);
@@ -513,6 +547,34 @@
     });
 
     $("#downloadBtn").addEventListener("click", downloadPdf);
+    const reg = $("#region");
+    reg.innerHTML = Object.keys(IG.REGIONS).map((k) => '<option value="' + k + '">' + IG.REGIONS[k].name + "</option>").join("");
+    reg.addEventListener("change", () => {
+      const old = IG.REGIONS[inv.region] || IG.REGIONS.us, nw = IG.REGIONS[reg.value];
+      inv.region = reg.value; IG.setRegion(inv.region);
+      if (!inv.taxLabel || IG.TAX_NAMES.indexOf(inv.taxLabel) >= 0) { inv.taxLabel = nw.tax; const tl = $('[data-f="taxLabel"]'); if (tl) tl.value = nw.tax; }
+      if (inv.currency === old.cur && nw.cur) { inv.currency = nw.cur; $("#currency").value = nw.cur; }
+      regionHint(); update(); changed();
+      IG.toast(nw.name + " style: " + (nw.paper === "letter" ? "US Letter" : "A4") + " paper, local number and date format.", "ok");
+    });
+    $("#unitSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-unit]"); if (!b) return;
+      inv.unit = b.dataset.unit; unitLabels(); changed();
+    });
+    $("#addField").addEventListener("click", () => {
+      inv.fields = Array.isArray(inv.fields) ? inv.fields : [];
+      if (inv.fields.length >= 6) return IG.toast("You can add up to 6 extra fields.");
+      inv.fields.push({ label: "", value: "" }); renderFields(); changed();
+      const el = $('#metaExtra [data-fi="' + (inv.fields.length - 1) + '"][data-fk="label"]'); if (el) el.focus();
+    });
+    $("#metaExtra").addEventListener("input", (e) => {
+      const el = e.target.closest("[data-fi]"); if (!el) return;
+      const f = inv.fields[+el.dataset.fi]; if (f) { f[el.dataset.fk] = el.value; changed(); }
+    });
+    $("#metaExtra").addEventListener("click", (e) => {
+      const x = e.target.closest("[data-fx]"); if (!x) return;
+      inv.fields.splice(+x.dataset.fx, 1); renderFields(); changed();
+    });
     document.addEventListener("click", (e) => {
       const li = e.target.closest(".spp-list li");
       if (!li) return;

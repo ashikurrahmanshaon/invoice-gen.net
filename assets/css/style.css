@@ -1222,3 +1222,34 @@ body:not(.app-body) { background: #fff; }
 .spp-dot svg { width: 12px; height: 12px; }
 .spp-list li.done .spp-dot { background: var(--brand); box-shadow: none; color: #fff; }
 .spp-list li.done button { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(86, 97, 91, .4); }
+
+/* region, units and extra fields */
+.sp-sub { display: block; margin-top: 6px; font-size: .78rem; color: var(--muted); }
+.seg-full { display: flex; width: 100%; border-radius: 999px; padding: 3px; gap: 3px; background: var(--desk); border: 1px solid var(--rule); }
+.seg-full button { flex: 1; border-radius: 999px; border: 0 !important; padding: 8px 6px; font-size: .84rem; background: transparent; color: var(--muted); }
+.seg-full button[aria-pressed="true"] { background: #fff; color: var(--ink); box-shadow: 0 1px 3px rgba(15, 23, 42, .12); }
+.meta-extra { display: contents; }
+.sh-meta .mf-l { text-align: right; font-size: .9rem; color: var(--muted); padding-inline: 6px; }
+.mf-v { position: relative; display: block; }
+.mf-v .fi { padding-right: 28px; }
+.mf-x { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 22px; height: 22px; display: grid; place-items: center; border: 0; background: none; color: var(--faint); border-radius: 6px; cursor: pointer; }
+.mf-x:hover { color: var(--bad); background: var(--bad-bg); }
+.mf-x svg { width: 13px; height: 13px; }
+.add-field { display: block; margin: 8px 0 0 auto; border: 0; background: none; color: var(--brand-2); font: 600 .84rem var(--font); cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+.add-field:hover { background: var(--brand-soft); }
+.sheet.t-modern .add-field { color: #fff; }
+.sheet.t-modern .sh-meta .mf-l { color: rgba(255, 255, 255, .75); }
+@media print { .add-field, .mf-x { display: none !important; } }
+
+/* invoice panel polish */
+.logo-drop { border-radius: 14px; border: 1.5px dashed #bfe3d2; background: #f6fefb; color: var(--brand-2); transition: border-color .15s, background .15s; }
+.logo-drop:hover { border-color: var(--brand); background: var(--brand-soft); }
+.logo-drop .ico { color: var(--brand); }
+.sheet .items-head { border-radius: 10px; }
+.sheet.t-minimal .items-head { border-radius: 0; }
+.add-line { border-radius: 999px; border: 1.5px dashed #bfe3d2; color: var(--brand-2); background: #fff; }
+.add-line:hover { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-ink); }
+.sh-label { color: var(--ink-2); font-weight: 700; }
+/* phones: a thin progress line on top of the action bar */
+.mobile-bar { --prog: 0; }
+.mobile-bar::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: calc(var(--prog) * 100%); background: var(--brand); transition: width .4s var(--ease); }

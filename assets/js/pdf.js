@@ -28,7 +28,8 @@
   IG.buildPdf = function (inv) {
     if (!window.jspdf || !window.jspdf.jsPDF) throw new Error("The PDF tool did not load. Check your internet connection and reload the page.");
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
+    IG.setRegion(inv.region);
+    const doc = new jsPDF({ unit: "mm", format: (IG.REGIONS[inv.region] || {}).paper || "a4", compress: true });
     const t = IG.calc(inv);
     const cur = inv.currency;
     const M = (v) => IG.moneyPdf(v, cur);
@@ -43,7 +44,8 @@
     const T = ["modern", "minimal"].indexOf(inv.template) >= 0 ? inv.template : "classic";
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
     const onBand = T === "modern";
-    const metaCount = 3 + (inv.poNumber ? 1 : 0);
+    const extraFields = (inv.fields || []).filter((f) => String(f.label || "").trim() && String(f.value || "").trim());
+    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length;
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
@@ -84,6 +86,7 @@
       [IG.docLabels(inv.title).due, IG.prettyDate(inv.dueDate)]
     ];
     if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
+    extraFields.forEach((f) => meta.push([String(f.label).trim(), String(f.value).trim()]));
     meta.forEach(([k, v]) => {
       if (!v) return;
       doc.setFont("helvetica", "normal"); doc.setTextColor(...(onBand ? mix(accent, 0.7) : soft));
@@ -125,14 +128,14 @@
     doc.autoTable({
       startY: y,
       margin: { left: L, right: W - R },
-      head: [["Description", "Qty", "Rate", "Amount"]],
+      head: [["Description", (IG.UNITS[inv.unit] || IG.UNITS.qty).q, (IG.UNITS[inv.unit] || IG.UNITS.qty).r, "Amount"]],
       body: body.length ? body : [["-", "", "", M(0)]],
       theme: "plain",
       styles: { font: "helvetica", fontSize: 9.5, textColor: ink, cellPadding: { top: 3.2, bottom: 3.2, left: 3, right: 3 }, lineColor: [237, 240, 244], lineWidth: { bottom: 0.3 } },
       headStyles: T === "minimal"
         ? { fillColor: false, textColor: ink, fontStyle: "bold", fontSize: 8.5, lineColor: accent, lineWidth: { bottom: 0.7 } }
         : { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5, lineWidth: 0 },
-      columnStyles: { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 18 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
+      columnStyles: { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 20 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
       didParseCell: (d) => { if (d.section === "head" && d.column.index > 0) d.cell.styles.halign = "right"; }
     });
     y = doc.lastAutoTable.finalY + 8;

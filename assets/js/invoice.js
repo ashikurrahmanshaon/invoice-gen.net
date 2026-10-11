@@ -36,12 +36,7 @@
     d.setDate(d.getDate() + days);
     return IG.isoDate(d);
   };
-  IG.prettyDate = function (iso) {
-    if (!iso) return "";
-    const d = new Date(iso + "T00:00:00");
-    if (isNaN(d)) return iso;
-    return d.getDate() + " " + ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][d.getMonth()] + " " + d.getFullYear();
-  };
+  IG.prettyDate = function (iso) { return IG.formatDate(iso); };
 
   IG.uid = function () {
     return Math.random().toString(36).slice(2, 10);
@@ -61,14 +56,18 @@
   IG.blankInvoice = function (profile) {
     const p = profile || IG.store.get("ig_profile", {}) || {};
     const today = IG.isoDate(new Date());
+    const reg = IG.REGIONS[p.region] ? p.region : IG.guessRegion();
     return {
       id: null,
       title: "Invoice",
+      region: reg,
+      unit: "qty",
+      fields: [],
       number: IG.nextNumber(),
       issueDate: today,
       dueDate: IG.addDays(today, p.dueDays != null ? p.dueDays : 14),
       poNumber: "",
-      currency: p.currency || "USD",
+      currency: p.currency || IG.REGIONS[reg].cur || "USD",
       template: (p.tplPicked && p.template) || "classic",
       accent: p.accent || "#047857",
       logo: p.logo || null,
@@ -85,7 +84,7 @@
       items: [{ id: IG.uid(), desc: "", qty: 1, rate: 0 }],
       discount: 0,
       discountType: "%",
-      taxLabel: p.taxLabel || "Tax",
+      taxLabel: p.taxLabel || IG.REGIONS[reg].tax,
       taxRate: p.taxRate != null ? p.taxRate : 0,
       shipping: 0,
       paid: 0,
@@ -114,14 +113,61 @@
     return { lines, subtotal, discount, tax, shipping, total, paid, balance };
   };
 
+  /* Regional styles: number format, date format, paper size and the usual tax name */
+  IG.REGIONS = {
+    us: { name: "United States", locale: "en-US", paper: "letter", tax: "Sales tax", date: "mdy", cur: "USD" },
+    uk: { name: "United Kingdom", locale: "en-GB", paper: "a4", tax: "VAT", date: "dmy-text", cur: "GBP" },
+    eu: { name: "Europe", locale: "de-DE", paper: "a4", tax: "VAT", date: "dmy-dot", cur: "EUR" },
+    ca: { name: "Canada / Australia", locale: "en-CA", paper: "letter", tax: "GST", date: "dmy-text", cur: "CAD" },
+    asia: { name: "East Asia", locale: "en-SG", paper: "a4", tax: "Tax", date: "iso", cur: "USD" },
+    sa: { name: "South Asia", locale: "en-IN", paper: "a4", tax: "GST", date: "dmy-slash", cur: "INR" },
+    me: { name: "Middle East", locale: "en-AE", paper: "a4", tax: "VAT", date: "dmy-slash", cur: "AED" }
+  };
+  IG.TAX_NAMES = ["Tax", "Sales tax", "VAT", "GST", "Sales Tax"];
+  IG.guessRegion = function () {
+    const l = (navigator.language || "en-US").toLowerCase();
+    if (l === "en-gb" || l === "en-ie") return "uk";
+    if (/^en-(ca|au|nz)/.test(l) || /^fr-ca/.test(l)) return "ca";
+    if (/^(de|fr|es|it|nl|pt|pl|sv|da|fi|nb|no|cs|sk|hu|ro|el|bg|hr|sl|et|lv|lt)/.test(l)) return "eu";
+    if (/^(ja|zh|ko|th|vi|id|ms|fil)/.test(l) || /^en-(sg|my|ph|hk)/.test(l)) return "asia";
+    if (/^(hi|bn|ur|ta|te|ne|si)/.test(l) || /^en-(in|pk|bd|lk|np)/.test(l)) return "sa";
+    if (/^(ar|he|fa)/.test(l) || /^en-(ae|sa|qa|kw|bh|om)/.test(l)) return "me";
+    return "us";
+  };
+  IG.region = "us";
+  IG.setRegion = function (r) { IG.region = IG.REGIONS[r] ? r : "us"; };
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  IG.formatDate = function (iso, region) {
+    if (!iso) return "";
+    const d = new Date(iso + "T00:00:00");
+    if (isNaN(d)) return iso;
+    const R = IG.REGIONS[region || IG.region] || IG.REGIONS.us;
+    const dd = String(d.getDate()).padStart(2, "0"), mm = String(d.getMonth() + 1).padStart(2, "0"), y = d.getFullYear();
+    switch (R.date) {
+      case "mdy": return MON[d.getMonth()] + " " + d.getDate() + ", " + y;
+      case "dmy-dot": return dd + "." + mm + "." + y;
+      case "dmy-slash": return dd + "/" + mm + "/" + y;
+      case "iso": return y + "-" + mm + "-" + dd;
+      default: return d.getDate() + " " + MON[d.getMonth()] + " " + y;
+    }
+  };
+  /* What the quantity column counts */
+  IG.UNITS = {
+    qty: { name: "Quantity", q: "Qty", r: "Rate" },
+    hours: { name: "Hours", q: "Hours", r: "Rate / hr" },
+    days: { name: "Days", q: "Days", r: "Rate / day" }
+  };
+
   const fmtCache = {};
   IG.money = function (amount, currency) {
     const c = currency || "USD";
+    const loc = (IG.REGIONS[IG.region] || IG.REGIONS.us).locale;
+    const key = loc + c;
     try {
-      if (!fmtCache[c]) {
-        fmtCache[c] = new Intl.NumberFormat("en-US", { style: "currency", currency: c, currencyDisplay: "narrowSymbol" });
+      if (!fmtCache[key]) {
+        fmtCache[key] = new Intl.NumberFormat(loc, { style: "currency", currency: c, currencyDisplay: "narrowSymbol" });
       }
-      return fmtCache[c].format(amount || 0);
+      return fmtCache[key].format(amount || 0);
     } catch (e) {
       return c + " " + (amount || 0).toFixed(2);
     }
@@ -132,7 +178,7 @@
     const s = IG.money(amount, currency);
     // eslint-disable-next-line no-control-regex
     if (/^[\u0000-ÿ€\s\-−.,0-9]*$/.test(s)) return s.replace("−", "-");
-    const digits = new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(amount || 0));
+    const digits = new Intl.NumberFormat((IG.REGIONS[IG.region] || IG.REGIONS.us).locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(amount || 0));
     return (amount < 0 ? "-" : "") + currency + " " + digits;
   };
 

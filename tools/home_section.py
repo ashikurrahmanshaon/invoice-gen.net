@@ -80,7 +80,9 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
               <label for="f-issue">Date</label>{fi("issueDate", "", "Issue date", "date", extra=' id="f-issue"')}
               <label for="f-due">Due date</label>{fi("dueDate", "", "Due date", "date", extra=' id="f-due"')}
               <label for="f-po">PO / ref.</label>{fi("poNumber", "Optional", "PO or reference", extra=' id="f-po"')}
+              <div class="meta-extra" id="metaExtra"></div>
             </div>
+            <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
         </div>
         <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
@@ -105,7 +107,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
         </div>
 
         <div class="sh-items">
-          <div class="items-head" aria-hidden="true"><span>Item</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
+          <div class="items-head" aria-hidden="true"><span>Item</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
           <button type="button" class="add-line" id="addLine">{I(ICONS["plus"])} Add line item</button>
         </div>
@@ -166,7 +168,15 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
       </div>
 
       <div class="sp-card">
+        <label class="sp-field"><span class="sp-h">Region style</span><select class="in" id="region"></select><small class="sp-sub" id="regionHint"></small></label>
         <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
+        <div class="sp-field"><span class="sp-h" id="unitLabel">Bill items by</span>
+          <div class="seg seg-full" id="unitSeg" role="group" aria-labelledby="unitLabel">
+            <button type="button" data-unit="qty" aria-pressed="true">Quantity</button>
+            <button type="button" data-unit="hours" aria-pressed="false">Hours</button>
+            <button type="button" data-unit="days" aria-pressed="false">Days</button>
+          </div>
+        </div>
         <label class="sp-field"><span class="sp-h">Payment due</span>
           <select class="in" id="dueIn">
             <option value="">Custom date</option>

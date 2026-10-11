@@ -13,26 +13,26 @@
 <meta property="og:title" content="Free Receipt Generator: Make a Payment Receipt PDF Online | invoice-gen.net">
 <meta property="og:description" content="Create a professional payment receipt in seconds. Add what was paid, the payment date and method, then download a PDF or email it. Free receipt maker, no sign-up.">
 <meta property="og:url" content="https://invoice-gen.net/receipt-generator/">
-<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=20">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=21">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free Receipt Generator: Make a Payment Receipt PDF Online | invoice-gen.net">
 <meta name="twitter:description" content="Create a professional payment receipt in seconds. Add what was paid, the payment date and method, then download a PDF or email it. Free receipt maker, no sign-up.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=20">
-<link rel="icon" href="/favicon.ico?v=20" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=20" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=20" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=20" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=20">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=20" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=20">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=21">
+<link rel="icon" href="/favicon.ico?v=21" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=21" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=21" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=21" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=21">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=21" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=21">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.css?v=20">
+<link rel="stylesheet" href="/assets/css/style.css?v=21">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
@@ -99,7 +99,9 @@
               <label for="f-issue">Date</label><input class="fi " type="date" data-f="issueDate" placeholder="" aria-label="Issue date" id="f-issue">
               <label for="f-due">Due date</label><input class="fi " type="date" data-f="dueDate" placeholder="" aria-label="Due date" id="f-due">
               <label for="f-po">PO / ref.</label><input class="fi " data-f="poNumber" placeholder="Optional" aria-label="PO or reference" id="f-po">
+              <div class="meta-extra" id="metaExtra"></div>
             </div>
+            <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
         </div>
         <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
@@ -124,7 +126,7 @@
         </div>
 
         <div class="sh-items">
-          <div class="items-head" aria-hidden="true"><span>Item</span><span>Qty</span><span>Rate</span><span>Amount</span><span></span></div>
+          <div class="items-head" aria-hidden="true"><span>Item</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
           <button type="button" class="add-line" id="addLine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add line item</button>
         </div>
@@ -185,7 +187,15 @@
       </div>
 
       <div class="sp-card">
+        <label class="sp-field"><span class="sp-h">Region style</span><select class="in" id="region"></select><small class="sp-sub" id="regionHint"></small></label>
         <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
+        <div class="sp-field"><span class="sp-h" id="unitLabel">Bill items by</span>
+          <div class="seg seg-full" id="unitSeg" role="group" aria-labelledby="unitLabel">
+            <button type="button" data-unit="qty" aria-pressed="true">Quantity</button>
+            <button type="button" data-unit="hours" aria-pressed="false">Hours</button>
+            <button type="button" data-unit="days" aria-pressed="false">Days</button>
+          </div>
+        </div>
         <label class="sp-field"><span class="sp-h">Payment due</span>
           <select class="in" id="dueIn">
             <option value="">Custom date</option>
@@ -384,13 +394,13 @@
   </div>
 </footer>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
-<script src="/assets/js/config.js?v=20" defer></script>
-<script src="/assets/js/core.js?v=20" defer></script>
-<script src="/assets/js/motion.js?v=20" defer></script>
+<script src="/assets/js/config.js?v=21" defer></script>
+<script src="/assets/js/core.js?v=21" defer></script>
+<script src="/assets/js/motion.js?v=21" defer></script>
 <script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script>
 <script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
-<script src="/assets/js/invoice.js?v=20" defer></script>
-<script src="/assets/js/pdf.js?v=20" defer></script>
-<script src="/assets/js/app.js?v=20" defer></script>
+<script src="/assets/js/invoice.js?v=21" defer></script>
+<script src="/assets/js/pdf.js?v=21" defer></script>
+<script src="/assets/js/app.js?v=21" defer></script>
 </body>
 </html>
