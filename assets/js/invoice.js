@@ -13,6 +13,16 @@
     ["MXN", "Mexican Peso"], ["TRY", "Turkish Lira"], ["QAR", "Qatari Riyal"], ["KWD", "Kuwaiti Dinar"]
   ];
 
+  // Labels that change with the document type typed at the top (Invoice, Quote, Receipt...)
+  IG.DOC_TITLES = ["Invoice", "Quotation", "Quote", "Receipt", "Proforma Invoice", "Estimate", "Tax Invoice", "Bill"];
+  IG.docLabels = function (title) {
+    const t = String(title || "").toLowerCase();
+    if (t.indexOf("quot") >= 0) return { no: "Quote no.", due: "Valid until", bal: "Total due" };
+    if (t.indexOf("estimate") >= 0) return { no: "Estimate no.", due: "Valid until", bal: "Estimated total" };
+    if (t.indexOf("receipt") >= 0) return { no: "Receipt no.", due: "Payment date", bal: "Balance due" };
+    return { no: "Invoice no.", due: "Due date", bal: "Balance due" };
+  };
+
   IG.TEMPLATES = ["classic", "modern", "minimal"];
 
   IG.ACCENTS = [["#5b4dff", "Violet"], ["#2563eb", "Blue"], ["#151a2d", "Ink"], ["#0b8a52", "Green"], ["#be185d", "Rose"], ["#c2560c", "Orange"]];

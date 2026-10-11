@@ -71,7 +71,12 @@
     update();
   }
 
+  function docLabels() {
+    const L = IG.docLabels(inv.title), set = (sel, txt) => { const e = $(sel); if (e && e.textContent !== txt) e.textContent = txt; };
+    set('label[for="f-number"]', L.no); set('label[for="f-due"]', L.due); set(".t-due > span", L.bal);
+  }
   function update() {
+    docLabels();
     const t = IG.calc(inv);
     t.lines.forEach((amt, i) => { const c = $('[data-amount="' + i + '"]'); if (c) c.textContent = M(amt); });
     $("#tSub").textContent = M(t.subtotal);
@@ -542,6 +547,14 @@
       inv = Object.assign(IG.blankInvoice(), draft);
       if (!inv.tplPicked) inv.template = "classic";
       if (!inv.tplPicked && /^#(111111|2b5cff)$/i.test(inv.accent || "")) inv.accent = "#5b4dff";
+    }
+    // keyword pages (quote, receipt, estimate...) open with their own document title
+    const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
+    if (pageDoc && (!inv.title || IG.DOC_TITLES.indexOf(inv.title) >= 0)) {
+      inv.title = pageDoc;
+      const pre3 = { Quotation: "QUO", Receipt: "REC", Estimate: "EST", "Proforma Invoice": "PRO", Invoice: "INV" }[pageDoc];
+      const m = /^(INV|QUO|REC|EST|PRO)-(\d+)$/.exec(inv.number || "");
+      if (pre3 && m) inv.number = pre3 + "-" + m[2];
     }
     const pre = IG.store.get("ig_prefill_client", null);
     if (pre) { inv.to = Object.assign({ name: "", email: "", address: "", phone: "" }, pre); IG.store.remove("ig_prefill_client"); }

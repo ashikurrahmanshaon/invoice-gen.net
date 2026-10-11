@@ -6,10 +6,20 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "16"  # asset version, bump to bust browser caches
+V = "17"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
-LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#3f7bff"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#igg)"/><path d="M21.6 16h15.2l8.8 8.8V45a3.2 3.2 0 0 1-3.2 3.2H21.6a3.2 3.2 0 0 1-3.2-3.2V19.2a3.2 3.2 0 0 1 3.2-3.2z" fill="#fff"/><path d="M36.8 16v8.8h8.8z" fill="#d9d2ff"/><path d="m25.2 34.6 4.6 4.6 9.2-10" fill="none" stroke="#5b4dff" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><defs><linearGradient id="igg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7457ff"/><stop offset="1" stop-color="#3b5bff"/></linearGradient><linearGradient id="igs" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".22"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="64" height="64" rx="18" fill="url(#igg)"/><rect width="64" height="64" rx="18" fill="url(#igs)"/><rect x="24" y="12.5" width="24" height="31" rx="4" fill="#fff" fill-opacity=".34"/><path d="M20 18.5h14.5l7.5 7.5v20a4 4 0 0 1-4 4H20a4 4 0 0 1-4-4V22.5a4 4 0 0 1 4-4z" fill="#fff"/><path d="M34.5 18.5V26h7.5z" fill="#c9c0ff"/><rect x="21" y="30" width="11" height="3" rx="1.5" fill="#d9d3ff"/><rect x="21" y="36" width="15" height="3" rx="1.5" fill="#d9d3ff"/><rect x="29" y="42.5" width="8.5" height="3.6" rx="1.8" fill="#5b4dff"/></svg>'
+
+TOOLS = [
+    ("/", "Invoice generator", "Bill a client and get paid"),
+    ("/quote-generator/", "Quote generator", "Price a job before you start"),
+    ("/receipt-generator/", "Receipt generator", "Confirm a payment you received"),
+    ("/proforma-invoice/", "Proforma invoice", "Send a preliminary bill"),
+    ("/estimate-maker/", "Estimate maker", "Give a rough cost upfront"),
+]
+TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
+TOOLS_MENU = "".join(f'<a href="{u}"><span class="np-ico">{TOOL_ICON}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS)
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 def head(title, desc, path, extra_ld=None, noindex=False):
@@ -69,63 +79,80 @@ def head(title, desc, path, extra_ld=None, noindex=False):
     <a class="brand" href="/" aria-label="invoice-gen.net home">{LOGO_SVG}{WORDMARK}</a>
     <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav" aria-label="Menu"><span></span><span></span><span></span></button>
     <nav class="nav" id="nav" aria-label="Main">
-      <a href="/"{' aria-current="page"' if path == "/" else ""}>Invoice generator</a>
-      <a href="/invoice-template/"{' aria-current="page"' if path == "/invoice-template/" else ""}>Templates</a>
-      <a href="/how-to-make-an-invoice/"{' aria-current="page"' if path == "/how-to-make-an-invoice/" else ""}>Guide</a>
-      <a href="#" data-auth="in" data-signout hidden>Log out</a>
-      <a class="btn btn-dark btn-sm" href="/dashboard/" data-auth="in" hidden>Dashboard</a>
-      <a href="/login/" data-auth="out">Log in</a>
-      <a class="btn btn-dark btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
+      <div class="nav-main">
+        <a href="/"{' aria-current="page"' if path == "/" else ""}>Invoice generator</a>
+        <div class="nav-drop">
+          <button type="button" class="nav-drop-btn" aria-expanded="false">Tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="nav-panel">
+            {TOOLS_MENU}
+          </div>
+        </div>
+        <a href="/invoice-template/"{' aria-current="page"' if path == "/invoice-template/" else ""}>Templates</a>
+        <a href="/how-to-make-an-invoice/"{' aria-current="page"' if path == "/how-to-make-an-invoice/" else ""}>Guide</a>
+      </div>
+      <div class="nav-actions">
+        <a href="#" data-auth="in" data-signout hidden>Log out</a>
+        <a class="btn btn-primary btn-sm" href="/dashboard/" data-auth="in" hidden>Dashboard</a>
+        <a href="/login/" data-auth="out">Log in</a>
+        <a class="btn btn-primary btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
+      </div>
     </nav>
   </div>
 </header>
 '''
 
 FOOT = '''<footer class="site-footer">
+  <div class="wrap">
+    <div class="foot-cta">
+      <div>
+        <h2>Make your next invoice in under a minute</h2>
+        <p>Free, no sign-up, no watermark. Download a polished PDF or email it straight to your client.</p>
+      </div>
+      <div class="foot-cta-btns">
+        <a class="btn btn-white" href="/#create">Create an invoice</a>
+        <a class="btn btn-ghost-light" href="/login/?signup=1">Create free account</a>
+      </div>
+    </div>
+  </div>
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="brand" href="/" aria-label="invoice-gen.net home">''' + LOGO_SVG + WORDMARK + '''</a>
-      <p>Free invoices for freelancers and small businesses. Make one, download the PDF, or email it to your client.</p>
-      <a class="btn btn-primary btn-sm" href="/">Make an invoice</a>
+      <p>Professional invoices, quotes and receipts for freelancers and small businesses around the world.</p>
     </div>
     <div>
-      <h2>Make invoices</h2>
+      <h2>Tools</h2>
+      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''</ul>
+    </div>
+    <div>
+      <h2>Resources</h2>
       <ul>
-        <li><a href="/">Invoice generator</a></li>
         <li><a href="/invoice-template/">Invoice templates</a></li>
-        <li><a href="/freelance-invoice/">Freelance invoice</a></li>
         <li><a href="/how-to-make-an-invoice/">How to make an invoice</a></li>
+        <li><a href="/freelance-invoice/">Freelance invoices</a></li>
       </ul>
     </div>
     <div>
-      <h2>Account</h2>
-      <ul>
-        <li><a href="/login/?signup=1">Create free account</a></li>
-        <li><a href="/login/">Log in</a></li>
-        <li><a href="/dashboard/">My invoices</a></li>
-      </ul>
-    </div>
-    <div>
-      <h2>invoice-gen.net</h2>
+      <h2>Company</h2>
       <ul>
         <li><a href="/about/">About</a></li>
         <li><a href="/contact/">Contact</a></li>
         <li><a href="/privacy/">Privacy policy</a></li>
         <li><a href="/terms/">Terms of use</a></li>
+        <li><a href="/login/">Log in</a></li>
       </ul>
     </div>
   </div>
   <div class="wrap foot-base">
-    <span>&copy; <span data-year>2026</span> invoice-gen.net. All rights reserved.</span>
-    <span>Invoices are created in your browser. <a href="/privacy/">How we handle your data</a></span>
+    <span>&copy; <span data-year>2026</span> invoice-gen.net</span>
+    <span>Your invoices stay in your browser unless you save them to your account.</span>
   </div>
 </footer>
 '''
 
-BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
-<script src="/assets/js/config.js?v={V}"></script>
-<script src="/assets/js/core.js?v={V}"></script>
-<script src="/assets/js/motion.js?v={V}"></script>
+BASE_JS = f'''<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js" defer></script>
+<script src="/assets/js/config.js?v={V}" defer></script>
+<script src="/assets/js/core.js?v={V}" defer></script>
+<script src="/assets/js/motion.js?v={V}" defer></script>
 '''
 PDF_JS = '''<script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script>
 <script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
@@ -148,8 +175,8 @@ def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=Tru
         f.write(html)
     print("wrote", out)
 
-ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>'
-ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg>'
+ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg>'
+ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/></svg>'
 
 # ---------------------------------------------------------------- home
 FAQ = [
@@ -177,19 +204,116 @@ HOME = home_section.build(FAQ, ICON_DL, ICON_SEND)
 
 page("/", "Free Invoice Generator: Create, Download & Email PDF Invoices | invoice-gen.net",
      "Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.",
-     HOME, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/pdf.js?v={V}"></script>\n<script src="/assets/js/app.js?v={V}"></script>\n',
+     HOME, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n',
      [app_ld, faq_ld, howto_ld])
+
+# ---------------------------------------------------------------- keyword tool pages
+# Each page is the full working generator, opened with its own document type,
+# plus a short guide and FAQ written for that search.
+GEN_JS = PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n'
+
+def guide_band(h2, intro, cols):
+    items = "".join(f'<div><dt>{t}</dt><dd>{d}</dd></div>' for t, d in cols)
+    return f'''<section class="band" aria-label="{h2}">
+  <div class="wrap split-2">
+    <div>
+      <h2>{h2}</h2>
+      <p class="lede">{intro}</p>
+    </div>
+    <dl class="feat">{items}</dl>
+  </div>
+</section>
+
+'''
+
+def tool_page(path, doc, title, desc, h1, lead, guide, faq):
+    ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
+    ld_app = dict(app_ld, name="invoice-gen.net " + h1.lower(), url=SITE + path, description=desc)
+    crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
+        {"@type": "ListItem", "position": 2, "name": h1, "item": SITE + path}]}
+    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide))
+    page(path, title, desc, main, GEN_JS, [ld_app, ld_faq, crumb])
+
+tool_page("/quote-generator/", "Quotation",
+    "Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net",
+    "Make a professional quote or quotation in minutes. Add your logo, line items, tax and a valid-until date, then download the PDF or email it to your client. Free, no sign-up.",
+    "Free Quote Generator",
+    "Price the job before you start. Fill in the quotation, set how long the price is valid, then download a polished PDF or email it to your client.",
+    ("What to put on a quote", "A clear quote wins the job and avoids arguments later. These are the parts clients look for.", [
+        ("Quote number and date", "So you and your client can refer to the same version."),
+        ("Valid until", "How long the price holds. 14 or 30 days is common."),
+        ("Itemised work", "Each task or product with quantity and price."),
+        ("Tax and discounts", "Show them separately so the total is easy to check."),
+        ("Terms", "Deposit, payment schedule and what is not included."),
+        ("Next step", "Tell the client how to accept, for example by replying to the email.")]),
+    [("What is the difference between a quote and an invoice?", "A quote is the price you offer before the work starts. An invoice asks for payment after the client has agreed and the work or delivery is done. When a quote is accepted, change the title to Invoice and send it as your bill."),
+     ("Is this quote generator free?", "Yes. Creating, downloading and printing quotes is free with no limit and no watermark. A free account lets you save quotes and email them to clients."),
+     ("How long should a quote be valid?", "Most businesses use 14 or 30 days. Set the Valid until date on the quote so the client knows when the price may change."),
+     ("Can I turn a quote into an invoice?", "Yes. Open the quote, change the title at the top from Quotation to Invoice, update the dates and download or send it again.")])
+
+tool_page("/receipt-generator/", "Receipt",
+    "Free Receipt Generator: Make a Payment Receipt PDF Online | invoice-gen.net",
+    "Create a professional payment receipt in seconds. Add what was paid, the payment date and method, then download a PDF or email it. Free receipt maker, no sign-up.",
+    "Free Receipt Generator",
+    "Confirm a payment you received. Fill in the receipt, mark it as paid, then download the PDF or email it to your customer.",
+    ("What to put on a receipt", "A receipt is proof of payment. Customers keep it for their records and tax, so make it complete.", [
+        ("Receipt number", "A unique number for every payment."),
+        ("Payment date", "The day the money was received."),
+        ("What was paid for", "Each item or service with its price."),
+        ("Amount and currency", "The total received, with tax shown if you charge it."),
+        ("Payment method", "Cash, card, bank transfer or PayPal. Add it in the notes."),
+        ("Your business details", "Name, address and tax ID if you have one.")]),
+    [("What is the difference between a receipt and an invoice?", "An invoice asks for payment. A receipt confirms that payment has been received. Many businesses send an invoice first and a receipt once the client pays."),
+     ("How do I show that the receipt is paid?", "Set the status to Paid in the options panel. The receipt gets a Paid stamp and the balance due shows zero once you enter the amount paid."),
+     ("Is the receipt generator free?", "Yes, it's free with no limit and no watermark. You don't need an account to download or print receipts."),
+     ("Can I email a receipt?", "Yes. With a free account, press Send by email and your customer receives the receipt as a PDF attachment.")])
+
+tool_page("/proforma-invoice/", "Proforma Invoice",
+    "Free Proforma Invoice Generator: Create a Proforma Invoice PDF | invoice-gen.net",
+    "Create a proforma invoice online for free. Ideal for advance payments, customs and international orders. Add items, tax and shipping, then download the PDF or email it.",
+    "Free Proforma Invoice Generator",
+    "Send a preliminary bill before the goods ship or the work begins. Fill in the proforma invoice, then download the PDF or email it to your buyer.",
+    ("When to use a proforma invoice", "A proforma invoice tells the buyer exactly what they will be billed, before the sale is final.", [
+        ("Advance payment", "Ask for a deposit or full payment before you start."),
+        ("International orders", "Buyers often need one to arrange import permits or a letter of credit."),
+        ("Customs", "Shows the value and description of goods being shipped."),
+        ("Internal approval", "Lets the buyer's finance team approve the purchase."),
+        ("Shipping and terms", "Include delivery cost, delivery date and payment terms."),
+        ("Final invoice later", "Send a normal invoice once the goods are delivered.")]),
+    [("What is a proforma invoice?", "A proforma invoice is a preliminary bill sent before goods are delivered or work is done. It shows what the buyer will pay but is not a demand for payment in the accounting sense."),
+     ("Is a proforma invoice legally binding?", "Usually not. It's an estimate of the final invoice. Rules differ by country, so check with your accountant for tax purposes."),
+     ("Can I convert a proforma into a final invoice?", "Yes. Change the title at the top to Invoice, update the number and dates, and send it once the order is complete."),
+     ("Is it free?", "Yes. Creating and downloading proforma invoices is free, with no watermark and no sign-up.")])
+
+tool_page("/estimate-maker/", "Estimate",
+    "Free Estimate Maker: Create a Job Estimate PDF Online | invoice-gen.net",
+    "Make a professional estimate for any job in minutes. Itemise labour and materials, add tax and a valid-until date, then download the PDF or email it. Free, no sign-up.",
+    "Free Estimate Maker",
+    "Give your client a clear idea of the cost before you start. Fill in the estimate, then download a polished PDF or email it.",
+    ("What to put on an estimate", "Estimates are approximate, so explain what the price depends on.", [
+        ("Labour and materials", "List them on separate lines so the client sees where the money goes."),
+        ("Valid until", "Prices for materials change. Say how long the estimate holds."),
+        ("Assumptions", "What you expect to find on the job, and what would change the price."),
+        ("Tax", "Add your tax or VAT rate so the total is realistic."),
+        ("Deposit", "If you need one before starting, say how much in the terms."),
+        ("Contact details", "So the client can accept or ask questions quickly.")]),
+    [("What is the difference between an estimate and a quote?", "An estimate is an approximate price that may change as the work goes on. A quote is a fixed price for the work described. Use whichever matches how you price the job."),
+     ("Is the estimate maker free?", "Yes. Make, download and print estimates for free, with no limit and no watermark."),
+     ("Can I turn an estimate into an invoice?", "Yes. When the job is done, change the title to Invoice, adjust the amounts to the final figures and send it."),
+     ("Can I add my logo?", "Yes. Click Add your logo at the top of the estimate. It appears on the PDF too.")])
 
 # ---------------------------------------------------------------- login
 import app_pages
 LOGIN = app_pages.login_markup()
 page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.net to save invoices and clients and email invoices to your clients.",
-     LOGIN, f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/auth.js?v={V}"></script>\n', noindex=True)
+     LOGIN, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/auth.js?v={V}" defer></script>\n', noindex=True)
 
 # ---------------------------------------------------------------- dashboard
 DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
 page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
-     DASH, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}"></script>\n<script src="/assets/js/pdf.js?v={V}"></script>\n<script src="/assets/js/dashboard.js?v={V}"></script>\n', noindex=True, chrome=False)
+     DASH, PDF_JS + f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
 
 # ---------------------------------------------------------------- articles
 def article(path, title, desc, h1, crumbs_name, body, ld=None):
@@ -358,3 +482,17 @@ article("/terms/", "Terms of Use | invoice-gen.net", "The terms for using invoic
 page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist.",
      '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/how-to-make-an-invoice/">Read the guide</a></p></section>''',
      noindex=True)
+
+# ---------------------------------------------------------------- sitemap
+import datetime
+TODAY = datetime.date.today().isoformat()
+SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS if u != "/"] + [
+    ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
+    ("/freelance-invoice/", "monthly", "0.8"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
+    ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
+with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+    for u, c, pr in SITEMAP:
+        f.write(f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>{c}</changefreq><priority>{pr}</priority></url>\n")
+    f.write("</urlset>\n")
+print("wrote sitemap.xml")

@@ -79,9 +79,9 @@
     doc.setFontSize(9.5);
     let my = y + 17;
     const meta = [
-      ["Invoice no.", inv.number],
+      [IG.docLabels(inv.title).no, inv.number],
       ["Issue date", IG.prettyDate(inv.issueDate)],
-      ["Due date", IG.prettyDate(inv.dueDate)]
+      [IG.docLabels(inv.title).due, IG.prettyDate(inv.dueDate)]
     ];
     if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
     meta.forEach(([k, v]) => {
@@ -175,7 +175,7 @@
       doc.setTextColor(...accent);
     }
     doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
-    doc.text("Balance due", TX, y + 1.5); doc.text(M(t.balance), R, y + 1.5, { align: "right" });
+    doc.text(IG.docLabels(inv.title).bal, TX, y + 1.5); doc.text(M(t.balance), R, y + 1.5, { align: "right" });
     const balanceY = y;
     const balancePage = doc.getCurrentPageInfo().pageNumber;
     y += 16;

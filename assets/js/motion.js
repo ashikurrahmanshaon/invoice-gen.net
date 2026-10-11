@@ -18,6 +18,17 @@
       const nav = $(".nav"), t = $(".nav-toggle");
       if (nav && nav.classList.contains("open")) { nav.classList.remove("open"); if (t) t.setAttribute("aria-expanded", "false"); }
     }));
+    // Tools menu: opens on click (and hover on desktop), closes on outside click or Escape
+    const drop = $(".nav-drop"), btn = $(".nav-drop-btn");
+    if (drop && btn) {
+      const setOpen = (o) => { drop.classList.toggle("open", o); btn.setAttribute("aria-expanded", String(o)); };
+      btn.addEventListener("click", (e) => { e.stopPropagation(); setOpen(!drop.classList.contains("open")); });
+      document.addEventListener("click", (e) => { if (!drop.contains(e.target)) setOpen(false); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+      const fine = window.matchMedia("(hover: hover) and (min-width: 861px)");
+      drop.addEventListener("mouseenter", () => { if (fine.matches) setOpen(true); });
+      drop.addEventListener("mouseleave", () => { if (fine.matches) setOpen(false); });
+    }
   }
 
   function reveals() {
