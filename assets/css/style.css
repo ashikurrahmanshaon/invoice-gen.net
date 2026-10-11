@@ -1253,3 +1253,30 @@ body:not(.app-body) { background: #fff; }
 /* phones: a thin progress line on top of the action bar */
 .mobile-bar { --prog: 0; }
 .mobile-bar::before { content: ""; position: absolute; left: 0; top: 0; height: 3px; width: calc(var(--prog) * 100%); background: var(--brand); transition: width .4s var(--ease); }
+
+/* final polish: bigger brand, refined buttons and cards */
+.brand { font-size: 1.2rem; gap: 10px; }
+.brand .brand-mark { width: 40px; height: 40px; border-radius: 50%; }
+.site-footer .brand .brand-mark { width: 40px; height: 40px; }
+.side .brand .brand-mark { width: 36px; height: 36px; }
+@media (max-width: 860px) { .brand .brand-mark { width: 36px; height: 36px; } .brand { font-size: 1.1rem; } }
+
+.btn { letter-spacing: -0.01em; transition: background .18s, color .18s, box-shadow .18s, transform .18s; }
+.btn-primary, .nav a.btn, .site-header .nav a.btn { background: linear-gradient(180deg, #08a877 0%, #059669 100%); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .22), 0 0 0 1px #04805a, 0 2px 6px -2px rgba(4, 120, 87, .45); }
+.btn-primary:hover, .nav a.btn:hover { background: linear-gradient(180deg, #069d6f 0%, #04855d 100%); }
+.btn-primary:focus-visible { box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--brand); outline: none; }
+.btn-white, .btn-line, .btn-ghost { box-shadow: 0 0 0 1px #d7e3dd, 0 1px 2px rgba(15, 23, 42, .05); }
+.btn-white:hover, .btn-line:hover, .btn-ghost:hover { background: #f6fefb; box-shadow: 0 0 0 1px #9fd8bf, 0 1px 2px rgba(15, 23, 42, .05); color: var(--brand-ink); }
+.sp-mini { transition: border-color .15s, background .15s, transform .15s; }
+.sp-mini:hover { background: #f6fefb; transform: translateY(-1px); }
+.tpl-btn { transition: border-color .15s, background .15s, transform .15s; }
+.tpl-btn:hover { transform: translateY(-1px); }
+.how li, .feat div, .guides a, .qa, .facts div { transition: box-shadow .2s, transform .2s; }
+.how li:hover, .feat div:hover { box-shadow: 0 0 0 1px #cfe9dc, 0 10px 24px -16px rgba(6, 78, 59, .3); }
+.qa[open] { box-shadow: 0 0 0 1px #bfe3d2, 0 8px 20px -14px rgba(6, 78, 59, .25); }
+h2 { letter-spacing: -0.03em; }
+.band h2 { margin-bottom: .55em; }
+.sheet .logo-drop:not(.has-logo) { border-radius: 14px; border: 1.5px dashed #bfe3d2; background: #f6fefb; color: var(--brand-2); }
+.sheet .logo-drop:not(.has-logo):hover, .sheet .logo-drop.drag { border-color: var(--brand); background: var(--brand-soft); color: var(--brand-ink); }
+.sheet .logo-drop.has-logo { border-radius: 12px; }
+.sheet.t-modern .logo-drop:not(.has-logo) { background: rgba(255, 255, 255, .95); }
