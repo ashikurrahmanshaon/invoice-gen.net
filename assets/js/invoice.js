@@ -82,6 +82,11 @@
       },
       to: { name: "", email: "", address: "", phone: "" },
       items: [{ id: IG.uid(), desc: "", qty: 1, rate: 0 }],
+      mode: "standard",
+      service: p.service || "",
+      hourRate: p.hourRate || "",
+      shipTo: "",
+      shifts: [IG.blankShift(today)],
       discount: 0,
       discountType: "%",
       taxLabel: p.taxLabel || IG.REGIONS[reg].tax,
@@ -100,8 +105,50 @@
   };
   const round2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 
+  /* ---------- timesheet (shifts with start, end and break) ---------- */
+  IG.WORK_TYPES = ["Kitchen", "House", "Kitchen & House", "House (Deep Cleaning)", "Bar", "Service", "Front of house", "Cleaning", "Dishwashing", "Delivery", "Event", "Training"];
+  IG.BREAKS = [0, 15, 30, 45, 60, 90];
+  IG.blankShift = function (date) {
+    return { id: IG.uid(), date: date || IG.isoDate(new Date()), type: "", start: "", end: "", brk: 0, hours: "", manual: false };
+  };
+  const mins = (t) => { const m = /^(\d{1,2}):(\d{2})/.exec(t || ""); return m ? (+m[1]) * 60 + (+m[2]) : null; };
+  /* hours between start and end, minus the break; an end at or before the start runs past midnight */
+  IG.autoHours = function (s) {
+    const a = mins(s.start), b = mins(s.end);
+    if (a == null || b == null) return null;
+    let d = b - a;
+    if (d <= 0) d += 1440;
+    d -= +s.brk || 0;
+    return Math.max(0, Math.round((d / 60 + Number.EPSILON) * 100) / 100);
+  };
+  IG.shiftHours = function (s) {
+    if (!s.manual) { const h = IG.autoHours(s); if (h != null) return h; }
+    const n = parseFloat(String(s.hours == null ? "" : s.hours).replace(",", "."));
+    return isFinite(n) && n > 0 ? Math.round(n * 100) / 100 : 0;
+  };
+  IG.totalHours = function (inv) {
+    return Math.round((inv.shifts || []).reduce((a, s) => a + IG.shiftHours(s), 0) * 100) / 100;
+  };
+  IG.isTimesheet = (inv) => inv && inv.mode === "timesheet";
+  IG.effectiveItems = function (inv) {
+    if (!IG.isTimesheet(inv)) return inv.items || [];
+    return [{ id: "ts", desc: (inv.service || "").trim() || "Hours worked", qty: IG.totalHours(inv), rate: inv.hourRate }];
+  };
+  IG.fmtHours = function (h) {
+    const loc = (IG.REGIONS[IG.region] || IG.REGIONS.us).locale;
+    try { return new Intl.NumberFormat(loc, { maximumFractionDigits: 2 }).format(h || 0); } catch (e) { return String(h || 0); }
+  };
+  IG.fmtTime = function (t) {
+    const m = mins(t);
+    if (m == null) return "";
+    const h = Math.floor(m / 60), mm = String(m % 60).padStart(2, "0");
+    if (IG.region === "us") return ((h % 12) || 12) + ":" + mm + (h < 12 ? " AM" : " PM");
+    return String(h).padStart(2, "0") + ":" + mm;
+  };
+  IG.fmtBreak = (b) => (+b ? (+b) + " min" : "0 min");
+
   IG.calc = function (inv) {
-    const lines = inv.items.map((it) => round2(num(it.qty) * num(it.rate)));
+    const lines = IG.effectiveItems(inv).map((it) => round2(num(it.qty) * num(it.rate)));
     const subtotal = round2(lines.reduce((a, b) => a + b, 0));
     const discount = inv.discountType === "%" ? round2(subtotal * num(inv.discount) / 100) : round2(num(inv.discount));
     const afterDiscount = Math.max(0, subtotal - discount);

@@ -53,6 +53,7 @@
     const ink = [22, 33, 58], soft = [86, 97, 118], faint = [138, 147, 165];
 
     doc.setProperties({ title: clean((inv.title || "Invoice") + " " + inv.number), creator: "invoice-gen.net" });
+    if (IG.isTimesheet && IG.isTimesheet(inv)) return buildTimesheet(doc, inv, t, M, accent);
 
     const T = ["modern", "minimal"].indexOf(inv.template) >= 0 ? inv.template : "classic";
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
@@ -227,6 +228,203 @@
     }
     return doc;
   };
+
+  /* Timesheet invoice: header, Bill to | Ship to, a one-line summary, then the
+     shift table on the left with the totals and notes beside it */
+  function buildTimesheet(doc, inv, t, M, accent) {
+    const W = doc.internal.pageSize.getWidth();
+    const H = doc.internal.pageSize.getHeight();
+    const L = 15, R = W - 15;
+    const ink = [24, 32, 48], soft = [84, 94, 112], faint = [134, 143, 160], rule = [222, 227, 234];
+    const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
+    const head = accent;
+    const totalH = IG.totalHours(inv);
+    const rate = Number(inv.hourRate) || 0;
+    const H2 = (h) => IG.fmtHours(h);
+
+    // left: logo, then the worker or business name and contact lines
+    let y = 16;
+    let ly = y + 5;
+    const fmt = imageFormat(inv.logo);
+    if (fmt) {
+      try {
+        const boxW = 46, boxH = 20;
+        let w = boxW, h = boxH;
+        if (inv.logoW && inv.logoH) { const r = Math.min(boxW / inv.logoW, boxH / inv.logoH); w = inv.logoW * r; h = inv.logoH * r; }
+        doc.addImage(inv.logo, fmt, L, y, w, h, undefined, "FAST");
+        ly = y + h + 8;
+      } catch (e) { /* skip a logo jsPDF can't read */ }
+    }
+    const leftW = 92;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(17); doc.setTextColor(...ink);
+    const nm = doc.splitTextToSize(clean(inv.from.name || ""), leftW);
+    doc.text(nm, L, ly); ly += nm.length * 6.6;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
+    [inv.from.address, inv.from.email, inv.from.phone, inv.from.taxId ? "Tax / VAT ID: " + inv.from.taxId : ""].forEach((line) => {
+      if (!String(line || "").trim()) return;
+      const parts = doc.splitTextToSize(clean(line), leftW);
+      doc.text(parts, L, ly); ly += parts.length * 4.5;
+    });
+
+    // right: big title, number, dates and the balance box
+    doc.setFont("helvetica", "bold"); doc.setFontSize(28); doc.setTextColor(...ink);
+    doc.text(clean((inv.title || "Invoice").toUpperCase()), R, y + 9, { align: "right" });
+    doc.setFont("helvetica", "normal"); doc.setFontSize(11.5); doc.setTextColor(...faint);
+    doc.text(clean("# " + (inv.number || "")), R, y + 16.5, { align: "right" });
+    let my = y + 26;
+    const meta = [["Date:", IG.prettyDate(inv.issueDate)], [IG.docLabels(inv.title).due + ":", IG.prettyDate(inv.dueDate)]];
+    if (inv.poNumber) meta.push(["PO / ref.:", inv.poNumber]);
+    (inv.fields || []).forEach((f) => { if (String(f.label || "").trim() && String(f.value || "").trim()) meta.push([String(f.label).trim() + ":", String(f.value).trim()]); });
+    doc.setFontSize(9.5);
+    meta.forEach(([k, v]) => {
+      if (!v) return;
+      doc.setFont("helvetica", "normal"); doc.setTextColor(...soft); doc.text(clean(k), R - 40, my, { align: "right" });
+      doc.setTextColor(...ink); doc.text(clean(v), R - 2, my, { align: "right" });
+      my += 5.6;
+    });
+    my += 0.6;
+    doc.setFillColor(243, 245, 248);
+    doc.roundedRect(R - 86, my - 5, 86, 9, 1.2, 1.2, "F");
+    doc.setFont("helvetica", "bold"); doc.setFontSize(10.5); doc.setTextColor(...ink);
+    doc.text(clean(IG.docLabels(inv.title).bal + ":"), R - 40, my + 0.8, { align: "right" });
+    doc.text(M(t.balance), R - 2, my + 0.8, { align: "right" });
+    my += 8;
+
+    // Bill to | Ship to, under the name, beside the dates and balance
+    y = ly + 7;
+    const hasShip = !!String(inv.shipTo || "").trim();
+    const leftEnd = R - 92;
+    const colW = hasShip ? (leftEnd - L - 10) / 2 : leftEnd - L;
+    function party(label, lines, boldFirst, x) {
+      let py = y;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...faint);
+      doc.text(label, x, py); py += 5.2;
+      lines.forEach((line, i) => {
+        if (!String(line || "").trim()) return;
+        const strong = boldFirst ? i === 0 : true;
+        doc.setFont("helvetica", strong ? "bold" : "normal"); doc.setFontSize(strong ? 10 : 9); doc.setTextColor(...(strong ? ink : soft));
+        const parts = doc.splitTextToSize(clean(line), colW);
+        doc.text(parts, x, py); py += parts.length * (strong ? 4.8 : 4.3);
+      });
+      return py;
+    }
+    const endA = party("Bill To:", [inv.to.name, inv.to.address, inv.to.email, inv.to.phone], true, L);
+    let endB = endA;
+    if (hasShip) {
+      const DX = L + colW + 5;
+      endB = party("Ship To:", [inv.shipTo], false, DX + 5);
+      doc.setDrawColor(...rule); doc.setLineWidth(0.4);
+      doc.line(DX, y - 3.5, DX, Math.max(endA, endB) - 2);
+    }
+    y = Math.max(endA, endB, my) + 5;
+
+    // summary line
+    doc.autoTable({
+      startY: y,
+      margin: { left: L, right: W - R },
+      head: [["Item", "Quantity", "Rate", "Amount"]],
+      body: [[clean((inv.service || "").trim() || "Hours worked"), H2(totalH), M(rate), M(t.lines[0] || 0)]],
+      theme: "plain",
+      styles: { font: "helvetica", fontSize: 9.5, textColor: ink, cellPadding: { top: 3, bottom: 3, left: 3, right: 3 }, lineColor: rule, lineWidth: { bottom: 0.3 } },
+      headStyles: { fillColor: head, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 9, lineWidth: 0 },
+      columnStyles: { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 26 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
+      didParseCell: (d) => { if (d.section === "head" && d.column.index > 0) d.cell.styles.halign = "right"; }
+    });
+    const y0 = doc.lastAutoTable.finalY + 7;
+    const page0 = doc.getCurrentPageInfo().pageNumber;
+
+    // shift table (left)
+    const TW = 118;
+    const tw = inv.region === "us" ? 17 : 13.5;
+    const shifts = (inv.shifts || []).filter((s) => IG.shiftHours(s) > 0 || String(s.type || "").trim() || s.start || s.end);
+    const body = shifts.map((s) => [IG.formatDate(s.date, inv.region) || "", clean(s.type || ""), IG.fmtTime(s.start), IG.fmtTime(s.end), IG.fmtBreak(s.brk), H2(IG.shiftHours(s))]);
+    doc.autoTable({
+      startY: y0,
+      margin: { left: L, right: W - (L + TW), top: 16, bottom: 18 },
+      head: [["Date", "Work type", "Start", "End", "Break", "Hours"]],
+      body: body.length ? body : [["", "", "", "", "", "0"]],
+      foot: [["", "Total", "", "", "", H2(totalH)]],
+      showFoot: "lastPage",
+      showHead: "everyPage",
+      theme: "plain",
+      styles: { font: "helvetica", fontSize: 8, textColor: ink, cellPadding: { top: 1.9, bottom: 1.9, left: 2, right: 2 }, overflow: "linebreak" },
+      headStyles: { fillColor: head, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8 },
+      footStyles: { fillColor: mix(head, 0.88), textColor: ink, fontStyle: "bold", fontSize: 8.5 },
+      alternateRowStyles: { fillColor: [246, 247, 249] },
+      columnStyles: { 0: { cellWidth: inv.region === "us" ? 22 : 20 }, 1: { cellWidth: "auto" }, 2: { cellWidth: tw, halign: "center" }, 3: { cellWidth: tw, halign: "center" }, 4: { cellWidth: 15, halign: "center" }, 5: { cellWidth: 13, halign: "right" } },
+      rowPageBreak: "avoid",
+      didParseCell: (d) => {
+        if (d.section !== "body" && d.column.index >= 2) d.cell.styles.halign = d.column.index === 5 ? "right" : "center";
+      }
+    });
+    const lastPage = doc.getNumberOfPages();
+
+    // totals and notes (right column, beside the table)
+    const RX = L + TW + 8;
+    const RW = R - RX;
+    doc.setPage(page0);
+    let pg = page0;
+    let ry = y0 + 4;
+    const room = (h) => {
+      if (ry + h <= H - 16) return;
+      pg += 1;
+      if (pg > doc.getNumberOfPages()) doc.addPage();
+      doc.setPage(pg); ry = 20;
+    };
+    const line = (k, v, bold, size) => {
+      room(6);
+      doc.setFont("helvetica", bold ? "bold" : "normal"); doc.setFontSize(size || 9.5);
+      doc.setTextColor(...(bold ? ink : soft)); doc.text(clean(k), RX, ry);
+      doc.setTextColor(...ink); doc.text(clean(v), R, ry, { align: "right" });
+      ry += bold ? 6.6 : 6;
+    };
+    const divider = () => { doc.setDrawColor(...rule); doc.setLineWidth(0.35); doc.line(RX, ry - 3, R, ry - 3); ry += 2.6; };
+    line("Total Hours:", H2(totalH) + " h");
+    line("Rate:", M(rate) + " / h");
+    line("Subtotal:", M(t.subtotal));
+    if (t.discount) line("Discount" + (inv.discountType === "%" ? " (" + inv.discount + "%)" : "") + ":", "-" + M(t.discount));
+    if (Number(inv.taxRate) > 0) line((inv.taxLabel || "Tax") + " (" + inv.taxRate + "%):", M(t.tax));
+    if (t.shipping) line("Shipping:", M(t.shipping));
+    divider();
+    line("Total:", M(t.total), true, 11);
+    if (t.paid) {
+      line("Amount paid:", "-" + M(t.paid));
+      room(10);
+      doc.setFillColor(...mix(accent, 0.9));
+      doc.roundedRect(RX - 2, ry - 5, RW + 2, 8.6, 1.2, 1.2, "F");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10); doc.setTextColor(...accent);
+      doc.text(clean(IG.docLabels(inv.title).bal + ":"), RX, ry); doc.text(M(t.balance), R - 1.5, ry, { align: "right" });
+      ry += 8;
+    }
+    divider();
+    const block = (label, text) => {
+      if (!String(text || "").trim()) return;
+      room(10);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...ink);
+      doc.text(label, RX, ry); ry += 4.8;
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...soft);
+      doc.splitTextToSize(clean(text), RW).forEach((ln) => { room(4.2); doc.text(ln, RX, ry); ry += 4.1; });
+      ry += 3;
+    };
+    block("Notes:", inv.notes);
+    block("Terms:", inv.terms);
+
+    if (inv.status === "paid") {
+      doc.setPage(1);
+      doc.setTextColor(14, 124, 90); doc.setFont("helvetica", "bold"); doc.setFontSize(34);
+      doc.text("PAID", W / 2 - 4, 36, { angle: 12 });
+    }
+
+    const pages = doc.getNumberOfPages();
+    for (let i = 1; pages > 1 && i <= pages; i++) {
+      doc.setPage(i);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...faint);
+      doc.text(clean((inv.title || "Invoice") + " " + (inv.number || "")), L, H - 9);
+      doc.text("Page " + i + " of " + pages, R, H - 9, { align: "right" });
+    }
+    doc.setPage(Math.max(lastPage, pg));
+    return doc;
+  }
 
   IG.pdfFileName = function (inv) {
     const base = (inv.number || "invoice") + (inv.to && inv.to.name ? "-" + inv.to.name : "");

@@ -47,8 +47,66 @@
     showLogo();
     renderItems();
     unitLabels();
+    setMode(inv.mode, false);
+    renderShifts();
     $$("#sheet textarea").forEach(autosize);
   }
+
+  /* ---------- timesheet mode ---------- */
+  const ICO_COPY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>';
+  const ICO_X = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>';
+  const isTs = () => IG.isTimesheet(inv);
+  function setMode(m, save) {
+    m = m === "timesheet" ? "timesheet" : "standard";
+    const was = inv.mode;
+    inv.mode = m;
+    if (!Array.isArray(inv.shifts) || !inv.shifts.length) inv.shifts = [IG.blankShift(inv.issueDate)];
+    $("#create").classList.toggle("is-ts", m === "timesheet");
+    $$("#modeSwitch [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
+    if (save && was !== m) {
+      const sec = $(m === "timesheet" ? ".sh-time" : ".sh-items");
+      if (sec && !reduce()) { sec.classList.remove("mode-in"); void sec.offsetWidth; sec.classList.add("mode-in"); }
+      if (m === "timesheet") renderShifts();
+      update(); changed();
+    }
+  }
+  function hoursValue(sh) {
+    if (sh.manual) return sh.hours == null ? "" : String(sh.hours);
+    const h = IG.autoHours(sh);
+    return h == null ? (sh.hours ? String(sh.hours) : "") : String(h);
+  }
+  function renderShifts() {
+    const box = $("#tsRows"); if (!box) return;
+    inv.shifts = Array.isArray(inv.shifts) && inv.shifts.length ? inv.shifts : [IG.blankShift(inv.issueDate)];
+    const brk = IG.BREAKS.map((b) => '<option value="' + b + '">' + (b ? b + " min" : "None") + "</option>").join("");
+    box.innerHTML = inv.shifts.map((sh, i) => {
+      const n = i + 1;
+      return '<div class="ts-row" data-row="' + i + '">' +
+        '<label class="tr-date"><span class="ir-l">Date</span><input class="fi" type="date" data-s="' + i + '" data-sk="date" aria-label="Date, shift ' + n + '"></label>' +
+        '<label class="tr-type"><span class="ir-l">Work type</span><input class="fi" list="workTypes" data-s="' + i + '" data-sk="type" placeholder="Kitchen" autocomplete="off" aria-label="Work type, shift ' + n + '"></label>' +
+        '<label class="tr-start"><span class="ir-l">Start</span><input class="fi" type="time" data-s="' + i + '" data-sk="start" aria-label="Start time, shift ' + n + '"></label>' +
+        '<label class="tr-end"><span class="ir-l">End</span><input class="fi" type="time" data-s="' + i + '" data-sk="end" aria-label="End time, shift ' + n + '"></label>' +
+        '<label class="tr-brk"><span class="ir-l">Break</span><select class="fi" data-s="' + i + '" data-sk="brk" aria-label="Break, shift ' + n + '">' + brk + "</select></label>" +
+        '<label class="tr-hrs"><span class="ir-l">Hours</span><input class="fi" inputmode="decimal" data-s="' + i + '" data-sk="hours" placeholder="0" aria-label="Hours, shift ' + n + '"></label>' +
+        '<span class="tr-act"><button type="button" class="ir-x" data-sdup="' + i + '" aria-label="Copy shift ' + n + ' to the next day" title="Copy to next day">' + ICO_COPY + '</button>' +
+        '<button type="button" class="ir-x" data-sx="' + i + '" aria-label="Remove shift ' + n + '" title="Remove shift">' + ICO_X + "</button></span></div>";
+    }).join("");
+    inv.shifts.forEach((sh, i) => {
+      const q = (k) => $('[data-s="' + i + '"][data-sk="' + k + '"]', box);
+      q("date").value = sh.date || ""; q("type").value = sh.type || ""; q("start").value = sh.start || ""; q("end").value = sh.end || "";
+      q("brk").value = String(IG.BREAKS.indexOf(+sh.brk) >= 0 ? +sh.brk : 0);
+      q("hours").value = hoursValue(sh);
+      q("hours").classList.toggle("is-manual", !!sh.manual);
+      ["date", "start", "end"].forEach((k) => q(k).classList.toggle("has-v", !!sh[k]));
+    });
+    update();
+  }
+  function nextShift(from) {
+    const c = Object.assign({}, from, { id: IG.uid() });
+    if (from.date) c.date = IG.addDays(from.date, 1);
+    return c;
+  }
+  function shiftsDone() { return Number(inv.hourRate) > 0 && IG.totalHours(inv) > 0; }
 
   /* ---------- region, units, extra fields ---------- */
   function regionHint() {
@@ -124,6 +182,11 @@
     docLabels();
     progress();
     const t = IG.calc(inv);
+    if (isTs()) {
+      const th = $("#tsHours"); if (th) th.textContent = IG.fmtHours(IG.totalHours(inv)) + " h";
+      const tr = $("#tsRate"); if (tr) tr.textContent = M(+inv.hourRate || 0) + " / h";
+      const ta = $("#tsAmount"); if (ta) ta.textContent = M(t.lines[0] || 0);
+    }
     t.lines.forEach((amt, i) => { const c = $('[data-amount="' + i + '"]'); if (c) c.textContent = M(amt); });
     $("#tSub").textContent = M(t.subtotal);
     $("#tDisc").textContent = t.discount ? "-" + M(t.discount) : M(0);
@@ -192,7 +255,7 @@
   }
 
   /* ---------- checks ---------- */
-  function itemsDone() { return inv.items.some((it) => String(it.desc).trim() && Number(it.rate) > 0); }
+  function itemsDone() { return isTs() ? shiftsDone() : inv.items.some((it) => String(it.desc).trim() && Number(it.rate) > 0); }
   function flag(el, msg) {
     if (!el) return;
     el.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" });
@@ -203,6 +266,8 @@
   function checkReady() {
     if (!inv.from.name.trim()) { flag($('[data-f="from.name"]'), "Add your business name at the top of the invoice."); return false; }
     if (!inv.to.name.trim()) { flag($('[data-f="to.name"]'), "Add who the invoice is for under Bill to."); return false; }
+    if (isTs() && !(Number(inv.hourRate) > 0)) { flag($("#f-hourRate"), "Add your rate per hour."); return false; }
+    if (isTs() && !(IG.totalHours(inv) > 0)) { flag($('[data-s="0"][data-sk="start"]'), "Add at least one shift with a start and end time."); return false; }
     if (!itemsDone()) {
       const first = inv.items.findIndex((it) => !String(it.desc).trim() || !(Number(it.rate) > 0));
       const i = first < 0 ? 0 : first;
@@ -306,7 +371,7 @@
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
       name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
       currency: inv.currency, region: inv.region, accent: inv.accent, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
-      taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms
+      taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms, service: inv.service, hourRate: inv.hourRate
     });
     IG.store.set("ig_profile", p);
     if (IG.cloud && user) {
@@ -384,7 +449,7 @@
   function newInvoice() {
     if (!window.confirm("Start a new invoice? Your business details and logo stay; the client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
-    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate };
+    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate, mode: inv.mode, service: inv.service, hourRate: inv.hourRate, shipTo: inv.shipTo };
     inv = Object.assign(IG.blankInvoice(), keep);
     const url = new URL(window.location.href);
     url.searchParams.delete("id");
@@ -468,7 +533,7 @@
       if (el.tagName === "TEXTAREA") autosize(el);
       if (el.dataset.f) {
         let v = el.value;
-        if (["discount", "taxRate", "shipping", "paid"].includes(el.dataset.f)) v = v.replace(/[^\d.]/g, "");
+        if (["discount", "taxRate", "shipping", "paid", "hourRate"].includes(el.dataset.f)) v = v.replace(",", ".").replace(/[^\d.]/g, "");
         setPath(inv, el.dataset.f, v);
         if (el.dataset.f === "issueDate" || el.dataset.f === "dueDate") {
           if (el.dataset.f === "issueDate" && $("#dueIn").value !== "") { inv.dueDate = IG.addDays(inv.issueDate, +$("#dueIn").value); $('[data-f="dueDate"]').value = inv.dueDate; }
@@ -477,7 +542,7 @@
       } else if (el.dataset.k) {
         const it = inv.items[+el.dataset.i];
         if (!it) return;
-        it[el.dataset.k] = el.dataset.k === "desc" ? el.value : el.value.replace(/[^\d.]/g, "");
+        it[el.dataset.k] = el.dataset.k === "desc" ? el.value : el.value.replace(",", ".").replace(/[^\d.]/g, "");
       } else return;
       update();
       changed();
@@ -519,6 +584,69 @@
       const rows = $$("#itemRows .item-row"), last = rows[rows.length - 1];
       last.classList.add("row-in");
       $('[data-k="desc"]', last).focus();
+      changed();
+    });
+
+    // timesheet
+    $("#workTypes").innerHTML = IG.WORK_TYPES.map((w) => '<option value="' + esc(w) + '">').join("");
+    $("#modeSwitch").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-mode]"); if (!b) return;
+      setMode(b.dataset.mode, true);
+      if (b.dataset.mode === "timesheet") IG.toast("Timesheet invoice: add each shift and the hours are worked out for you.", "ok");
+    });
+    const tsInput = (e) => {
+      const el = e.target.closest("[data-sk]"); if (!el) return;
+      const sh = inv.shifts[+el.dataset.s]; if (!sh) return;
+      el.classList.remove("invalid");
+      const k = el.dataset.sk;
+      if (k === "hours") {
+        const v = el.value.replace(",", ".").replace(/[^\d.]/g, "");
+        sh.hours = v; sh.manual = v !== "";
+        el.classList.toggle("is-manual", sh.manual);
+      } else {
+        sh[k] = k === "brk" ? +el.value : el.value;
+        if (el.type === "time" || el.type === "date") el.classList.toggle("has-v", !!el.value);
+        if (k === "start" || k === "end" || k === "brk") {
+          const h = IG.autoHours(sh);
+          if (h != null) { sh.manual = false; sh.hours = h; const hi = $('[data-s="' + el.dataset.s + '"][data-sk="hours"]'); if (hi && document.activeElement !== hi) { hi.value = String(h); hi.classList.remove("is-manual"); } }
+        }
+      }
+      update(); changed();
+    };
+    $("#tsRows").addEventListener("input", tsInput);
+    $("#tsRows").addEventListener("change", (e) => { if (e.target.tagName === "SELECT") tsInput(e); });
+    $("#tsRows").addEventListener("click", (e) => {
+      const d = e.target.closest("[data-sdup]"), x = e.target.closest("[data-sx]");
+      if (d) {
+        const i = +d.dataset.sdup;
+        inv.shifts.splice(i + 1, 0, nextShift(inv.shifts[i]));
+        renderShifts(); changed();
+        const row = $('#tsRows [data-row="' + (i + 1) + '"]'); if (row && !reduce()) row.classList.add("row-in");
+        return;
+      }
+      if (!x) return;
+      const row = x.closest(".ts-row");
+      const finish = () => {
+        inv.shifts.splice(+x.dataset.sx, 1);
+        if (!inv.shifts.length) inv.shifts.push(IG.blankShift(inv.issueDate));
+        renderShifts(); changed();
+      };
+      if (!reduce()) { row.classList.add("row-out"); setTimeout(finish, 200); } else finish();
+    });
+    $("#tsRows").addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && e.target.dataset.sk === "hours" && +e.target.dataset.s === inv.shifts.length - 1) { e.preventDefault(); $("#addShift").click(); }
+    });
+    $("#addShift").addEventListener("click", () => {
+      if (inv.shifts.length >= 200) return IG.toast("A timesheet can have up to 200 shifts.");
+      const last = inv.shifts[inv.shifts.length - 1];
+      const fresh = last && (last.start || last.end || last.type) ? nextShift(last) : IG.blankShift(last && last.date ? IG.addDays(last.date, 1) : inv.issueDate);
+      inv.shifts.push(fresh);
+      renderShifts();
+      const rows = $$("#tsRows .ts-row"), lastRow = rows[rows.length - 1];
+      if (!reduce()) lastRow.classList.add("row-in");
+      const f = $('[data-sk="' + (fresh.start ? "end" : "start") + '"]', lastRow);
+      if (f) f.focus({ preventScroll: true });
+      lastRow.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "nearest" });
       changed();
     });
 
@@ -595,7 +723,9 @@
       if (!li) return;
       const step = li.dataset.step;
       let el = step === "from" ? $('[data-f="from.name"]') : step === "to" ? $('[data-f="to.name"]') : null;
-      if (step === "items") {
+      if (step === "items" && isTs()) {
+        el = !(Number(inv.hourRate) > 0) ? $("#f-hourRate") : $('[data-s="' + Math.max(0, inv.shifts.findIndex((x) => !IG.shiftHours(x))) + '"][data-sk="start"]');
+      } else if (step === "items") {
         const i = Math.max(0, inv.items.findIndex((it) => !String(it.desc).trim() || !(Number(it.rate) > 0)));
         el = !String(inv.items[i].desc).trim() ? $('[data-i="' + i + '"][data-k="desc"]') : $('[data-i="' + i + '"][data-k="rate"]');
       }
@@ -661,6 +791,9 @@
       const m = /^(INV|QUO|REC|EST|PRO)-(\d+)$/.exec(inv.number || "");
       if (pre3 && m) inv.number = pre3 + "-" + m[2];
     }
+    const pageMode = ($("#create") && $("#create").dataset.mode) || "";
+    if (pageMode) inv.mode = pageMode;
+    if (!Array.isArray(inv.shifts) || !inv.shifts.length) inv.shifts = [IG.blankShift(inv.issueDate)];
     const pre = IG.store.get("ig_prefill_client", null);
     if (pre) { inv.to = Object.assign({ name: "", email: "", address: "", phone: "" }, pre); IG.store.remove("ig_prefill_client"); }
     fillFields();

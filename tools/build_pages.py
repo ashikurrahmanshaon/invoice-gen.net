@@ -6,7 +6,7 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "23"  # asset version, bump to bust browser caches
+V = "24"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
 LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#059669"/><g transform="translate(32 32) scale(1.24) translate(-32 -32)"><path d="M23 15h18a3 3 0 0 1 3 3v31l-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4V18a3 3 0 0 1 3-3z" fill="#fff"/><path d="m26.2 31.8 4.2 4.2 8.2-8.6" fill="none" stroke="#059669" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>'
@@ -17,6 +17,7 @@ TOOLS = [
     ("/receipt-generator/", "Receipt generator", "Confirm a payment you received"),
     ("/proforma-invoice/", "Proforma invoice", "Send a preliminary bill"),
     ("/estimate-maker/", "Estimate maker", "Give a rough cost upfront"),
+    ("/timesheet-invoice/", "Timesheet invoice", "Bill shifts and hours worked"),
 ]
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
 TOOLS_MENU = "".join(f'<a href="{u}"><span class="np-ico">{TOOL_ICON}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS)
@@ -188,6 +189,7 @@ ICON_SEND = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 
 # ---------------------------------------------------------------- home
 FAQ = [
+    ("Can I bill hours and shifts?", "Yes. Choose Timesheet invoice above the invoice. Add each shift with the date, work type, start, end and break, and the hours and total are worked out for you. The PDF includes the full timesheet."),
     ("Is invoice-gen.net really free?", "Yes. Making invoices, downloading them as PDF and printing are free with no limit. A free account adds saved invoices, saved clients and sending invoices by email."),
     ("Do I need an account to make an invoice?", "No. Fill in the invoice and press Download PDF. Your draft stays in your browser so you can come back to it. Create an account only when you want to save invoices or email them."),
     ("How do I send an invoice by email?", "Log in, fill in the invoice and press Send by email. Add your client's email address and a short message. Your client receives the invoice as a PDF attachment, and their reply goes straight to your email."),
@@ -234,15 +236,33 @@ def guide_band(h2, intro, cols):
 
 '''
 
-def tool_page(path, doc, title, desc, h1, lead, guide, faq):
+def tool_page(path, doc, title, desc, h1, lead, guide, faq, mode=""):
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
     ld_app = dict(app_ld, name="invoice-gen.net " + h1.lower(), url=SITE + path, description=desc)
     crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
         {"@type": "ListItem", "position": 2, "name": h1, "item": SITE + path}]}
-    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide))
+    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide), mode=mode)
     page(path, title, desc, main, GEN_JS, [ld_app, ld_faq, crumb])
+
+tool_page("/timesheet-invoice/", "Invoice",
+    "Free Timesheet Invoice Generator: Bill Hours and Shifts as a PDF | invoice-gen.net",
+    "Turn your shifts into a professional invoice. Enter the date, work type, start and end time and break of each shift; hours and totals are worked out for you. Ideal for restaurant, kitchen, cleaning and hourly work. Free PDF, no sign-up.",
+    "Free Timesheet Invoice Generator",
+    "Bill the hours you worked. Add each shift with its start, end and break, and the hours, total and tax are worked out for you. Then download a clean PDF with your timesheet attached.",
+    ("What goes on a timesheet invoice", "Hourly workers in restaurants, kitchens, hotels, cleaning and events are paid for time. A clear timesheet invoice shows every shift, so the client can check it and pay quickly.", [
+        ("Every shift", "Date, work type, start and end time, break and hours for each day you worked."),
+        ("Breaks taken off", "Unpaid breaks are subtracted, so the hours match what you are owed."),
+        ("Night shifts", "A shift that ends after midnight, like 22:00 to 02:00, still counts the right hours."),
+        ("Total hours and rate", "One summary line: total hours times your rate per hour."),
+        ("Tax and registration", "Add VAT or sales tax, and your tax or company number in the notes."),
+        ("Where you worked", "Add the work address. It shows next to the client as Ship to.")]),
+    [("How are the hours worked out?", "Hours are the time from start to end, minus the break. If the end time is earlier than the start, the shift ran past midnight and the hours are counted correctly. You can also type the hours yourself."),
+     ("Can I add my logo?", "Yes. Tap Add your logo at the top of the invoice. It appears on the PDF above your name."),
+     ("Who is this for?", "Anyone paid by the hour: kitchen and restaurant staff, house and cleaning help, bar and event staff, carers, tutors and freelancers who track time."),
+     ("Is it free?", "Yes. Creating and downloading timesheet invoices is free, with no watermark and no sign-up. A free account saves your invoices and lets you email them.")],
+    mode="timesheet")
 
 tool_page("/quote-generator/", "Quotation",
     "Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net",
