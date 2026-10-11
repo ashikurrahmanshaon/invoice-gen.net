@@ -25,7 +25,7 @@
 
   IG.TEMPLATES = ["classic", "modern", "minimal"];
 
-  IG.ACCENTS = [["#1d4ed8", "Blue"], ["#0f172a", "Navy"], ["#15803d", "Green"], ["#7c3aed", "Purple"], ["#be123c", "Red"], ["#c2410c", "Orange"]];
+  IG.ACCENTS = [["#047857", "Emerald"], ["#0f172a", "Navy"], ["#1d4ed8", "Blue"], ["#7c3aed", "Purple"], ["#be123c", "Red"], ["#c2410c", "Orange"]];
 
   const pad = (n) => String(n).padStart(2, "0");
   IG.isoDate = function (d) {
@@ -70,7 +70,7 @@
       poNumber: "",
       currency: p.currency || "USD",
       template: (p.tplPicked && p.template) || "classic",
-      accent: p.accent || "#1d4ed8",
+      accent: p.accent || "#047857",
       logo: p.logo || null,
       logoW: p.logoW || 0,
       logoH: p.logoH || 0,

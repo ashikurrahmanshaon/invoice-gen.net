@@ -75,8 +75,18 @@
     const L = IG.docLabels(inv.title), set = (sel, txt) => { const e = $(sel); if (e && e.textContent !== txt) e.textContent = txt; };
     set('label[for="f-number"]', L.no); set('label[for="f-due"]', L.due); set(".t-due > span", L.bal);
   }
+  function progress() {
+    const steps = { from: !!inv.from.name.trim(), to: !!inv.to.name.trim(), items: itemsDone() };
+    const n = Object.values(steps).filter(Boolean).length;
+    $$(".spp-list li").forEach((li) => li.classList.toggle("done", !!steps[li.dataset.step]));
+    const bar = $("#progBar"), txt = $("#progText"), box = $(".sp-progress");
+    if (bar) bar.style.width = (n / 3) * 100 + "%";
+    if (txt) txt.textContent = n === 3 ? "Ready to download" : n + " of 3 done";
+    if (box) box.classList.toggle("ready", n === 3);
+  }
   function update() {
     docLabels();
+    progress();
     const t = IG.calc(inv);
     t.lines.forEach((amt, i) => { const c = $('[data-amount="' + i + '"]'); if (c) c.textContent = M(amt); });
     $("#tSub").textContent = M(t.subtotal);
@@ -503,6 +513,20 @@
     });
 
     $("#downloadBtn").addEventListener("click", downloadPdf);
+    document.addEventListener("click", (e) => {
+      const li = e.target.closest(".spp-list li");
+      if (!li) return;
+      const step = li.dataset.step;
+      let el = step === "from" ? $('[data-f="from.name"]') : step === "to" ? $('[data-f="to.name"]') : null;
+      if (step === "items") {
+        const i = Math.max(0, inv.items.findIndex((it) => !String(it.desc).trim() || !(Number(it.rate) > 0)));
+        el = !String(inv.items[i].desc).trim() ? $('[data-i="' + i + '"][data-k="desc"]') : $('[data-i="' + i + '"][data-k="rate"]');
+      }
+      if (!el) return;
+      if (document.documentElement.classList.contains("sheet-open")) closeOptions();
+      el.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" });
+      setTimeout(() => el.focus({ preventScroll: true }), 250);
+    });
     $("#mDownload").addEventListener("click", downloadPdf);
     $("#sendBtn").addEventListener("click", openSend);
     $("#mSend").addEventListener("click", openSend);
@@ -546,7 +570,7 @@
     } else {
       inv = Object.assign(IG.blankInvoice(), draft);
       if (!inv.tplPicked) inv.template = "classic";
-      if (!inv.tplPicked && /^#(111111|2b5cff|5b4dff|0b0f0c)$/i.test(inv.accent || "")) inv.accent = "#1d4ed8";
+      if (!inv.tplPicked && /^#(111111|2b5cff|5b4dff|0b0f0c|1d4ed8)$/i.test(inv.accent || "")) inv.accent = "#047857";
     }
     // keyword pages (quote, receipt, estimate...) open with their own document title
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";

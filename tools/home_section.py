@@ -137,6 +137,15 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
 
     <aside class="side-panel" id="sidePanel" aria-label="Invoice options">
       <div class="sp-sheet-head"><span class="sp-grab" aria-hidden="true"></span><b>Invoice options</b><button type="button" class="btn btn-ink btn-sm" id="spClose">Done</button></div>
+      <div class="sp-card sp-progress" aria-live="polite">
+        <div class="spp-head"><b>Your progress</b><span id="progText">0 of 3 done</span></div>
+        <div class="spp-bar"><i id="progBar"></i></div>
+        <ul class="spp-list">
+          <li data-step="from"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Your business name</button></li>
+          <li data-step="to"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Who it's for</button></li>
+          <li data-step="items"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>An item with a price</button></li>
+        </ul>
+      </div>
       <div class="sp-card sp-actions">
         <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button">{ICON_DL} Download PDF</button>
         <button class="btn btn-white btn-block" id="sendBtn" type="button">{ICON_SEND} Send by email</button>
