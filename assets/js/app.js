@@ -147,7 +147,7 @@
       const row = document.createElement("div");
       row.className = "item-row";
       row.innerHTML =
-        '<label class="ir-desc"><span class="sr-only">Item ' + (i + 1) + ' description</span><textarea class="fi" rows="1" data-i="' + i + '" data-k="desc" placeholder="Description of item or service"></textarea></label>' +
+        '<label class="ir-desc"><span class="ir-l">Item ' + (i + 1) + '</span><textarea class="fi" rows="1" data-i="' + i + '" data-k="desc" placeholder="Description of item or service"></textarea></label>' +
         '<label class="ir-qty"><span class="ir-l">Qty</span><input class="fi" inputmode="decimal" data-i="' + i + '" data-k="qty" aria-label="Quantity, item ' + (i + 1) + '"></label>' +
         '<label class="ir-rate"><span class="ir-l">Rate</span><input class="fi" inputmode="decimal" data-i="' + i + '" data-k="rate" placeholder="0.00" aria-label="Rate, item ' + (i + 1) + '"></label>' +
         '<span class="ir-amt"><span class="ir-l">Amount</span><b data-amount="' + i + '"></b></span>' +
@@ -177,6 +177,27 @@
     const mb = $(".mobile-bar"); if (mb) mb.style.setProperty("--prog", n / 3);
     $$("[data-section]").forEach((el) => el.classList.toggle("sec-done", !!steps[el.dataset.section]));
     const ih = $("#itemsHint"); if (ih) ih.hidden = steps.items;
+    // phones: one clear "next step" above the action bar
+    const ns = $("#nextStep");
+    if (ns) {
+      const order = ["from", "to", "items"], next = order.find((k) => !steps[k]);
+      const text = { from: "Add your business name", to: "Add who it's for", items: isTs() ? "Add your shifts and rate per hour" : "Add an item and its price" };
+      ns.hidden = !next;
+      if (next) { ns.dataset.step = next; $("#nsNum").textContent = order.indexOf(next) + 1; $("#nsText").textContent = text[next]; }
+    }
+  }
+  function focusStep(step) {
+    let el = step === "from" ? $('[data-f="from.name"]') : step === "to" ? $('[data-f="to.name"]') : null;
+    if (step === "items" && isTs()) {
+      el = !(Number(inv.hourRate) > 0) ? $("#f-hourRate") : $('[data-s="' + Math.max(0, inv.shifts.findIndex((x) => !IG.shiftHours(x))) + '"][data-sk="start"]');
+    } else if (step === "items") {
+      const i = Math.max(0, inv.items.findIndex((it) => !String(it.desc).trim() || !(Number(it.rate) > 0)));
+      el = !String(inv.items[i].desc).trim() ? $('[data-i="' + i + '"][data-k="desc"]') : $('[data-i="' + i + '"][data-k="rate"]');
+    }
+    if (!el) return;
+    if (document.documentElement.classList.contains("sheet-open")) closeOptions();
+    el.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" });
+    setTimeout(() => el.focus({ preventScroll: true }), 250);
   }
   function update() {
     docLabels();
@@ -720,19 +741,20 @@
     });
     document.addEventListener("click", (e) => {
       const li = e.target.closest(".spp-list li");
-      if (!li) return;
-      const step = li.dataset.step;
-      let el = step === "from" ? $('[data-f="from.name"]') : step === "to" ? $('[data-f="to.name"]') : null;
-      if (step === "items" && isTs()) {
-        el = !(Number(inv.hourRate) > 0) ? $("#f-hourRate") : $('[data-s="' + Math.max(0, inv.shifts.findIndex((x) => !IG.shiftHours(x))) + '"][data-sk="start"]');
-      } else if (step === "items") {
-        const i = Math.max(0, inv.items.findIndex((it) => !String(it.desc).trim() || !(Number(it.rate) > 0)));
-        el = !String(inv.items[i].desc).trim() ? $('[data-i="' + i + '"][data-k="desc"]') : $('[data-i="' + i + '"][data-k="rate"]');
-      }
-      if (!el) return;
-      if (document.documentElement.classList.contains("sheet-open")) closeOptions();
-      el.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" });
-      setTimeout(() => el.focus({ preventScroll: true }), 250);
+      if (li) focusStep(li.dataset.step);
+    });
+    $("#nextStep").addEventListener("click", (e) => focusStep(e.currentTarget.dataset.step));
+    // typing on a phone: hide the next-step hint, and Enter moves to the next box
+    const root = document.documentElement;
+    sheet.addEventListener("focusin", (e) => { if (e.target.matches(".fi")) root.classList.add("is-typing"); });
+    sheet.addEventListener("focusout", () => setTimeout(() => { if (!sheet.contains(document.activeElement)) root.classList.remove("is-typing"); }, 60));
+    $$('#sheet input.fi[data-f]').forEach((el) => el.setAttribute("enterkeyhint", "next"));
+    sheet.addEventListener("keydown", (e) => {
+      const el = e.target;
+      if (e.key !== "Enter" || el.tagName !== "INPUT" || !el.dataset.f || e.isComposing) return;
+      const all = $$("#sheet .fi").filter((x) => x.offsetParent !== null && !x.disabled);
+      const nx = all[all.indexOf(el) + 1];
+      if (nx) { e.preventDefault(); nx.focus(); }
     });
     $("#mDownload").addEventListener("click", downloadPdf);
     $("#sendBtn").addEventListener("click", openSend);
@@ -792,6 +814,8 @@
       if (pre3 && m) inv.number = pre3 + "-" + m[2];
     }
     const pageMode = ($("#create") && $("#create").dataset.mode) || "";
+    const pageUnit = ($("#create") && $("#create").dataset.unit) || "";
+    if (pageUnit && IG.UNITS[pageUnit]) inv.unit = pageUnit;
     if (pageMode) inv.mode = pageMode;
     if (!Array.isArray(inv.shifts) || !inv.shifts.length) inv.shifts = [IG.blankShift(inv.issueDate)];
     const pre = IG.store.get("ig_prefill_client", null);

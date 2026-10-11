@@ -1431,3 +1431,51 @@ h2 { letter-spacing: -0.03em; }
   .sheet .sh-time { background: none !important; box-shadow: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { .ms-pill, .mode-in, .ts-row.row-in { transition: none; animation: none; } }
+
+/* =====================================================================
+   Phones: labelled fields and a clear next step
+   ===================================================================== */
+.pf { display: block; position: relative; }
+.pf-l { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.pf-l em { font-style: normal; }
+.next-step { display: none; }
+@media (max-width: 860px) {
+  .party { gap: 10px; }
+  .pf-l { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; display: flex; align-items: center; gap: 6px; margin: 0 0 5px 2px; font-size: .78rem; font-weight: 600; color: var(--muted); }
+  .pf-l em { font-size: .66rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; color: var(--brand-2); background: var(--brand-soft); border-radius: 999px; padding: 2px 7px; }
+  .pf:focus-within .pf-l { color: var(--brand-ink); }
+  /* filled boxes stay visible as boxes, so it is always clear where to tap */
+  .sheet :where(.sh-top, .party, .item-rows, .sh-notes, .sh-time, .sh-totals) .fi:not(:placeholder-shown):not(:focus) { background-color: #fff; border-color: #e3e8ef; }
+  .sheet.t-modern .sh-top .fi:not(:placeholder-shown):not(:focus) { background-color: rgba(255, 255, 255, .12); border-color: rgba(255, 255, 255, .28); }
+  .sheet .fi-doc:not(:focus) { border-color: transparent !important; background-color: transparent !important; }
+  .sheet .fi { scroll-margin-block: 96px 140px; }
+  .sheet .fi:focus { box-shadow: 0 0 0 3px rgba(5, 150, 105, .16); border-color: var(--brand) !important; }
+  .sheet .item-row .ir-l, .sheet .ts-row .ir-l { display: block; font-size: .74rem; font-weight: 600; color: var(--muted); margin-bottom: 4px; }
+  .next-step { position: absolute; left: 12px; right: 12px; bottom: calc(100% + 10px); display: flex; align-items: center; gap: 10px; padding: 9px 14px 9px 9px; border: 0; border-radius: 16px; background: #0f172a; color: #fff; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 12px 28px -12px rgba(15, 23, 42, .55); animation: nsIn .4s cubic-bezier(.2, .9, .3, 1.2) both; transition: opacity .2s, transform .2s; -webkit-tap-highlight-color: transparent; }
+  .next-step[hidden] { display: none; }
+  .ns-n { width: 28px; height: 28px; flex: none; display: grid; place-items: center; border-radius: 50%; background: var(--brand); font-weight: 700; font-size: .85rem; }
+  .ns-t { flex: 1; min-width: 0; line-height: 1.2; }
+  .ns-t small { display: block; font-size: .7rem; color: #94a3b8; font-weight: 500; }
+  .ns-t b { display: block; font-size: .92rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .next-step .ico { width: 18px; height: 18px; color: #6ee7b7; flex: none; }
+  .next-step:active { transform: scale(.98); }
+  .is-typing .next-step, .sheet-open .next-step { opacity: 0; transform: translateY(8px); pointer-events: none; }
+}
+@keyframes nsIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .next-step { animation: none; transition: none; } }
+@media print { .next-step { display: none !important; } }
+
+/* SEO link lists */
+.chips-links { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.chips-links a { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; border-radius: 999px; background: #fff; color: var(--ink); text-decoration: none; font-size: .92rem; box-shadow: inset 0 0 0 1px var(--rule); transition: box-shadow .15s, color .15s, transform .15s; }
+.chips-links a b { font-weight: 600; }
+.chips-links a::after { content: "→"; color: var(--brand); }
+.chips-links a:hover { box-shadow: inset 0 0 0 1.5px var(--brand); color: var(--brand-ink); transform: translateY(-1px); }
+.by-biz-h { font-size: 1.05rem; margin: 32px 0 14px; letter-spacing: -.01em; }
+.site-footer .foot-grid { grid-template-columns: 1.4fr repeat(4, 1fr); }
+@media (max-width: 1000px) { .site-footer .foot-grid { grid-template-columns: repeat(2, 1fr); } .site-footer .foot-brand { grid-column: 1 / -1; } }
+@media (max-width: 480px) { .site-footer .foot-grid > div:last-child { grid-column: auto; } .site-footer .foot-grid > div:last-child ul { grid-template-columns: 1fr; } }
+.article blockquote { margin: 14px 0 22px; padding: 16px 18px; border-radius: 14px; background: #f8fafc; box-shadow: inset 3px 0 0 var(--brand); color: var(--ink); }
+.article blockquote p { margin: 0 0 8px; }
+.article blockquote p:first-child { font-weight: 600; }
+.article h3 { font-size: 1.05rem; margin: 22px 0 6px; }

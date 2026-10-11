@@ -19,6 +19,21 @@ TOOLS = [
     ("/estimate-maker/", "Estimate maker", "Give a rough cost upfront"),
     ("/timesheet-invoice/", "Timesheet invoice", "Bill shifts and hours worked"),
 ]
+INDUSTRY = [
+    ("/contractor-invoice/", "Contractor invoice"),
+    ("/cleaning-invoice/", "Cleaning invoice"),
+    ("/consulting-invoice/", "Consulting invoice"),
+    ("/photography-invoice/", "Photography invoice"),
+    ("/self-employed-invoice/", "Self-employed invoice"),
+    ("/freelance-invoice/", "Freelance invoice"),
+]
+GUIDES = [
+    ("/how-to-make-an-invoice/", "How to make an invoice"),
+    ("/invoice-template/", "Invoice templates"),
+    ("/invoice-vs-receipt/", "Invoice vs receipt"),
+    ("/payment-terms/", "Payment terms explained"),
+    ("/payment-reminder/", "Payment reminder emails"),
+]
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
 TOOLS_MENU = "".join(f'<a href="{u}"><span class="np-ico">{TOOL_ICON}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS)
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
@@ -134,12 +149,12 @@ FOOT = '''<footer class="site-footer">
       <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''</ul>
     </div>
     <div>
-      <h2>Resources</h2>
-      <ul>
-        <li><a href="/invoice-template/">Invoice templates</a></li>
-        <li><a href="/how-to-make-an-invoice/">How to make an invoice</a></li>
-        <li><a href="/freelance-invoice/">Freelance invoices</a></li>
-      </ul>
+      <h2>By business</h2>
+      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in INDUSTRY) + '''</ul>
+    </div>
+    <div>
+      <h2>Guides</h2>
+      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in GUIDES) + '''</ul>
     </div>
     <div>
       <h2>Company</h2>
@@ -212,7 +227,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import home_section
 HOME = home_section.build(FAQ, ICON_DL, ICON_SEND)
 
-page("/", "Free Invoice Generator: Create, Download & Email PDF Invoices | invoice-gen.net",
+page("/", "Free Invoice Generator: Create & Download PDF Invoices Online",
      "Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.",
      HOME, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n',
      [app_ld, faq_ld, howto_ld])
@@ -236,19 +251,31 @@ def guide_band(h2, intro, cols):
 
 '''
 
-def tool_page(path, doc, title, desc, h1, lead, guide, faq, mode=""):
+def related_band(path):
+    links = [(u, n) for u, n in INDUSTRY if u != path][:5] + [(u, n) for u, n, d in TOOLS if u not in ("/", path)][:3]
+    items = "".join(f'<li><a href="{u}"><b>{n}</b></a></li>' for u, n in links)
+    return f'''<section class="band band-line" aria-label="More invoice generators">
+  <div class="wrap">
+    <h2>More free generators</h2>
+    <ul class="chips-links">{items}</ul>
+  </div>
+</section>
+
+'''
+
+def tool_page(path, doc, title, desc, h1, lead, guide, faq, mode="standard", unit=""):
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
     ld_app = dict(app_ld, name="invoice-gen.net " + h1.lower(), url=SITE + path, description=desc)
     crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
         {"@type": "ListItem", "position": 2, "name": h1, "item": SITE + path}]}
-    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide), mode=mode)
+    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide) + related_band(path), mode=mode, unit=unit)
     page(path, title, desc, main, GEN_JS, [ld_app, ld_faq, crumb])
 
 tool_page("/timesheet-invoice/", "Invoice",
-    "Free Timesheet Invoice Generator: Bill Hours and Shifts as a PDF | invoice-gen.net",
-    "Turn your shifts into a professional invoice. Enter the date, work type, start and end time and break of each shift; hours and totals are worked out for you. Ideal for restaurant, kitchen, cleaning and hourly work. Free PDF, no sign-up.",
+    "Timesheet Invoice Generator: Bill Hours and Shifts (Free PDF)",
+    "Turn your shifts into an invoice. Add date, start, end and break; hours and totals work themselves out. For restaurant, kitchen and hourly work. Free PDF.",
     "Free Timesheet Invoice Generator",
     "Bill the hours you worked. Add each shift with its start, end and break, and the hours, total and tax are worked out for you. Then download a clean PDF with your timesheet attached.",
     ("What goes on a timesheet invoice", "Hourly workers in restaurants, kitchens, hotels, cleaning and events are paid for time. A clear timesheet invoice shows every shift, so the client can check it and pay quickly.", [
@@ -266,7 +293,7 @@ tool_page("/timesheet-invoice/", "Invoice",
 
 tool_page("/quote-generator/", "Quotation",
     "Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net",
-    "Make a professional quote or quotation in minutes. Add your logo, line items, tax and a valid-until date, then download the PDF or email it to your client. Free, no sign-up.",
+    "Make a professional quote in minutes. Add your logo, items, tax and a valid-until date, then download the PDF or email it. Free, no sign-up.",
     "Free Quote Generator",
     "Price the job before you start. Fill in the quotation, set how long the price is valid, then download a polished PDF or email it to your client.",
     ("What to put on a quote", "A clear quote wins the job and avoids arguments later. These are the parts clients look for.", [
@@ -299,7 +326,7 @@ tool_page("/receipt-generator/", "Receipt",
      ("Can I email a receipt?", "Yes. With a free account, press Send by email and your customer receives the receipt as a PDF attachment.")])
 
 tool_page("/proforma-invoice/", "Proforma Invoice",
-    "Free Proforma Invoice Generator: Create a Proforma Invoice PDF | invoice-gen.net",
+    "Free Proforma Invoice Generator: Create a Proforma PDF Online",
     "Create a proforma invoice online for free. Ideal for advance payments, customs and international orders. Add items, tax and shipping, then download the PDF or email it.",
     "Free Proforma Invoice Generator",
     "Send a preliminary bill before the goods ship or the work begins. Fill in the proforma invoice, then download the PDF or email it to your buyer.",
@@ -335,6 +362,94 @@ tool_page("/estimate-maker/", "Estimate",
 # ---------------------------------------------------------------- login
 import app_pages
 LOGIN = app_pages.login_markup()
+# ---------------------------------------------------------------- invoices by business
+tool_page("/contractor-invoice/", "Invoice",
+    "Contractor Invoice Template: Labour and Materials (Free PDF)",
+    "Create a contractor invoice with labour, materials, deposits and tax. Free template for builders, electricians, plumbers and handymen. Download the PDF or email it.",
+    "Free Contractor Invoice Template",
+    "Bill a job the way clients expect: labour and materials on separate lines, the deposit taken off, and the balance clear. Download the PDF or email it from the site.",
+    ("How to invoice a contracting job", "Clients compare your invoice with the quote. Keep the same structure so it is easy to approve.", [
+        ("Job address", "Add the site address in the client details or the notes, so the invoice matches the job."),
+        ("Labour", "One line per trade or stage, with hours or days and your rate."),
+        ("Materials", "List the main materials with quantity and unit price. Group small parts as one line."),
+        ("Deposit", "Enter any deposit already paid in Amount paid. The balance due updates by itself."),
+        ("Changes", "Add agreed extra work as its own line, like Additional socket, kitchen."),
+        ("Licence and tax", "Put your licence or registration number in an extra field, and add sales tax or VAT if you charge it.")]),
+    [("What should a contractor invoice include?", "Your business name and licence number, the client and job address, a unique invoice number and date, labour and materials as separate lines, tax, any deposit paid, the balance due and how to pay."),
+     ("Should I list materials separately?", "Yes. Clients trust an invoice more when they can see labour and materials apart. It also makes it easier to match the invoice against your quote."),
+     ("How do I show a deposit?", "Enter the deposit in Amount paid. The invoice shows the total, the amount already paid and the balance still due."),
+     ("Is it free?", "Yes. Make and download as many contractor invoices as you need, with no watermark and no sign-up.")])
+
+tool_page("/cleaning-invoice/", "Invoice",
+    "Free Cleaning Invoice Template: Bill Hours and Visits | invoice-gen.net",
+    "Make a cleaning invoice in minutes. Add each visit's start and end time and the hours and total are worked out for you. For house and office cleaners. Free PDF.",
+    "Free Cleaning Invoice Template",
+    "Add each cleaning visit with its date, type, start and end time. Hours, total and tax are worked out for you, and the PDF lists every visit so your client can check it.",
+    ("What a cleaning invoice should show", "Regular clients pay faster when they can see exactly which visits they are paying for.", [
+        ("Each visit", "Date, type of clean, start and end time, and hours."),
+        ("Type of clean", "Regular clean, deep cleaning, end of tenancy, office or windows."),
+        ("Hourly rate", "One rate per hour, shown next to the total hours."),
+        ("Supplies", "If you charge for products, switch to a standard invoice and add them as lines."),
+        ("Address", "Add the cleaning address as the work address. It shows as Ship to."),
+        ("Payment details", "Bank details or a payment link in the notes, so paying takes a minute.")]),
+    [("Can I invoice by the hour?", "Yes. This page opens a timesheet invoice: enter start and end times and the hours are worked out for you, minus any break."),
+     ("Can I invoice a fixed price per clean?", "Yes. Switch to Standard invoice at the top and add each clean as a line with quantity 1 and your price."),
+     ("How often should I invoice regular clients?", "Weekly or monthly is common. Add all visits in the period to one invoice so your client pays once."),
+     ("Is it free?", "Yes. Cleaning invoices are free to make and download, with no watermark.")],
+    mode="timesheet")
+
+tool_page("/consulting-invoice/", "Invoice",
+    "Consulting Invoice Template: Hourly and Retainer Billing (Free)",
+    "Create a consulting invoice for hourly work, day rates or retainers. Free template with tax, 28 currencies and PDF download. Email it to your client in one click.",
+    "Free Consulting Invoice Template",
+    "Bill hours, days or a monthly retainer. Describe the work clearly, set your rate and currency, then download a polished PDF or email it to your client.",
+    ("How consultants usually bill", "Pick the model you agreed with the client and keep it the same on every invoice.", [
+        ("Hourly", "Hours as the quantity and your hourly rate. Describe the work and the period."),
+        ("Day rate", "Switch Bill items by to Days in the options and enter the number of days."),
+        ("Retainer", "One line, like Advisory retainer, October 2026, with quantity 1."),
+        ("Expenses", "Travel or software at cost, each on its own line."),
+        ("Purchase order", "Large companies often need their PO number. Add it in PO / ref."),
+        ("Currency", "Invoice in your client's currency to make paying easy.")]),
+    [("How do I write a consulting invoice?", "Add your details and your client's, give the invoice a number and due date, then list your hours, days or retainer with the rate. Add tax if you are registered and put your payment details in the notes."),
+     ("What payment terms do consultants use?", "Net 14 or Net 30 is common. Companies often pay on a 30-day cycle, so agree the terms before you start."),
+     ("Can I bill in another currency?", "Yes. Choose from 28 currencies in the options panel. Amounts are formatted the way your client expects."),
+     ("Is it free?", "Yes, with no limit and no watermark.")],
+    unit="hours")
+
+tool_page("/photography-invoice/", "Invoice",
+    "Photography Invoice Template: Shoots, Editing, Prints (Free)",
+    "Make a photography invoice for shoots, editing, prints and travel. Free template with your logo, deposits and PDF download. For wedding, event and portrait work.",
+    "Free Photography Invoice Template",
+    "Bill a shoot the way you quoted it: session, editing, prints and travel on their own lines, with your logo on top and any booking deposit taken off the balance.",
+    ("What to put on a photography invoice", "A clear invoice also reminds the client what they are getting.", [
+        ("Session", "The shoot itself, with the date and length, like Wedding coverage, 8 hours."),
+        ("Editing", "Number of edited images or hours of retouching."),
+        ("Products", "Prints, albums or USB, each with quantity and price."),
+        ("Travel", "Mileage or travel fee as a separate line."),
+        ("Booking deposit", "Enter the deposit in Amount paid so the balance due is right."),
+        ("Usage", "For commercial work, note the licence or usage rights in the terms.")]),
+    [("Should I take a deposit?", "Most photographers take 25 to 50 percent to book the date. Invoice the deposit first, then enter it as Amount paid on the final invoice."),
+     ("Can I add my logo?", "Yes. Tap Add your logo at the top of the invoice. It appears on the PDF."),
+     ("How do I mark an invoice as paid?", "Set the status to Paid in the options. The PDF gets a Paid stamp, which works as a receipt."),
+     ("Is it free?", "Yes. No watermark and no sign-up needed.")])
+
+tool_page("/self-employed-invoice/", "Invoice",
+    "Free Self-Employed Invoice Template: Simple PDF Invoices | invoice-gen.net",
+    "A simple invoice template for self-employed people and sole traders. Add your name, your client, what you did and the price, then download the PDF. Free, no sign-up.",
+    "Free Self-Employed Invoice Template",
+    "You don't need a company to send a proper invoice. Use your own name, add your client and the work, and download a clean PDF in a minute.",
+    ("Invoicing when you are self-employed", "A sole trader invoice needs the same basics as any business invoice.", [
+        ("Your name", "Your own name or trading name, with your address and email."),
+        ("Unique number", "Number every invoice in order, like INV-0001, INV-0002."),
+        ("What you did", "A short, plain description and the date or period of the work."),
+        ("Tax", "Only add VAT or sales tax if you are registered to charge it."),
+        ("Payment", "Your bank details or payment link in the notes."),
+        ("Records", "Keep a copy of every invoice for your tax return. A free account saves them for you.")]),
+    [("Can I send an invoice without a company?", "Yes. Self-employed people and sole traders invoice under their own name. Use your name or trading name at the top."),
+     ("Do I have to charge tax?", "Only if you are registered for VAT, GST or sales tax. If you are not, leave the tax rate at 0."),
+     ("How do I number my invoices?", "Use a simple sequence and never reuse a number. invoice-gen.net counts up for you automatically."),
+     ("Is it free?", "Yes. Free to make, download and print, with no watermark.")])
+
 page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.net to save invoices and clients and email invoices to your clients.",
      LOGIN, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/auth.js?v={V}" defer></script>\n', noindex=True)
 
@@ -344,6 +459,8 @@ page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clie
      DASH, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
 
 # ---------------------------------------------------------------- articles
+import datetime
+TODAY = datetime.date.today().isoformat()
 def article(path, title, desc, h1, crumbs_name, body, ld=None):
     crumb_ld = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
@@ -357,7 +474,13 @@ def article(path, title, desc, h1, crumbs_name, body, ld=None):
 <article class="article">
 {body}
 </article>'''
-    page(path, title, desc, main, "", [crumb_ld] + (ld or []))
+    art_ld = {"@context": "https://schema.org", "@type": "Article", "headline": h1, "description": desc,
+              "mainEntityOfPage": SITE + path, "datePublished": "2026-10-01", "dateModified": TODAY,
+              "author": {"@type": "Organization", "name": "invoice-gen.net", "url": SITE + "/"},
+              "publisher": {"@type": "Organization", "name": "invoice-gen.net", "logo": {"@type": "ImageObject", "url": SITE + "/assets/brand/logo-mark-256.png"}},
+              "image": SITE + "/assets/img/og-image.png"}
+    extra = [art_ld] if path not in ("/about/", "/contact/", "/privacy/", "/terms/") else []
+    page(path, title, desc, main, "", [crumb_ld] + extra + (ld or []))
 
 CTA = '''  <div class="cta-box">
     <h2>Make your invoice now</h2>
@@ -452,6 +575,97 @@ article("/freelance-invoice/", "Freelance Invoice Generator: Bill Clients and Ge
   <p>With a free account, every invoice is saved to your dashboard. You can see your total invoiced, paid and still owed, mark invoices as paid, and spot overdue ones at a glance.</p>
 ''' + CTA)
 
+def faq_ld(pairs):
+    return {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in pairs]}
+
+def faq_html(pairs):
+    return "  <h2>Questions</h2>\n" + "\n".join(f'  <h3>{q}</h3>\n  <p>{a}</p>' for q, a in pairs) + "\n"
+
+IVR_FAQ = [
+    ("Is a paid invoice the same as a receipt?", "Often it can serve as one. If you mark an invoice as paid and it shows the amount and date received, many clients accept it as proof of payment. Some businesses still prefer a separate receipt."),
+    ("Do I need to send both?", "Send an invoice to ask for payment. Send a receipt when the client asks for proof, or when they paid on the spot without an invoice."),
+    ("Can I make a receipt for free?", "Yes. Use the free receipt generator, mark it as paid and download the PDF."),
+]
+article("/invoice-vs-receipt/", "Invoice vs Receipt: The Difference and When to Send Each",
+        "An invoice asks for payment; a receipt confirms it. Learn the difference, what each must include, and when to send an invoice, a receipt or both.",
+        "Invoice vs receipt: what's the difference?", "Invoice vs receipt", '''  <p>An <strong>invoice</strong> asks your client to pay. A <strong>receipt</strong> confirms that they already did. They look alike, but they happen at different moments and do different jobs.</p>
+  <table>
+    <thead><tr><th></th><th>Invoice</th><th>Receipt</th></tr></thead>
+    <tbody>
+      <tr><td>When</td><td>Before payment</td><td>After payment</td></tr>
+      <tr><td>Purpose</td><td>Requests payment</td><td>Proves payment</td></tr>
+      <tr><td>Key dates</td><td>Issue date and due date</td><td>Date the money was received</td></tr>
+      <tr><td>Shows</td><td>Balance due and how to pay</td><td>Amount paid and payment method</td></tr>
+      <tr><td>Number</td><td>Invoice number, like INV-0042</td><td>Receipt number, often linked to the invoice</td></tr>
+    </tbody>
+  </table>
+  <h2>When to send an invoice</h2>
+  <p>Send an invoice when you have delivered work or goods and expect to be paid later. It gives your client a due date and the details they need to pay, and gives you a record for your accounts.</p>
+  <h2>When to send a receipt</h2>
+  <p>Send a receipt when a client pays you, especially if they paid in cash, on the spot, or asked for proof for their own records or expenses.</p>
+  <h2>Turning an invoice into a receipt</h2>
+  <p>On invoice-gen.net you can open a paid invoice, set the status to <strong>Paid</strong> and enter the amount paid. The PDF gets a Paid stamp and a zero balance. Or use the <a href="/receipt-generator/">receipt generator</a> to make a separate receipt.</p>
+''' + faq_html(IVR_FAQ) + CTA, ld=[faq_ld(IVR_FAQ)])
+
+PT_FAQ = [
+    ("What does Net 30 mean?", "Net 30 means the full amount is due 30 days after the invoice date. Net 7 and Net 14 work the same way with 7 or 14 days."),
+    ("What payment terms should I use?", "For individuals and small clients, 7 or 14 days works well. Larger companies often pay on Net 30. For a new client or a big job, ask for a deposit upfront."),
+    ("Can I charge a late fee?", "In many countries you can, if it was agreed in advance. State it in your terms, for example: a late fee of 2% per month applies after the due date. Check the rules where you work."),
+]
+article("/payment-terms/", "Invoice Payment Terms Explained: Net 30, Due on Receipt and More",
+        "What Net 7, Net 30, due on receipt and 2/10 Net 30 mean, which payment terms to choose, and example wording you can copy onto your invoices.",
+        "Invoice payment terms explained", "Payment terms", '''  <p>Payment terms tell your client <strong>when</strong> and <strong>how</strong> to pay. Clear terms are one of the simplest ways to get paid on time.</p>
+  <h2>Common payment terms</h2>
+  <table>
+    <thead><tr><th>Term</th><th>What it means</th></tr></thead>
+    <tbody>
+      <tr><td>Due on receipt</td><td>Pay as soon as the invoice arrives.</td></tr>
+      <tr><td>Net 7 / Net 14</td><td>Pay within 7 or 14 days of the invoice date.</td></tr>
+      <tr><td>Net 30</td><td>Pay within 30 days. Common with larger companies.</td></tr>
+      <tr><td>EOM</td><td>Pay by the end of the month the invoice was issued.</td></tr>
+      <tr><td>2/10 Net 30</td><td>2% discount if paid within 10 days, otherwise the full amount within 30 days.</td></tr>
+      <tr><td>50% upfront</td><td>Half before the work starts, the rest on delivery.</td></tr>
+    </tbody>
+  </table>
+  <h2>Which terms to choose</h2>
+  <ul>
+    <li><strong>New client or large job:</strong> ask for a deposit, then Net 7 on the final invoice.</li>
+    <li><strong>Regular small clients:</strong> Net 7 or Net 14.</li>
+    <li><strong>Large companies:</strong> Net 30 is normal. Ask early if they need a purchase order number.</li>
+  </ul>
+  <h2>Wording you can copy</h2>
+  <ul>
+    <li>Payment is due within 14 days of the invoice date.</li>
+    <li>Please pay by bank transfer and use the invoice number as the reference.</li>
+    <li>A deposit of 50% is due before work begins. The balance is due on completion.</li>
+  </ul>
+  <p>On invoice-gen.net, choose <strong>Payment due</strong> in the options to set the due date, and edit the <strong>Terms</strong> box at the bottom of the invoice.</p>
+''' + faq_html(PT_FAQ) + CTA, ld=[faq_ld(PT_FAQ)])
+
+PR_FAQ = [
+    ("When should I send a payment reminder?", "A friendly reminder a few days before the due date works well. Send a second one on the day after the due date, and a firmer one a week later."),
+    ("Should I attach the invoice again?", "Yes. Attach the PDF every time so your client doesn't have to search for it."),
+    ("What if the client still doesn't pay?", "Call them, check the invoice reached the right person, and offer a payment plan if needed. If it is still unpaid, look at your local small claims process."),
+]
+article("/payment-reminder/", "Payment Reminder Email Templates for Unpaid Invoices | invoice-gen.net",
+        "Polite and firm payment reminder emails you can copy for unpaid and overdue invoices, with tips on when to send each one.",
+        "Payment reminder emails for unpaid invoices", "Payment reminder", '''  <p>Most late payments are simply forgotten. A short, polite reminder usually fixes it. Here are three emails you can copy and adjust.</p>
+  <h2>1. Friendly reminder, before the due date</h2>
+  <blockquote><p>Subject: Invoice INV-0042 due on 14 March</p><p>Hi Sam,<br>A quick reminder that invoice INV-0042 for $1,250.00 is due on 14 March. I've attached it again for convenience. Payment details are at the bottom of the invoice.<br>Thanks,<br>Alex</p></blockquote>
+  <h2>2. Gentle follow-up, just after the due date</h2>
+  <blockquote><p>Subject: Invoice INV-0042 is now due</p><p>Hi Sam,<br>Invoice INV-0042 for $1,250.00 was due yesterday. Could you let me know when payment is planned? If it's already on its way, thank you and please ignore this message.<br>Best,<br>Alex</p></blockquote>
+  <h2>3. Firm reminder, a week or more overdue</h2>
+  <blockquote><p>Subject: Overdue: invoice INV-0042</p><p>Hi Sam,<br>Invoice INV-0042 for $1,250.00 is now 8 days overdue. Please arrange payment by Friday, 22 March. If there's a problem with the invoice, reply and I'll sort it out straight away.<br>Regards,<br>Alex</p></blockquote>
+  <h2>Tips that help</h2>
+  <ul>
+    <li>Keep it short and friendly. Assume it was an oversight.</li>
+    <li>Always include the invoice number, amount and due date.</li>
+    <li>Attach the invoice PDF again.</li>
+    <li>With a free account, your dashboard shows which invoices are overdue, and you can resend them in one click.</li>
+  </ul>
+''' + faq_html(PR_FAQ) + CTA, ld=[faq_ld(PR_FAQ)])
+
 article("/about/", "About invoice-gen.net", "invoice-gen.net is a free invoice generator for freelancers and small businesses.",
         "About invoice-gen.net", "About", '''  <p class="lead">invoice-gen.net is a free online invoice generator for freelancers, small shops and growing businesses that need a professional invoice without buying accounting software.</p>
   <div class="facts">
@@ -465,7 +679,7 @@ article("/about/", "About invoice-gen.net", "invoice-gen.net is a free invoice g
   <p>Questions or ideas for the next feature? <a href="/contact/">Contact us</a>.</p>
 ''' + CTA)
 
-article("/contact/", "Contact invoice-gen.net", "Contact the invoice-gen.net team for help or feedback.",
+article("/contact/", "Contact invoice-gen.net", "Contact the invoice-gen.net team for help, feedback or account questions. We reply by email, usually within one working day.",
         "Contact", "Contact", '''  <p class="lead">Help, feedback or business enquiries: we read every message.</p>
   <div class="contact-card">
     <div><span class="cc-label">Email</span><a class="cc-mail" href="mailto:support@invoice-gen.net">support@invoice-gen.net</a><span class="cc-note">We usually reply within two working days.</span></div>
@@ -476,7 +690,7 @@ article("/contact/", "Contact invoice-gen.net", "Contact the invoice-gen.net tea
   <h2>Before you write</h2>
   <p>Most questions are answered in the <a href="/#faq">FAQ</a> and the <a href="/how-to-make-an-invoice/">invoice guide</a>.</p>''')
 
-article("/privacy/", "Privacy Policy | invoice-gen.net", "How invoice-gen.net collects, uses and protects your information.",
+article("/privacy/", "Privacy Policy | invoice-gen.net", "How invoice-gen.net collects, uses and protects your information, including invoices, client details and account data.",
         "Privacy policy", "Privacy policy", '''  <p><em>Last updated: 8 October 2026</em></p>
   <h2>Without an account</h2>
   <p>Invoices you make without an account stay in your own browser (local storage). They are not sent to our servers. PDFs are created in your browser.</p>
@@ -490,7 +704,7 @@ article("/privacy/", "Privacy Policy | invoice-gen.net", "How invoice-gen.net co
   <p>You can edit or delete any invoice or client in your dashboard. To delete your account entirely, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a>.</p>
   <p class="hint">This policy is a starting point. Have it reviewed for the laws that apply to your business.</p>''')
 
-article("/terms/", "Terms of Use | invoice-gen.net", "The terms for using invoice-gen.net.",
+article("/terms/", "Terms of Use | invoice-gen.net", "The terms for using invoice-gen.net, the free online invoice generator, including accounts, acceptable use and liability.",
         "Terms of use", "Terms of use", '''  <p><em>Last updated: 8 October 2026</em></p>
   <p>By using invoice-gen.net you agree to these terms.</p>
   <h2>Using the service</h2>
@@ -516,7 +730,8 @@ import datetime
 TODAY = datetime.date.today().isoformat()
 SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS if u != "/"] + [
     ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
-    ("/freelance-invoice/", "monthly", "0.8"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
+    ("/freelance-invoice/", "monthly", "0.8")] + [(u, "monthly", "0.8") for u, n in INDUSTRY if u != "/freelance-invoice/"] + [
+    ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')

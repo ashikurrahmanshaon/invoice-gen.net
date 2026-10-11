@@ -38,18 +38,22 @@ def fi(path, ph, aria, typ="text", cls="", extra=""):
     t = '' if typ == "text" else f' type="{typ}"'
     return f'<input class="fi {cls}"{t} data-f="{path}" placeholder="{ph}" aria-label="{aria}"{extra}>'
 
+def pf(lab, inner, req=False):
+    tag = ' <em>Required</em>' if req else ''
+    return f'<label class="pf"><span class="pf-l">{lab}{tag}</span>{inner}</label>'
+
 def ta(path, ph, aria, rows=2, cls=""):
     return f'<textarea class="fi {cls}" rows="{rows}" data-f="{path}" placeholder="{ph}" aria-label="{aria}"></textarea>'
 
 TPLS = [("classic", "Classic"), ("modern", "Modern"), ("minimal", "Minimal")]
 
-def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a professional invoice in seconds. Add your logo, then download a polished PDF or email it straight to your client.", doc="Invoice", extra="", mode=""):
+def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a professional invoice in seconds. Add your logo, then download a polished PDF or email it straight to your client.", doc="Invoice", extra="", mode="", unit=""):
     tpl_buttons = "".join(
         f'<button type="button" class="tpl-btn" data-template="{k}" aria-pressed="false"><span class="tpl-thumb t-{k}" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>{n}</span></button>'
         for k, n in TPLS)
     faq_html = "\n".join(f'          <details class="qa"><summary>{q}</summary><div class="qa-body"><p>{a}</p></div></details>' for q, a in FAQ)
 
-    return f"""<section class="gen" id="create" aria-labelledby="gen-title"{(' data-doc="' + doc + '"') if doc else ""}{(' data-mode="' + mode + '"') if mode else ""}>
+    return f"""<section class="gen" id="create" aria-labelledby="gen-title"{(' data-doc="' + doc + '"') if doc else ""}{(' data-mode="' + mode + '"') if mode else ""}{(' data-unit="' + unit + '"') if unit else ""}>
   <div class="wrap gen-head">
     <div>
       <span class="gen-pill"><b>Free</b> No sign-up, no watermark</span>
@@ -95,19 +99,19 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
         <div class="sh-parties">
           <div class="party" data-section="from">
             <span class="sh-label"><span class="sh-step"><i>1</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>From <small>your business</small></span>
-            {fi("from.name", "Your business name *", "Your business name", cls="fi-strong", extra=' autocomplete="organization" data-req')}
-            {fi("from.email", "Email", "Your email", "email", extra=' autocomplete="email"')}
-            {ta("from.address", "Address", "Your address")}
-            {fi("from.phone", "Phone", "Your phone", extra=' autocomplete="tel"')}
-            {fi("from.taxId", "Tax / VAT ID (optional)", "Your tax number")}
+            {pf("Business or your name", fi("from.name", "e.g. Northline Studio", "Your business name", cls="fi-strong", extra=' autocomplete="organization" data-req'), True)}
+            {pf("Your email", fi("from.email", "you@example.com", "Your email", "email", extra=' autocomplete="email" inputmode="email"'))}
+            {pf("Your address", ta("from.address", "Street, city, postcode", "Your address"))}
+            {pf("Your phone", fi("from.phone", "Optional", "Your phone", "tel", extra=' autocomplete="tel"'))}
+            {pf("Tax / VAT ID", fi("from.taxId", "Optional", "Your tax number"))}
           </div>
           <div class="party" data-section="to">
             <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
             <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
-            {fi("to.name", "Client name *", "Client name", cls="fi-strong", extra=' data-req')}
-            {fi("to.email", "Client email", "Client email", "email")}
-            {ta("to.address", "Client address", "Client address")}
-            {fi("to.phone", "Phone (optional)", "Client phone")}
+            {pf("Client or company name", fi("to.name", "e.g. Acme Ltd", "Client name", cls="fi-strong", extra=' data-req autocomplete="off"'), True)}
+            {pf("Client email", fi("to.email", "client@company.com", "Client email", "email", extra=' autocomplete="off" inputmode="email"'))}
+            {pf("Client address", ta("to.address", "Street, city, postcode", "Client address"))}
+            {pf("Client phone", fi("to.phone", "Optional", "Client phone", "tel", extra=' autocomplete="off"'))}
             <label class="ship-to ts-only"><span>Work address <small>shown as Ship to</small></span>{ta("shipTo", "Where the work was done (optional)", "Work address")}</label>
           </div>
         </div>
@@ -227,6 +231,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
 
 <div class="sp-scrim" id="spScrim" hidden></div>
 <nav class="mobile-bar" aria-label="Invoice actions">
+  <button type="button" class="next-step" id="nextStep" hidden><span class="ns-n" id="nsNum">1</span><span class="ns-t"><small>Next step</small><b id="nsText">Add your business name</b></span>{I(ICONS["arrow"])}</button>
   <button class="mb-btn" id="mOptions" type="button" aria-controls="sidePanel" aria-expanded="false">{I(ICONS["sliders"])}<span>Options</span></button>
   <button class="mb-btn" id="mSend" type="button">{ICON_SEND}<span>Send</span></button>
   <button class="btn btn-primary mb-main" id="mDownload" type="button">{ICON_DL} Download PDF</button>
@@ -336,6 +341,18 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
       <li><a href="/how-to-make-an-invoice/"><b>How to make an invoice</b><span>What to include, with a checklist.</span></a></li>
       <li><a href="/invoice-template/"><b>Invoice templates</b><span>Free templates you can fill in online.</span></a></li>
       <li><a href="/freelance-invoice/"><b>Freelance invoices</b><span>Hourly or project billing, and getting paid on time.</span></a></li>
+      <li><a href="/invoice-vs-receipt/"><b>Invoice vs receipt</b><span>What each one is for, and when to send it.</span></a></li>
+      <li><a href="/payment-terms/"><b>Payment terms explained</b><span>Net 30, due on receipt, deposits, with wording to copy.</span></a></li>
+      <li><a href="/payment-reminder/"><b>Payment reminder emails</b><span>Three polite to firm emails for unpaid invoices.</span></a></li>
+    </ul>
+    <h3 class="by-biz-h">Invoice templates by business</h3>
+    <ul class="chips-links">
+      <li><a href="/contractor-invoice/"><b>Contractors</b></a></li>
+      <li><a href="/cleaning-invoice/"><b>Cleaning</b></a></li>
+      <li><a href="/consulting-invoice/"><b>Consultants</b></a></li>
+      <li><a href="/photography-invoice/"><b>Photographers</b></a></li>
+      <li><a href="/self-employed-invoice/"><b>Self-employed</b></a></li>
+      <li><a href="/timesheet-invoice/"><b>Restaurant and hourly staff</b></a></li>
     </ul>
   </div>
 </section>
