@@ -842,12 +842,12 @@ a:hover { text-decoration-color: var(--brand); text-decoration-thickness: 2px; }
 .t-due.bump b { background: rgba(255, 255, 255, .22); }
 .logo-drop { border-radius: 12px; }
 
-@media (prefers-reduced-motion: no-preference) {
-  .js .gen .sheet { animation: settle .8s var(--ease) .06s backwards; }
-  .js .gen-head > div { animation: fadeIn .6s var(--ease) backwards; }
+/* entrance: desktop only, short and light; nothing above the fold is hidden on phones */
+@media (prefers-reduced-motion: no-preference) and (min-width: 861px) {
+  .js .gen .sheet { animation: settle .5s var(--ease) .04s backwards; }
+  .js .gen .side-panel { animation: settle .5s var(--ease) .12s backwards; }
 }
-@media (prefers-reduced-motion: no-preference) and (min-width: 861px) { .js .gen .side-panel { animation: settle .8s var(--ease) .18s backwards; } }
-@keyframes settle { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+@keyframes settle { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
 /* content sections */
@@ -1479,3 +1479,44 @@ h2 { letter-spacing: -0.03em; }
 .article blockquote p { margin: 0 0 8px; }
 .article blockquote p:first-child { font-weight: 600; }
 .article h3 { font-size: 1.05rem; margin: 22px 0 6px; }
+
+
+/* =====================================================================
+   Smoothness and first screen
+   ===================================================================== */
+/* page to page: a soft cross-fade instead of a white flash (Chrome, Edge, Safari 18+) */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }
+@media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
+/* the header no longer blurs what scrolls under it: cheaper to paint on phones */
+.site-header { background: rgba(255, 255, 255, .97) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transition: box-shadow .2s; }
+.site-header.scrolled { box-shadow: 0 1px 0 var(--rule), 0 6px 18px -14px rgba(15, 23, 42, .3); }
+button, a, .seg button, .chip, .swatch { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+/* sections below the generator render only when they come near the screen */
+main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
+/* phones: keep the headline short so the invoice starts on the first screen */
+@media (max-width: 860px) {
+  .gen { padding-top: 14px; }
+  .gen-pill { display: none; }
+  .gen-head { margin-bottom: 12px; }
+  .gen-head h1 { font-size: clamp(1.6rem, 7.2vw, 2rem); line-height: 1.08; letter-spacing: -.035em; margin-bottom: 6px; }
+  .gen-head p { font-size: .9rem; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+  .mode-switch { margin-bottom: 10px; }
+  .sheet .sh-top { gap: 10px; }
+}
+@media (max-width: 560px) {
+  /* invoice no., dates and PO side by side, label above each box */
+  .sheet .sh-meta { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 10px; row-gap: 0; align-items: end; }
+  .sheet .sh-meta > label { text-align: left; font-size: .74rem; font-weight: 600; color: var(--muted); margin: 8px 0 4px 2px; justify-self: start; }
+  .sheet .sh-meta > :nth-child(1) { grid-area: 1 / 1; } .sheet .sh-meta > :nth-child(2) { grid-area: 2 / 1; }
+  .sheet .sh-meta > :nth-child(3) { grid-area: 1 / 2; } .sheet .sh-meta > :nth-child(4) { grid-area: 2 / 2; }
+  .sheet .sh-meta > :nth-child(5) { grid-area: 3 / 1; } .sheet .sh-meta > :nth-child(6) { grid-area: 4 / 1; }
+  .sheet .sh-meta > :nth-child(7) { grid-area: 3 / 2; } .sheet .sh-meta > :nth-child(8) { grid-area: 4 / 2; }
+  .sheet .sh-meta > .meta-extra { grid-column: 1 / -1; grid-row: 5; }
+  .sheet .sh-meta .fi { width: 100%; min-width: 0; padding-inline: 10px; }
+  .sheet .add-field { margin-top: 6px; }
+  .sheet .logo-drop:not(.has-logo) { min-height: 0; height: 52px; padding: 0 12px; }
+  .sheet .logo-drop:not(.has-logo) .logo-empty { flex-direction: row; gap: 8px; }
+  .sheet .fi-doc { font-size: 1.6rem; }
+}
+@media (max-width: 380px) { .mode-switch button .ico { display: none; } .mode-switch button { justify-content: center; text-align: center; padding-inline: 6px; } }

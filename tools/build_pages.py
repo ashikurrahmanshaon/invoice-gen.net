@@ -9,6 +9,8 @@ SITE = "https://invoice-gen.net"
 V = "25"  # asset version, bump to bust browser caches
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
+SPEC_JS = '<script type="speculationrules">{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/login/*","/dashboard/*","/*\\\\?*"]}}]},"eagerness":"moderate"}]}</script>'
+
 LOGO_SVG = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="32" fill="#059669"/><g transform="translate(32 32) scale(1.24) translate(-32 -32)"><path d="M23 15h18a3 3 0 0 1 3 3v31l-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4V18a3 3 0 0 1 3-3z" fill="#fff"/><path d="m26.2 31.8 4.2 4.2 8.2-8.6" fill="none" stroke="#059669" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg>'
 
 TOOLS = [
@@ -68,6 +70,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <meta name="description" content="{desc}">
 {robots}
 <link rel="canonical" href="{url}">
+{SPEC_JS}
 <meta name="theme-color" content="#ffffff">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="invoice-gen.net">
