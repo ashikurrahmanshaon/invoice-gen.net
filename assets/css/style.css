@@ -1711,3 +1711,55 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .site-footer .foot-trust { padding: 30px 0 36px; margin: 0 0 6px; }
 .site-footer .foot-trust li { margin: 0; }
 @media (max-width: 560px) { .site-footer .foot-trust { padding: 26px 0 30px; } }
+
+/* =====================================================================
+   One system: radius, sizes and touch targets
+   pill = actions · 10px = small icon buttons · 12px = input boxes
+   14px = tiles · 18px = cards · 22px = big panels
+   ===================================================================== */
+:root { --r-tile: 14px; --r-card: 18px; --r-panel: 22px; }
+
+/* big panels */
+.gen .sheet, .gen .side-panel, .foot-cta, .auth-card, .cta-box { border-radius: var(--r-panel); }
+/* cards */
+.how li, .feat-wrap .feat > div, .guides a, .qa, .ledger, .facts div, .contact-card, .designs > *, .mode-switch { border-radius: var(--r-card); }
+.mode-switch button, .ms-pill { border-radius: 14px; }
+/* tiles */
+.sp-mini, .tpl-btn, .logo-drop, .nav-panel a, .how-art, .ft-ico { border-radius: var(--r-tile); }
+.feat-ico, .np-ico { border-radius: 10px; }
+
+/* actions: every button is a pill, three sizes, one weight */
+.btn { border-radius: 999px; font-weight: 650; }
+.btn-sm { min-height: 38px; padding: 8px 16px; font-size: .9rem; }
+.btn:not(.btn-sm):not(.btn-lg) { min-height: 46px; }
+.btn-lg { min-height: 54px; }
+.add-line, .add-field, .chip, .chips-links a { border-radius: 999px; }
+.add-field { display: inline-flex; align-items: center; min-height: 32px; padding: 6px 12px; margin-right: -12px; font-weight: 600; transition: background .2s; }
+.add-field:hover { background: var(--brand-soft); }
+.chip { min-height: 34px; padding: 6px 14px; display: inline-flex; align-items: center; }
+.ir-x, .pw-eye, .mf-x { border-radius: 10px; }
+
+/* menu links: soft pill on hover, the current page gets a filled pill */
+.nav a:not(.btn), .nav-drop-btn { border-radius: 999px; }
+.nav a[aria-current="page"], .nav-drop-btn.is-active { box-shadow: none; background: var(--brand-soft); color: var(--brand-ink); border-radius: 999px; }
+
+/* boxes: same height everywhere in the invoice, compact only in tables and totals */
+.sheet .fi { min-height: 40px; }
+.sheet .item-row .fi, .sheet .ts-row .fi, .t-in .fi, .t-tax .fi-label, .sh-meta .fi { min-height: 38px; }
+.sheet textarea.fi { min-height: 62px; }
+.sheet .fi-doc { min-height: 0; }
+
+/* section headings in proportion with the page title */
+.band h2 { font-size: clamp(1.7rem, 2.6vw, 2.3rem); letter-spacing: -.035em; line-height: 1.1; }
+
+/* phones: anything you tap is at least 40px */
+@media (max-width: 860px) {
+  .chip, .add-field { min-height: 40px; }
+  .swatches { gap: 12px; }
+  .swatch { width: 34px; height: 34px; }
+  .ir-x, .mf-x { width: 40px; height: 40px; }
+  .mb-btn { border-radius: 14px; min-height: 48px; }
+  .seg-xs button { min-height: 32px; }
+  .sheet .fi { min-height: 44px; }
+  .sheet .item-row .fi, .sheet .ts-row .fi, .t-in .fi, .t-tax .fi-label, .sh-meta .fi { min-height: 42px; }
+}
