@@ -41,6 +41,8 @@
     $("#status").value = inv.status || "draft";
     renderFields();
     regionApply();
+    docDefaults();
+    docApply();
     syncDueIn();
     $$("[data-disc]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.disc === (inv.discountType === "%" ? "%" : "flat"))));
     setAccent(inv.accent, false);
@@ -109,6 +111,42 @@
     return c;
   }
   function shiftsDone() { return Number(inv.hourRate) > 0 && IG.totalHours(inv) > 0; }
+
+  /* ---------- document type rules: quote, estimate, receipt, proforma ---------- */
+  let lastKind = null;
+  function docApply() {
+    const kind = IG.docKind(inv.title), D = IG.DOCS[kind];
+    $("#create").dataset.kind = kind;
+    $$(".doc-pay").forEach((e) => (e.hidden = !D.receipt));
+    $("#acceptBox").hidden = !D.accept;
+    const dn = $("#tDocNote"); dn.hidden = !D.note; dn.textContent = D.note || "";
+    $("#dueInLabel").textContent = D.validity ? "Valid for" : "Payment due";
+    $$("#dueIn option").forEach((o) => {
+      if (o.value === "") o.textContent = "Custom date";
+      else if (o.value === "0") o.textContent = D.validity ? "Today only" : "On receipt";
+      else o.textContent = (D.validity ? "" : "In ") + o.value + " days";
+    });
+    $("#dueInWrap").hidden = !!D.receipt;
+    $("#statusWrap").hidden = !!D.receipt;
+    if (D.receipt) { inv.status = "paid"; $("#status").value = "paid"; }
+    if (!D.paidRow && Number(inv.paid)) { inv.paid = "0"; const pf = $('[data-f="paid"]'); if (pf) pf.value = "0"; }
+  }
+  /* switching type: swap in that type's standard terms and dates, keep anything the person wrote */
+  function docDefaults() {
+    const kind = IG.docKind(inv.title), D = IG.DOCS[kind];
+    if (kind === lastKind) return;
+    const was = lastKind ? IG.DOCS[lastKind] : null;
+    lastKind = kind;
+    if (IG.isDefaultTerms(inv.terms) && inv.terms !== D.terms) { inv.terms = D.terms; const t = $('[data-f="terms"]'); if (t) { t.value = D.terms; autosize(t); } }
+    const days = inv.issueDate && inv.dueDate ? Math.round((new Date(inv.dueDate + "T00:00:00") - new Date(inv.issueDate + "T00:00:00")) / 864e5) : null;
+    const defDays = was ? was.dueDays : IG.DOCS.invoice.dueDays;
+    if (inv.issueDate && (days == null || days === defDays || D.receipt)) {
+      inv.dueDate = IG.addDays(inv.issueDate, D.dueDays);
+      const d = $('[data-f="dueDate"]'); if (d) d.value = inv.dueDate;
+      syncDueIn();
+    }
+    if (D.receipt) inv.paidManual = false;
+  }
 
   /* ---------- region rules: labels, extra boxes, checklist ---------- */
   function setLabel(input, text) {
@@ -270,7 +308,12 @@
   function update() {
     docLabels();
     progress();
-    const t = IG.calc(inv);
+    let t = IG.calc(inv);
+    if (IG.doc(inv.title).receipt && !inv.paidManual && Number(inv.paid) !== t.total) {
+      inv.paid = String(t.total);
+      const pf = $('[data-f="paid"]'); if (pf && document.activeElement !== pf) pf.value = inv.paid;
+      t = IG.calc(inv);
+    }
     if (isTs()) {
       const th = $("#tsHours"); if (th) th.textContent = IG.fmtHours(IG.totalHours(inv)) + " h";
       const tr = $("#tsRate"); if (tr) tr.textContent = M(+inv.hourRate || 0) + " / h";
@@ -646,6 +689,8 @@
         let v = el.value;
         if (["discount", "taxRate", "shipping", "paid", "hourRate"].includes(el.dataset.f)) v = v.replace(",", ".").replace(/[^\d.]/g, "");
         setPath(inv, el.dataset.f, v);
+        if (el.dataset.f === "paid") inv.paidManual = true;
+        if (el.dataset.f === "title" && IG.docKind(v) !== lastKind) { docDefaults(); docApply(); }
         if (el.dataset.f === "from.name") brandName();
         if (el.dataset.f === "taxRate") {
           if (inv.taxNote && Number(v) > 0) { inv.taxNote = ""; $("#taxNote").value = ""; }
@@ -704,6 +749,7 @@
     });
 
     // timesheet
+    $("#payMethods").innerHTML = IG.PAY_METHODS.map((w) => '<option value="' + esc(w) + '">').join("");
     $("#workTypes").innerHTML = IG.WORK_TYPES.map((w) => '<option value="' + esc(w) + '">').join("");
     $("#modeSwitch").addEventListener("click", (e) => {
       const b = e.target.closest("button[data-mode]"); if (!b) return;
@@ -939,6 +985,8 @@
     if (pageUnit && IG.UNITS[pageUnit]) inv.unit = pageUnit;
     if (pageMode) inv.mode = pageMode;
     if (!Array.isArray(inv.shifts) || !inv.shifts.length) inv.shifts = [IG.blankShift(inv.issueDate)];
+    lastKind = IG.docKind((IG.draft.get() || {}).title || "Invoice");
+    if (!IG.draft.get()) lastKind = null;
     const pre = IG.store.get("ig_prefill_client", null);
     if (pre) { inv.to = Object.assign({ name: "", email: "", address: "", phone: "" }, pre); IG.store.remove("ig_prefill_client"); }
     fillFields();

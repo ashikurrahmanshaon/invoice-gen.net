@@ -57,12 +57,13 @@
 
     const T = ["modern", "minimal"].indexOf(inv.template) >= 0 ? inv.template : "classic";
     const RG = IG.R(inv);
+    const DK = IG.doc(inv.title);
     const EU = RG.layout === "eu", IN = RG.layout === "in";
     const BOTTOM = EU ? 34 : 18;
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
     const onBand = T === "modern";
     const extraFields = (inv.fields || []).filter((f) => String(f.label || "").trim() && String(f.value || "").trim());
-    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN && /invoice/i.test(inv.title || "") ? 1 : 0);
+    const metaCount = 3 + (DK.receipt && inv.payMethod ? 1 : 0) + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN && /invoice/i.test(inv.title || "") ? 1 : 0);
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
@@ -116,6 +117,7 @@
       ["Issue date", IG.prettyDate(inv.issueDate)],
       [IG.docLabels(inv.title).due, IG.prettyDate(inv.dueDate)]
     ];
+    if (DK.receipt && inv.payMethod) meta.push(["Paid by", inv.payMethod]);
     if (RG.supply && inv.supplyDate) meta.push([RG.supply, IG.prettyDate(inv.supplyDate)]);
     if (RG.pos && inv.placeOfSupply) meta.push(["Place of supply", inv.placeOfSupply]);
     if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
@@ -210,7 +212,7 @@
     doc.setFont("helvetica", "bold"); doc.setFontSize(13);
     doc.text("Total", TX, y); doc.text(M(t.total), R, y, { align: "right" });
     y += 7;
-    if (t.paid) {
+    if (t.paid && DK.paidRow) {
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
       doc.text("Amount paid", TX, y); doc.setTextColor(...ink); doc.text("-" + M(t.paid), R, y, { align: "right" });
       y += 6;
@@ -243,6 +245,11 @@
       const parts = doc.splitTextToSize(clean(line), R - L);
       doc.text(parts, R, y, { align: "right" }); y += parts.length * 4.4 + 1;
     });
+    if (DK.note) {
+      doc.setFont("helvetica", "italic"); doc.setFontSize(8.8); doc.setTextColor(...soft);
+      const dn = doc.splitTextToSize(clean(DK.note), R - L);
+      doc.text(dn, L, y + 2); y += dn.length * 4.4 + 3;
+    }
     if (inv.taxNote && IG.TAX_NOTES[inv.taxNote]) {
       doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...ink);
       doc.text(clean(IG.TAX_NOTES[inv.taxNote]), L, y + 2); y += 7;
@@ -262,6 +269,17 @@
     block("Notes", inv.notes);
     block("Terms", inv.terms);
 
+    if (DK.accept) {
+      if (y + 30 > H - BOTTOM) { doc.addPage(); y = 24; }
+      doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...faint);
+      doc.text("Accepted by", L, y + 2);
+      doc.setDrawColor(...mix(faint, 0.4)); doc.setLineWidth(0.3);
+      const half = (R - L - 12) / 2;
+      doc.line(L, y + 18, L + half, y + 18); doc.line(L + half + 12, y + 18, R, y + 18);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...soft);
+      doc.text("Name and signature", L, y + 22.5); doc.text("Date", L + half + 12, y + 22.5);
+      y += 30;
+    }
     if (RG.sign) {
       if (y + 26 > H - BOTTOM) { doc.addPage(); y = 24; }
       const sx = R - 70;

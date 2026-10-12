@@ -14,26 +14,26 @@
 <meta property="og:title" content="Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net">
 <meta property="og:description" content="Make a professional quote in minutes. Add your logo, items, tax and a valid-until date, then download the PDF or email it. Free, no sign-up.">
 <meta property="og:url" content="https://invoice-gen.net/quote-generator/">
-<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=0130dc05">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=04e083d4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net">
 <meta name="twitter:description" content="Make a professional quote in minutes. Add your logo, items, tax and a valid-until date, then download the PDF or email it. Free, no sign-up.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=0130dc05">
-<link rel="icon" href="/favicon.ico?v=0130dc05" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=0130dc05" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=0130dc05" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=0130dc05" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=0130dc05">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=0130dc05" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=0130dc05">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=04e083d4">
+<link rel="icon" href="/favicon.ico?v=04e083d4" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=04e083d4" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=04e083d4" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=04e083d4" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=04e083d4">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=04e083d4" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=04e083d4">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.min.css?v=0130dc05">
+<link rel="stylesheet" href="/assets/css/style.min.css?v=04e083d4">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
@@ -108,9 +108,11 @@
               <label for="f-po">PO / ref.</label><input class="fi " data-f="poNumber" placeholder="Optional" aria-label="PO or reference" id="f-po">
               <div class="meta-region" id="metaRegion">
                 <label for="f-supply" class="reg-supply" hidden>Date of supply</label><input class="fi reg-supply" type="date" data-f="supplyDate" placeholder="" aria-label="Date of supply" id="f-supply" hidden>
+                <label for="f-pay" class="doc-pay" hidden>Paid by</label><input class="fi doc-pay" data-f="payMethod" placeholder="Card, cash, bank transfer…" aria-label="Payment method" id="f-pay" list="payMethods" autocomplete="off" hidden>
                 <label for="f-pos" class="reg-pos" hidden>Place of supply</label><input class="fi reg-pos" data-f="placeOfSupply" placeholder="State, e.g. Maharashtra (27)" aria-label="Place of supply" id="f-pos" hidden>
               </div>
               <div class="meta-extra" id="metaExtra"></div>
+              <datalist id="payMethods"></datalist>
             </div>
             <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
@@ -173,6 +175,7 @@
             </div>
             <span class="sh-label">Terms</span>
             <textarea class="fi " rows="2" data-f="terms" placeholder="Payment terms" aria-label="Terms"></textarea>
+            <div class="accept-box" id="acceptBox" hidden><span>Accepted by</span><i></i><small>Name, signature and date. This box also prints on the PDF so your client can sign and send it back.</small></div>
           </div>
           <div class="sh-totals" aria-live="polite">
             <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
@@ -181,11 +184,12 @@
             <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in"><input class="fi " data-f="shipping" placeholder="0" aria-label="Shipping" inputmode="decimal"></span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
-            <div class="t-row t-adj"><span>Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
+            <div class="t-row t-adj t-paid"><span>Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
             <p class="t-incl" id="tIncl" hidden></p>
             <p class="t-words" id="tWords" hidden></p>
             <p class="t-note" id="tNote" hidden></p>
+            <p class="t-docnote" id="tDocNote" hidden></p>
           </div>
         </div>
       </div>
@@ -242,7 +246,7 @@
             <button type="button" data-unit="days" aria-pressed="false">Days</button>
           </div>
         </div>
-        <label class="sp-field"><span class="sp-h">Payment due</span>
+        <label class="sp-field" id="dueInWrap"><span class="sp-h" id="dueInLabel">Payment due</span>
           <select class="in" id="dueIn">
             <option value="">Custom date</option>
             <option value="0">On receipt</option>
@@ -252,7 +256,7 @@
             <option value="30">In 30 days</option>
           </select>
         </label>
-        <label class="sp-field"><span class="sp-h">Status</span>
+        <label class="sp-field" id="statusWrap"><span class="sp-h">Status</span>
           <select class="in" id="status">
             <option value="draft">Draft</option>
             <option value="sent">Sent</option>
@@ -462,11 +466,11 @@
     <nav class="foot-legal" aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></nav>
   </div>
 </footer>
-<script src="/assets/js/config.js?v=0130dc05" defer></script>
-<script src="/assets/js/core.js?v=0130dc05" defer></script>
-<script src="/assets/js/motion.js?v=0130dc05" defer></script>
-<script src="/assets/js/invoice.js?v=0130dc05" defer></script>
-<script src="/assets/js/pdf.js?v=0130dc05" defer></script>
-<script src="/assets/js/app.js?v=0130dc05" defer></script>
+<script src="/assets/js/config.js?v=04e083d4" defer></script>
+<script src="/assets/js/core.js?v=04e083d4" defer></script>
+<script src="/assets/js/motion.js?v=04e083d4" defer></script>
+<script src="/assets/js/invoice.js?v=04e083d4" defer></script>
+<script src="/assets/js/pdf.js?v=04e083d4" defer></script>
+<script src="/assets/js/app.js?v=04e083d4" defer></script>
 </body>
 </html>

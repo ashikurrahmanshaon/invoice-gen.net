@@ -15,13 +15,35 @@
 
   // Labels that change with the document type typed at the top (Invoice, Quote, Receipt...)
   IG.DOC_TITLES = ["Invoice", "Quotation", "Quote", "Receipt", "Proforma Invoice", "Estimate", "Tax Invoice", "Bill"];
-  IG.docLabels = function (title) {
-    const t = String(title || "").toLowerCase();
-    if (t.indexOf("quot") >= 0) return { no: "Quote no.", due: "Valid until", bal: "Total due" };
-    if (t.indexOf("estimate") >= 0) return { no: "Estimate no.", due: "Valid until", bal: "Estimated total" };
-    if (t.indexOf("receipt") >= 0) return { no: "Receipt no.", due: "Payment date", bal: "Balance due" };
-    return { no: "Invoice no.", due: "Due date", bal: "Balance due" };
+  /* Each document type has its own wording, defaults and rules */
+  IG.DOCS = {
+    invoice: { no: "Invoice no.", due: "Due date", bal: "Balance due", dueDays: 14, paidRow: true,
+      terms: "Payment is due by the due date shown above. Thank you for your business." },
+    quote: { no: "Quote no.", due: "Valid until", bal: "Quote total", dueDays: 30, paidRow: false, accept: true, validity: true,
+      terms: "This quote is valid until the date shown above. It covers only the items listed; any extra work will be quoted separately. To accept, sign below or reply to confirm." },
+    estimate: { no: "Estimate no.", due: "Valid until", bal: "Estimated total", dueDays: 30, paidRow: false, accept: true, validity: true,
+      terms: "This is an estimate based on what we know today. The final price may change if the work changes; we will confirm with you before doing anything extra." },
+    receipt: { no: "Receipt no.", due: "Payment date", bal: "Balance", dueDays: 0, paidRow: true, receipt: true,
+      terms: "Thank you for your payment." },
+    proforma: { no: "Proforma no.", due: "Valid until", bal: "Amount due", dueDays: 14, paidRow: true, validity: true,
+      note: "This is a proforma invoice, not a tax invoice. A final invoice will be issued when the goods or services are delivered.",
+      terms: "Payment in advance confirms the order. Prices are valid until the date shown above." }
   };
+  IG.docKind = function (title) {
+    const t = String(title || "").toLowerCase();
+    if (t.indexOf("proforma") >= 0 || t.indexOf("pro forma") >= 0) return "proforma";
+    if (t.indexOf("quot") >= 0) return "quote";
+    if (t.indexOf("estimate") >= 0) return "estimate";
+    if (t.indexOf("receipt") >= 0) return "receipt";
+    return "invoice";
+  };
+  IG.doc = function (title) { return IG.DOCS[IG.docKind(title)]; };
+  IG.docLabels = function (title) { const d = IG.doc(title); return { no: d.no, due: d.due, bal: d.bal }; };
+  IG.isDefaultTerms = function (text) {
+    const t = String(text || "").trim();
+    return !t || Object.keys(IG.DOCS).some((k) => IG.DOCS[k].terms === t);
+  };
+  IG.PAY_METHODS = ["Bank transfer", "Card", "Cash", "PayPal", "Cheque", "Mobile payment", "Wise", "Stripe"];
 
   IG.TEMPLATES = ["classic", "modern", "minimal"];
 
@@ -101,7 +123,8 @@
       shipping: 0,
       paid: 0,
       notes: p.notes || "",
-      terms: p.terms || "Payment is due by the due date shown above. Thank you for your business.",
+      terms: p.terms || IG.DOCS.invoice.terms,
+      payMethod: "",
       status: "draft"
     };
   };

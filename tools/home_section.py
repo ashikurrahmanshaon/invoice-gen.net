@@ -96,9 +96,11 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
               <label for="f-po">PO / ref.</label>{fi("poNumber", "Optional", "PO or reference", extra=' id="f-po"')}
               <div class="meta-region" id="metaRegion">
                 <label for="f-supply" class="reg-supply" hidden>Date of supply</label>{fi("supplyDate", "", "Date of supply", "date", cls="reg-supply", extra=' id="f-supply" hidden')}
+                <label for="f-pay" class="doc-pay" hidden>Paid by</label>{fi("payMethod", "Card, cash, bank transfer…", "Payment method", cls="doc-pay", extra=' id="f-pay" list="payMethods" autocomplete="off" hidden')}
                 <label for="f-pos" class="reg-pos" hidden>Place of supply</label>{fi("placeOfSupply", "State, e.g. Maharashtra (27)", "Place of supply", cls="reg-pos", extra=' id="f-pos" hidden')}
               </div>
               <div class="meta-extra" id="metaExtra"></div>
+              <datalist id="payMethods"></datalist>
             </div>
             <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
@@ -161,6 +163,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             </div>
             <span class="sh-label">Terms</span>
             {ta("terms", "Payment terms", "Terms", 2)}
+            <div class="accept-box" id="acceptBox" hidden><span>Accepted by</span><i></i><small>Name, signature and date. This box also prints on the PDF so your client can sign and send it back.</small></div>
           </div>
           <div class="sh-totals" aria-live="polite">
             <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
@@ -169,11 +172,12 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in">{fi("shipping", "0", "Shipping", extra=' inputmode="decimal"')}</span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
-            <div class="t-row t-adj"><span>Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
+            <div class="t-row t-adj t-paid"><span>Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
             <p class="t-incl" id="tIncl" hidden></p>
             <p class="t-words" id="tWords" hidden></p>
             <p class="t-note" id="tNote" hidden></p>
+            <p class="t-docnote" id="tDocNote" hidden></p>
           </div>
         </div>
       </div>
@@ -230,7 +234,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <button type="button" data-unit="days" aria-pressed="false">Days</button>
           </div>
         </div>
-        <label class="sp-field"><span class="sp-h">Payment due</span>
+        <label class="sp-field" id="dueInWrap"><span class="sp-h" id="dueInLabel">Payment due</span>
           <select class="in" id="dueIn">
             <option value="">Custom date</option>
             <option value="0">On receipt</option>
@@ -240,7 +244,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <option value="30">In 30 days</option>
           </select>
         </label>
-        <label class="sp-field"><span class="sp-h">Status</span>
+        <label class="sp-field" id="statusWrap"><span class="sp-h">Status</span>
           <select class="in" id="status">
             <option value="draft">Draft</option>
             <option value="sent">Sent</option>
