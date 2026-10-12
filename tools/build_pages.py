@@ -219,6 +219,9 @@ def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=Tru
         h = h.replace('<body>', '<body class="app-body">')
         # dashboard: no saved login in this browser -> straight to the login page, before anything renders
         h = h.replace('</head>', '<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent("/dashboard/"+location.hash));</script>\n</head>')
+    if path in ("/login/", "/dashboard/"):
+        # sign-in pages: start fetching the sign-in library and connecting to the server right away
+        h = h.replace("</head>", '<link rel="preconnect" href="https://qmzwikvsmvdzirurzkxb.supabase.co" crossorigin>\n<link rel="preload" href="/assets/vendor/supabase.js?v=2.45.4" as="script">\n</head>', 1)
     html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT.replace("<!--CTA-->", FOOT_CTA if cta else "") if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
     out = os.path.join(ROOT, path.strip("/"), "index.html") if path != "/" else os.path.join(ROOT, "index.html")
     if path.endswith(".html"):

@@ -21,6 +21,32 @@
     box.hidden = !text;
   }
 
+  /* plain-language errors for what Supabase returns */
+  function friendly(m) {
+    m = String(m || "");
+    if (/invalid login/i.test(m)) return "That email and password don't match. Try again, or use Forgot password.";
+    if (/already registered|already been registered/i.test(m)) return "That email already has an account. Log in instead.";
+    if (/email not confirmed/i.test(m)) return "Please confirm your email first. Open the link we sent you (check spam too), then log in.";
+    if (/(\d+) seconds/i.test(m) || /rate limit|too many/i.test(m)) {
+      const s = /(\d+) seconds/i.exec(m);
+      return "Too many tries in a short time. Please wait " + (s ? s[1] + " seconds" : "a minute") + " and try again.";
+    }
+    if (/expired|invalid.*link|otp/i.test(m)) return "That link has expired or was already used. Ask for a new one below.";
+    if (/password.*(short|least|weak)/i.test(m)) return "Use a password of at least 8 characters.";
+    if (/failed to fetch|network|load failed/i.test(m)) return "Can't reach the server. Check your internet connection and try again.";
+    return m || "Something went wrong. Try again.";
+  }
+  function busy(btn, on, text) {
+    if (!btn) return;
+    if (on) { btn.dataset.label = btn.innerHTML; btn.disabled = true; btn.classList.add("is-busy"); btn.innerHTML = '<span class="spin" aria-hidden="true"></span>' + text; }
+    else if (btn.dataset.label != null) { btn.disabled = false; btn.classList.remove("is-busy"); btn.innerHTML = btn.dataset.label; delete btn.dataset.label; }
+  }
+  async function ready() {
+    await IG.loadCloud();
+    if (!IG.cloudReady) { msg("x", "soon"); return false; }
+    return true;
+  }
+
   function setMode(m) {
     mode = m;
     document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.mode === m)));
@@ -50,8 +76,10 @@
     if (!IG.validEmail(email)) return msg("Enter a valid email address.");
     if (password.length < 8) return msg("Use a password of at least 8 characters.");
     const btn = $("#authSubmit");
-    btn.disabled = true;
+    busy(btn, true, mode === "login" ? "Logging in…" : "Creating your account…");
+    msg("");
     try {
+      if (!(await ready())) return;
       if (mode === "login") {
         const { error } = await IG.cloud.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -68,32 +96,35 @@
         else msg("Check your inbox (and the spam folder) and click the link we sent to " + email + " to finish creating your account. It can take a minute to arrive.", "ok");
       }
     } catch (err) {
-      const m = err.message || "";
-      if (/invalid login/i.test(m)) msg("That email and password don't match. Try again or reset your password.");
-      else if (/already registered/i.test(m)) msg("That email already has an account. Log in instead.");
-      else msg(m || "Something went wrong. Try again.");
+      msg(friendly(err.message));
     } finally {
-      btn.disabled = false;
+      busy(btn, false);
     }
   }
 
-  async function magicLink() {
+  async function magicLink(e) {
+    if (e) e.preventDefault();
     const email = $("#email").value.trim();
     if (!IG.validEmail(email)) return msg("Enter your email address first, then press Email me a login link.");
-    const { error } = await IG.cloud.auth.signInWithOtp({
-      email, options: { emailRedirectTo: window.location.origin + "/login/?next=" + encodeURIComponent(nextUrl()) }
-    });
-    if (error) return msg(error.message);
-    msg("Login link sent to " + email + ". Open it on this device.", "ok");
+    const a = $("#magic"); if (a.dataset.sending) return; a.dataset.sending = "1";
+    try {
+      if (!(await ready())) return;
+      const { error } = await IG.cloud.auth.signInWithOtp({
+        email, options: { emailRedirectTo: window.location.origin + "/login/?next=" + encodeURIComponent(nextUrl()) }
+      });
+      if (error) return msg(friendly(error.message));
+      msg("Login link sent to " + email + ". Open it on this device; it works once and expires in an hour. Check spam if you can't see it.", "ok");
+    } finally { delete a.dataset.sending; }
   }
 
   async function forgot(e) {
     e.preventDefault();
     const email = $("#email").value.trim();
     if (!IG.validEmail(email)) return msg("Enter your email address first, then press Forgot password.");
+    if (!(await ready())) return;
     const { error } = await IG.cloud.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin + "/login/?reset=1" });
-    if (error) return msg(error.message);
-    msg("Password reset link sent to " + email + ".", "ok");
+    if (error) return msg(friendly(error.message));
+    msg("Password reset link sent to " + email + ". Check spam if you can't see it.", "ok");
   }
 
   // The Google button appears by itself once Google is switched on in Supabase (Authentication → Providers).
@@ -110,11 +141,15 @@
   }
 
   async function google() {
+    const btn = $("#googleBtn");
+    busy(btn, true, "Opening Google…");
+    if (!(await ready())) return busy(btn, false);
+    setTimeout(() => busy(btn, false), 8000);
     const { error } = await IG.cloud.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: window.location.origin + "/login/?next=" + encodeURIComponent(nextUrl()) }
     });
-    if (error) msg("Google login isn't set up yet: " + error.message);
+    if (error) { busy(btn, false); msg("Google login didn't start: " + friendly(error.message)); }
   }
 
   async function setNewPassword(e) {
@@ -122,40 +157,44 @@
     const pw = $("#newPassword").value;
     if (pw.length < 8) return msg("Use a password of at least 8 characters.");
     const { error } = await IG.cloud.auth.updateUser({ password: pw });
-    if (error) return msg(error.message);
+    if (error) return msg(friendly(error.message));
     msg("Password changed. Taking you to your invoices…", "ok");
     setTimeout(() => (window.location.href = "/dashboard/"), 1200);
   }
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    await IG.loadCloud();
-    showGoogleIfEnabled();
+  /* links from emails come back with an error in the address when they have expired */
+  function linkError() {
+    const h = new URLSearchParams((window.location.hash || "").replace(/^#/, "")), q = new URLSearchParams(window.location.search);
+    const d = h.get("error_description") || q.get("error_description");
+    if (!d) return;
+    msg(friendly(d.replace(/\+/g, " ")));
+    history.replaceState(null, "", window.location.pathname + (q.get("next") ? "?next=" + encodeURIComponent(q.get("next")) : ""));
+  }
+
+  function init() {
+    // the form works from the first click: each action waits for the sign-in library if it is still loading
     document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => setMode(b.dataset.mode)));
     if (new URLSearchParams(window.location.search).get("signup") === "1") setMode("signup");
-    if (!IG.cloudReady) {
-      // Accounts are off until Supabase keys are added in assets/js/config.js.
-      if (window.console) console.info("invoice-gen: add Supabase keys in assets/js/config.js to switch on accounts.");
-      const soon = (e) => { if (e) e.preventDefault(); msg("x", "soon"); };
-      $("#authForm").addEventListener("submit", soon);
-      ["#magic", "#forgot", "#googleBtn"].forEach((s) => $(s).addEventListener("click", soon));
-      return;
-    }
     $("#authForm").addEventListener("submit", submit);
     $("#magic").addEventListener("click", magicLink);
     $("#forgot").addEventListener("click", forgot);
     $("#googleBtn").addEventListener("click", google);
     $("#resetForm").addEventListener("submit", setNewPassword);
-
-    IG.cloud.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        $("#authForm").hidden = true;
-        $("#resetForm").hidden = false;
-        $("#authTitle").textContent = "Choose a new password";
-      }
+    linkError();
+    IG.loadCloud().then(async () => {
+      showGoogleIfEnabled();
+      if (!IG.cloudReady) return;
+      IG.cloud.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY") {
+          $("#authForm").hidden = true;
+          $("#resetForm").hidden = false;
+          $("#authTitle").textContent = "Choose a new password";
+        }
+      });
+      const params = new URLSearchParams(window.location.search);
+      const { data } = await IG.cloud.auth.getSession();
+      if (data && data.session && !params.get("reset")) window.location.replace(nextUrl());
     });
-
-    const params = new URLSearchParams(window.location.search);
-    const user = await IG.getUser();
-    if (user && !params.get("reset")) window.location.replace(nextUrl());
-  });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();

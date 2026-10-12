@@ -1887,3 +1887,8 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 }
 /* PAID stamp on phones: beside the title, never over the totals */
 @media (max-width: 860px) { .sheet .stamp { top: 76px; right: 18px; bottom: auto; font-size: 1.25rem; padding: 2px 10px; } }
+/* busy buttons (log in, sign up, Google) */
+.btn.is-busy { cursor: progress; opacity: .92; }
+.btn .spin { width: 16px; height: 16px; margin-right: 8px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; display: inline-block; vertical-align: -3px; animation: spin .7s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .btn .spin { animation-duration: 1.6s; } }

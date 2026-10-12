@@ -5,7 +5,8 @@
   const IG = (window.IG = window.IG || {});
 
   // Accounts are loaded only when needed, so first visits stay light and fast.
-  const SUPABASE_JS = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js";
+  // served from this site, not a CDN: one connection, cached for a month
+  const SUPABASE_JS = "/assets/vendor/supabase.js?v=2.45.4";
   IG.cfgReady = !!(cfg.SUPABASE_URL && cfg.SUPABASE_ANON_KEY);
   IG.cloudReady = false;
   IG.cloud = null;
