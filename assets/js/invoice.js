@@ -154,16 +154,27 @@
   };
   IG.fmtBreak = (b) => (+b ? (+b) + " min" : "0 min");
 
+  /* how many decimals a currency uses: yen and won have none */
+  const fdCache = {};
+  IG.fractionDigits = function (cur) {
+    if (fdCache[cur] == null) {
+      try { fdCache[cur] = new Intl.NumberFormat("en", { style: "currency", currency: cur || "USD" }).resolvedOptions().maximumFractionDigits; }
+      catch (e) { fdCache[cur] = 2; }
+    }
+    return fdCache[cur];
+  };
   IG.calc = function (inv) {
-    const lines = IG.effectiveItems(inv).map((it) => round2(num(it.qty) * num(it.rate)));
-    const subtotal = round2(lines.reduce((a, b) => a + b, 0));
-    const discount = inv.discountType === "%" ? round2(subtotal * num(inv.discount) / 100) : round2(num(inv.discount));
-    const afterDiscount = Math.max(0, subtotal - discount);
-    const tax = round2(afterDiscount * num(inv.taxRate) / 100);
-    const shipping = round2(num(inv.shipping));
-    const total = round2(afterDiscount + tax + shipping);
-    const paid = round2(num(inv.paid));
-    const balance = round2(total - paid);
+    const f = Math.pow(10, IG.fractionDigits(inv.currency));
+    const rd = (n) => Math.round((n + Number.EPSILON) * f) / f;
+    const lines = IG.effectiveItems(inv).map((it) => rd(num(it.qty) * num(it.rate)));
+    const subtotal = rd(lines.reduce((a, b) => a + b, 0));
+    const discount = inv.discountType === "%" ? rd(subtotal * num(inv.discount) / 100) : rd(num(inv.discount));
+    const afterDiscount = Math.max(0, rd(subtotal - discount));
+    const tax = rd(afterDiscount * num(inv.taxRate) / 100);
+    const shipping = rd(num(inv.shipping));
+    const total = rd(afterDiscount + tax + shipping);
+    const paid = rd(num(inv.paid));
+    const balance = rd(total - paid);
     return { lines, subtotal, discount, tax, shipping, total, paid, balance };
   };
 
@@ -235,9 +246,10 @@
     if (!t.tax && !rate) return [];
     if (R.split) {
       if (inv.gstSplit === "inter") return [["IGST (" + rate + "%)", t.tax]];
-      const half = Math.round((t.tax / 2 + Number.EPSILON) * 100) / 100;
+      const f = Math.pow(10, IG.fractionDigits(inv.currency));
+      const half = Math.round((t.tax / 2 + Number.EPSILON) * f) / f;
       const r2 = Math.round(rate / 2 * 100) / 100;
-      return [["CGST (" + r2 + "%)", half], ["SGST (" + r2 + "%)", Math.round((t.tax - half) * 100) / 100]];
+      return [["CGST (" + r2 + "%)", half], ["SGST (" + r2 + "%)", Math.round((t.tax - half) * f) / f]];
     }
     return [[(inv.taxLabel || R.tax || "Tax") + " (" + rate + "%)", t.tax]];
   };

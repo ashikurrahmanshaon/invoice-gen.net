@@ -636,7 +636,10 @@
         let v = el.value;
         if (["discount", "taxRate", "shipping", "paid", "hourRate"].includes(el.dataset.f)) v = v.replace(",", ".").replace(/[^\d.]/g, "");
         setPath(inv, el.dataset.f, v);
-        if (el.dataset.f === "taxRate") rateHint();
+        if (el.dataset.f === "taxRate") {
+          if (inv.taxNote && Number(v) > 0) { inv.taxNote = ""; $("#taxNote").value = ""; }
+          rateHint();
+        }
         if (el.dataset.f === "issueDate" || el.dataset.f === "dueDate") {
           if (el.dataset.f === "issueDate" && $("#dueIn").value !== "") { inv.dueDate = IG.addDays(inv.issueDate, +$("#dueIn").value); $('[data-f="dueDate"]').value = inv.dueDate; }
           syncDueIn();
@@ -808,10 +811,18 @@
       const b = e.target.closest("[data-gst]"); if (!b) return;
       inv.gstSplit = b.dataset.gst; regionApply(); update(); changed();
     });
-    $("#taxNote").addEventListener("change", (e) => { inv.taxNote = e.target.value; update(); changed(); });
+    $("#taxNote").addEventListener("change", (e) => {
+      inv.taxNote = e.target.value;
+      if (inv.taxNote && Number(inv.taxRate) > 0) {
+        inv.taxRate = "0"; $('[data-f="taxRate"]').value = "0"; rateHint();
+        IG.toast((inv.taxLabel || "VAT") + " set to 0%: with this note no " + (inv.taxLabel || "VAT") + " is charged on the invoice.", "ok");
+      }
+      update(); changed();
+    });
     $("#regRate").addEventListener("click", (e) => {
       if (!e.target.closest("#useRate")) return;
       const R = IG.R(inv);
+      inv.taxNote = ""; $("#taxNote").value = "";
       inv.taxRate = String(R.rate); if (!inv.taxLabel || IG.TAX_NAMES.indexOf(inv.taxLabel) >= 0) inv.taxLabel = R.tax;
       $('[data-f="taxRate"]').value = inv.taxRate; $('[data-f="taxLabel"]').value = inv.taxLabel;
       rateHint(); update(); changed();

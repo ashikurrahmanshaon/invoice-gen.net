@@ -62,7 +62,7 @@
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
     const onBand = T === "modern";
     const extraFields = (inv.fields || []).filter((f) => String(f.label || "").trim() && String(f.value || "").trim());
-    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN ? 1 : 0);
+    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN && /invoice/i.test(inv.title || "") ? 1 : 0);
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
@@ -97,7 +97,7 @@
     doc.text(clean(inv.title || "Invoice"), R, y + 8, { align: "right" });
     doc.setFontSize(9.5);
     let my = y + 17;
-    if (IN) {
+    if (IN && /invoice/i.test(inv.title || "")) {
       doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...(onBand ? mix(accent, 0.7) : faint));
       doc.text("ORIGINAL FOR RECIPIENT", R, y + 13.5, { align: "right" });
       doc.setFontSize(9.5); my += 3;
