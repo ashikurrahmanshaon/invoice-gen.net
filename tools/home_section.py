@@ -283,13 +283,13 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
 </section>
 
 <section class="band band-line" id="features" aria-labelledby="features-title">
-  <div class="wrap split-2">
+  <div class="wrap feat-wrap">
     <div>
       <h2 id="features-title">What's included</h2>
       <p class="lede">Everything below is free. A few extras need a free account, because we save your work and send email for you.</p>
     </div>
     <dl class="feat">
-      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="#d1fae5"/><path d="M14 3v5h5M12 11v6m0 0-2.5-2.5M12 17l2.5-2.5"/></svg></span>PDF download</dt><dd>A clean A4 PDF with your logo. No watermark.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="#d1fae5"/><path d="M14 3v5h5M12 11v6m0 0-2.5-2.5M12 17l2.5-2.5"/></svg></span>PDF download</dt><dd>A clean A4 or US Letter PDF with your logo. No watermark.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="2" fill="#d1fae5"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2" fill="#d1fae5"/></svg></span>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies</dt><dd>US Dollar, Euro, Pound, Canadian and Australian Dollar, Yen and more, formatted correctly.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9z" fill="#d1fae5"/><circle cx="8" cy="8" r="1.5"/><path d="m10 15 5-5"/></svg></span>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>

@@ -1576,3 +1576,63 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .t-in .fi { width: 68px; }
 .seg-xs button { padding: 4px 8px; }
 .t-tax .fi-label { width: 116px; max-width: 116px; }
+
+/* =====================================================================
+   Header: two-column Tools menu, calmer phone menu
+   ===================================================================== */
+.nav-panel { width: 560px; display: grid; grid-template-columns: 1.25fr 1fr; gap: 6px; padding: 10px; }
+.np-col { display: grid; align-content: start; gap: 2px; }
+.np-h { display: block; padding: 6px 10px 4px; font-size: .7rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+.np-biz { border-left: 1px solid var(--rule-2); padding-left: 6px; }
+.np-biz a { padding: 9px 10px; font-weight: 600; font-size: .9rem; color: var(--ink); }
+.np-biz a.np-all { margin-top: 6px; color: var(--brand-2); font-size: .86rem; }
+.np-ico { transition: background .2s, color .2s, transform .25s var(--ease-out); }
+.nav-panel a:hover .np-ico { background: var(--brand); color: #fff; transform: scale(1.05); }
+.nav-panel a { transition: background .15s; }
+.nav-scrim { display: none; }
+@media (max-width: 860px) {
+  .nav { max-height: calc(100dvh - 90px); overflow-y: auto; overscroll-behavior: contain; transform-origin: top center; }
+  .nav.open { animation: navIn .22s var(--ease-out) both; }
+  @keyframes navIn { from { opacity: 0; transform: translateY(-6px) scale(.98); } to { opacity: 1; transform: none; } }
+  .nav-scrim { position: fixed; inset: 0; z-index: 40; background: rgba(15, 23, 42, .32); opacity: 0; pointer-events: none; transition: opacity .2s; display: block; }
+  .nav-open .nav-scrim { opacity: 1; pointer-events: auto; }
+  .nav-open, .nav-open body { overflow: hidden; }
+  .site-header { z-index: 60; }
+  .nav a[aria-current="page"] { box-shadow: none; background: var(--brand-soft); color: var(--brand-ink); }
+  .nav-panel { width: auto; grid-template-columns: 1fr; gap: 0; padding: 0 0 6px; }
+  .nav-drop.open .nav-panel { display: grid; }
+  .np-biz { border-left: 0; padding-left: 0; border-top: 1px solid var(--rule-2); margin-top: 6px; padding-top: 4px; grid-template-columns: 1fr 1fr; }
+  .np-biz .np-h { grid-column: 1 / -1; }
+  .np-biz a { padding: 11px 10px; font-size: .94rem; }
+  .np-biz a.np-all { grid-column: 1 / -1; margin-top: 0; }
+  .nav-panel small { display: none; }
+  .nav-panel a { padding: 9px 10px; }
+  .np-ico { width: 32px; height: 32px; }
+}
+@media (prefers-reduced-motion: reduce) { .nav.open { animation: none; } }
+
+/* Home: features as an even 3 x 3 grid */
+.feat-wrap > div:first-child { max-width: 640px; margin-bottom: 22px; }
+.feat-wrap .feat { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.feat-wrap .feat > div { display: flex; flex-direction: column; height: 100%; padding: 18px 20px; border-radius: 16px; }
+.feat-wrap .feat dt { flex-wrap: nowrap; align-items: center; }
+.feat-wrap .feat dt em { margin-left: auto; flex: none; font-size: .68rem; }
+.feat-wrap .feat dd { margin: 8px 0 0; }
+@media (max-width: 1000px) { .feat-wrap .feat { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .feat-wrap .feat { grid-template-columns: 1fr; gap: 10px; } .feat-wrap .feat dd { margin-left: 44px; } }
+/* progress list: finished steps go quiet instead of being crossed out */
+.spp-list li.done button { text-decoration: none; color: var(--muted); }
+.nav-open .mobile-bar { transform: translateY(110%); }
+
+/* Invoice panel: every box has its label on every screen */
+.pf-l { position: static; width: auto; height: auto; overflow: visible; clip: auto; white-space: normal; display: flex; align-items: center; gap: 6px; margin: 0 0 4px 2px; font-size: .74rem; font-weight: 600; color: var(--muted); letter-spacing: .005em; }
+.pf-l em { font-style: normal; font-size: .62rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--brand-2); background: var(--brand-soft); border-radius: 999px; padding: 2px 7px; }
+.pf:focus-within .pf-l { color: var(--brand-ink); }
+.party { gap: 10px; }
+.party .fi { min-height: 40px; }
+.party textarea.fi { min-height: 62px; }
+@media (max-width: 860px) {
+  .nav-panel { display: none; box-shadow: none; border-radius: 0; background: transparent; }
+  .nav-drop.open .nav-panel { display: grid; }
+  .nav-open .mobile-bar { transform: translateY(calc(100% + 120px)); }
+}

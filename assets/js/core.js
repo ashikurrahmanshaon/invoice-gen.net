@@ -104,10 +104,18 @@
     const toggle = document.querySelector(".nav-toggle");
     const nav = document.querySelector(".nav");
     if (toggle && nav) {
-      toggle.addEventListener("click", () => {
-        const open = nav.classList.toggle("open");
+      const scrim = document.createElement("div");
+      scrim.className = "nav-scrim";
+      document.body.appendChild(scrim);
+      const set = (open) => {
+        nav.classList.toggle("open", open);
         toggle.setAttribute("aria-expanded", String(open));
-      });
+        document.documentElement.classList.toggle("nav-open", open);
+      };
+      toggle.addEventListener("click", () => set(!nav.classList.contains("open")));
+      scrim.addEventListener("click", () => set(false));
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape" && nav.classList.contains("open")) set(false); });
+      nav.addEventListener("click", (e) => { if (e.target.closest("a")) set(false); });
     }
     const user = await IG.getUser();
     document.documentElement.classList.toggle("has-session", !!user);

@@ -37,7 +37,21 @@ GUIDES = [
     ("/payment-reminder/", "Payment reminder emails"),
 ]
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
-TOOLS_MENU = "".join(f'<a href="{u}"><span class="np-ico">{TOOL_ICON}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS)
+def _svg(path):
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>'
+TOOL_ICONS = {
+    "/": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/>',
+    "/quote-generator/": '<path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/>',
+    "/receipt-generator/": '<path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z"/><path d="m9 11 2 2 4-4"/>',
+    "/proforma-invoice/": '<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 15h.01M12 15h.01M15 15h.01"/>',
+    "/estimate-maker/": '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2M12 11h2M16 11h0M8 15h2M12 15h2M8 18.5h6"/>',
+    "/timesheet-invoice/": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+}
+TOOLS_MENU = ('<div class="np-col"><span class="np-h">Documents</span>' +
+    "".join(f'<a href="{u}"><span class="np-ico">{_svg(TOOL_ICONS.get(u, ""))}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS) +
+    '</div><div class="np-col np-biz"><span class="np-h">By business</span>' +
+    "".join(f'<a href="{u}">{n.replace(" invoice", "")}</a>' for u, n in INDUSTRY) +
+    '<a class="np-all" href="/guides/">All guides →</a></div>')
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
 
@@ -172,7 +186,7 @@ FOOT = '''<footer class="site-footer">
   </div>
   <div class="wrap foot-base">
     <span>&copy; <span data-year>2026</span> invoice-gen.net</span>
-    <span>Your invoices stay in your browser unless you save them to your account.</span>
+    <span>Nothing you type is stored on our servers unless you save it to your account.</span>
   </div>
 </footer>
 '''
