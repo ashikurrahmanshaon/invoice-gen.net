@@ -1487,7 +1487,7 @@ h2 { letter-spacing: -0.03em; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .22s; }
 @media (prefers-reduced-motion: reduce) { @view-transition { navigation: none; } }
 /* the header no longer blurs what scrolls under it: cheaper to paint on phones */
-.site-header { background: rgba(255, 255, 255, .97) !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transition: box-shadow .2s; }
+.site-header { background: #fff !important; -webkit-backdrop-filter: none !important; backdrop-filter: none !important; transition: box-shadow .2s; }
 .site-header.scrolled { box-shadow: 0 1px 0 var(--rule), 0 6px 18px -14px rgba(15, 23, 42, .3); }
 button, a, .seg button, .chip, .swatch { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 /* sections below the generator render only when they come near the screen */
@@ -1892,3 +1892,51 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .btn .spin { width: 16px; height: 16px; margin-right: 8px; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; display: inline-block; vertical-align: -3px; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .btn .spin { animation-duration: 1.6s; } }
+
+/* =====================================================================
+   iPhone Safari: keep the sticky header above form fields
+   (inputs with transitions get their own layer on iOS and could paint over it)
+   ===================================================================== */
+.site-header { isolation: isolate; }
+
+/* =====================================================================
+   Phones: totals as one tidy grid — name | box | amount
+   ===================================================================== */
+@media (max-width: 560px) {
+  .sheet .sh-totals { padding-top: 6px; }
+  .sheet .sh-totals .t-row { min-height: 44px; padding: 4px 0; }
+  .sheet .sh-totals .t-adj { display: grid; grid-template-columns: minmax(0, 1fr) 138px minmax(72px, auto); gap: 10px; align-items: center; }
+  .sheet .sh-totals .t-adj > b { text-align: right; font-variant-numeric: tabular-nums; }
+  .sheet .sh-totals .t-in { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 6px; width: 138px; }
+  .sheet .sh-totals .t-in .fi { width: 100%; min-width: 0; min-height: 40px; padding: 6px 10px; font-size: 16px; text-align: right; }
+  .sheet .sh-totals .t-in em { font-style: normal; color: var(--faint); font-size: .9rem; padding-right: 2px; }
+  /* % / Fixed: a small two-way switch */
+  .sheet .sh-totals .t-in .seg-xs { padding: 2px; }
+  .sheet .sh-totals .t-in .seg-xs button { min-height: 34px; padding: 0 8px; font-size: .74rem; }
+  /* the tax name reads like the other labels and turns into a box when tapped */
+  .sheet .sh-totals .t-tax { min-width: 0; }
+  .sheet .sh-totals .t-tax .fi-label { width: 100%; max-width: 100%; min-height: 40px; padding: 6px 8px; margin-left: -8px; border-color: transparent !important; background: transparent !important; color: var(--muted); font-size: 16px; text-decoration: underline dotted #cbd5e1; text-underline-offset: 5px; }
+  .sheet .sh-totals .t-tax .fi-label:focus { border-color: var(--brand) !important; background: #fff !important; text-decoration: none; color: var(--ink); }
+  .sheet .sh-totals .t-total { margin-top: 6px; padding-top: 12px; }
+  .sheet .sh-totals .t-due { margin-top: 10px; padding: 14px 16px; border-radius: 14px; }
+  .sheet .sh-totals .t-split { margin: 0 0 6px; }
+}
+
+@media (max-width: 560px) {
+  .sheet .sh-totals .t-adj { grid-template-columns: minmax(0, 1fr) 118px minmax(70px, auto); gap: 8px; }
+  .sheet .sh-totals .t-in { width: 118px; gap: 4px; }
+  .sheet .sh-totals .t-adj > span:first-child { font-size: .92rem; line-height: 1.2; }
+  .sheet .sh-totals .t-in .seg-xs button { padding: 0 7px; font-size: .7rem; }
+  .sheet .sh-totals .t-in .fi { padding: 6px 8px; }
+  .sheet .sh-totals .t-tax .fi-label { font-size: .92rem; }
+}
+@media (max-width: 380px) {
+  .sheet .sh-totals .t-adj { grid-template-columns: minmax(0, 1fr) 104px minmax(64px, auto); gap: 6px; }
+  .sheet .sh-totals .t-in { width: 104px; }
+  .sheet .sh-totals .t-adj > span:first-child, .sheet .sh-totals .t-tax .fi-label { font-size: .86rem; }
+  .sheet .sh-totals .t-adj > b { font-size: .9rem; }
+}
+@media (max-width: 560px) {
+  .sheet .sh-totals .t-adj:has(.seg-xs) { grid-template-columns: minmax(0, 1fr) 146px minmax(64px, auto); }
+  .sheet .sh-totals .t-adj:has(.seg-xs) .t-in { width: 146px; }
+}
