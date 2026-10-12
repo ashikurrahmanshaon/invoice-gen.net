@@ -29,8 +29,19 @@
     $("#authSubmit").textContent = m === "login" ? "Log in" : "Create account";
     $("#password").setAttribute("autocomplete", m === "login" ? "current-password" : "new-password");
     $("#forgot").hidden = m !== "login";
+    const t = $("#authTerms"); if (t) t.hidden = m === "login";
+    $("#password").setAttribute("placeholder", m === "login" ? "Your password" : "At least 8 characters");
     msg("");
   }
+
+  document.addEventListener("click", (e) => {
+    const eye = e.target.closest("#pwEye"); if (!eye) return;
+    const pw = $("#password"), show = pw.type === "password";
+    pw.type = show ? "text" : "password";
+    eye.setAttribute("aria-pressed", String(show));
+    eye.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    pw.focus();
+  });
 
   async function submit(e) {
     e.preventDefault();

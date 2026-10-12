@@ -1636,3 +1636,78 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
   .nav-drop.open .nav-panel { display: grid; }
   .nav-open .mobile-bar { transform: translateY(calc(100% + 120px)); }
 }
+
+/* =====================================================================
+   Header details
+   ===================================================================== */
+.nav-drop-btn.is-active { color: var(--ink); box-shadow: inset 0 -2px 0 var(--brand); border-radius: 0; }
+.nav-avatar { display: inline-grid; place-items: center; width: 38px; height: 38px; padding: 0 !important; border-radius: 50% !important; background: #0f172a; color: #fff !important; font-weight: 700; font-size: .92rem; margin-left: 6px; box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #d1fae5; transition: transform .2s var(--ease-out), box-shadow .2s; }
+.nav-avatar[hidden] { display: none; }
+.nav-avatar:hover { transform: scale(1.06); box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px var(--brand); background: #0f172a !important; }
+.nav-actions a[data-signout] { color: var(--faint); }
+.brand .brand-mark { transition: transform .35s var(--ease-out); }
+.brand:hover .brand-mark { transform: rotate(-8deg) scale(1.04); }
+@media (max-width: 860px) {
+  .nav-drop-btn.is-active { box-shadow: none; background: var(--brand-soft); color: var(--brand-ink); border-radius: 12px; }
+  .nav-avatar { display: none !important; }
+}
+
+/* =====================================================================
+   Footer: trust strip, contact, legal bar
+   ===================================================================== */
+.foot-trust { list-style: none; margin: 0 0 8px; padding: 26px 0 34px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; border-bottom: 1px solid rgba(236, 253, 245, .1); }
+.foot-trust li { display: flex; gap: 12px; align-items: flex-start; }
+.ft-ico { width: 40px; height: 40px; flex: none; display: grid; place-items: center; border-radius: 12px; background: rgba(167, 243, 208, .1); color: #6ee7b7; box-shadow: inset 0 0 0 1px rgba(167, 243, 208, .16); }
+.ft-ico svg { width: 20px; height: 20px; }
+.foot-trust b { display: block; color: #ecfdf5; font-size: .95rem; font-weight: 700; margin: 1px 0 3px; }
+.foot-trust small { display: block; color: rgba(236, 253, 245, .6); font-size: .84rem; line-height: 1.5; }
+.foot-mail { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 9px 14px; border-radius: 999px; background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12); color: #ecfdf5 !important; font-size: .9rem; font-weight: 600; text-decoration: none; transition: background .2s; }
+.foot-mail:hover { background: rgba(255, 255, 255, .12); }
+.foot-mail svg { width: 17px; height: 17px; color: #6ee7b7; }
+.site-footer .foot-grid { padding-top: 28px; }
+.site-footer h2 { color: #ecfdf5; letter-spacing: 0; }
+.site-footer .foot-grid a:not(.brand):not(.foot-mail) { transition: color .15s; }
+.site-footer .foot-grid a:not(.brand):not(.foot-mail):hover { color: #fff; }
+.foot-base { display: flex; justify-content: space-between; align-items: center; gap: 12px 24px; flex-wrap: wrap; }
+.foot-legal { display: flex; gap: 20px; }
+.foot-legal a { color: rgba(236, 253, 245, .6) !important; text-decoration: none; }
+.foot-legal a:hover { color: #fff !important; }
+@media (max-width: 1000px) { .foot-trust { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .foot-trust { grid-template-columns: 1fr; gap: 16px; padding: 22px 0 26px; } .foot-base { flex-direction: column; align-items: flex-start; } }
+
+/* =====================================================================
+   Log in / sign up
+   ===================================================================== */
+.auth-form { background: radial-gradient(1200px 500px at 0% 0%, #f0fdf7 0%, rgba(240, 253, 247, 0) 60%), #fff; }
+.auth-card { width: 100%; max-width: 420px; background: #fff; border-radius: 24px; padding: 32px 30px 26px; box-shadow: 0 0 0 1px #e3ebe7, 0 2px 4px rgba(6, 78, 59, .04), 0 30px 60px -36px rgba(6, 78, 59, .35); }
+.auth-mark { display: block; width: 44px; height: 44px; margin-bottom: 18px; }
+.auth-mark svg { width: 100%; height: 100%; display: block; }
+.auth-card h1 { font-size: clamp(1.6rem, 2.6vw, 2rem); letter-spacing: -.035em; margin: 0 0 6px; }
+.auth-sub { margin: 0 0 20px; color: var(--muted); }
+.auth-card .tabs { margin-bottom: 18px; }
+.auth-card .f { margin-bottom: 14px; }
+.pw-wrap { position: relative; display: block; }
+.pw-wrap .in { padding-right: 48px; }
+.pw-eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 10px; background: none; color: var(--faint); cursor: pointer; transition: background .15s, color .15s; }
+.pw-eye:hover { background: var(--desk); color: var(--ink); }
+.pw-eye svg { width: 19px; height: 19px; }
+.pw-eye .pw-slash { opacity: 1; transition: opacity .15s; }
+.pw-eye[aria-pressed="true"] .pw-slash { opacity: 0; }
+.auth-terms { margin: 12px 0 0; font-size: .82rem; color: var(--muted); line-height: 1.5; }
+.auth-terms a { color: var(--ink); }
+.auth-links { display: flex; justify-content: space-between; gap: 12px; margin: 14px 0 0; font-size: .9rem; }
+.auth-links a { color: var(--brand-ink); font-weight: 600; text-decoration: none; }
+.auth-links a:hover { text-decoration: underline; }
+.auth-trust { display: flex; gap: 8px; align-items: flex-start; margin: 18px 0 0; padding: 12px 14px; border-radius: 14px; background: #f6fbf9; color: var(--muted); font-size: .82rem; line-height: 1.45; }
+.auth-trust svg { width: 16px; height: 16px; flex: none; color: var(--brand); margin-top: 1px; }
+.auth-foot { margin: 16px 0 0; text-align: center; font-size: .88rem; color: var(--muted); }
+.auth-foot a { color: var(--ink); font-weight: 600; }
+#googleBtn { min-height: 48px; font-weight: 650; gap: 10px; }
+@media (max-width: 900px) {
+  .auth-form { padding: 20px 14px 40px; background: radial-gradient(600px 300px at 50% 0%, #ecfdf5 0%, rgba(236, 253, 245, 0) 70%), #fff; }
+  .auth-card { padding: 24px 20px 20px; border-radius: 20px; }
+  .auth-mark { width: 40px; height: 40px; margin-bottom: 14px; }
+}
+.site-footer .foot-trust { padding: 30px 0 36px; margin: 0 0 6px; }
+.site-footer .foot-trust li { margin: 0; }
+@media (max-width: 560px) { .site-footer .foot-trust { padding: 26px 0 30px; } }

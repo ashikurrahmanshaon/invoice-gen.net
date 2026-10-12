@@ -121,6 +121,8 @@
     document.documentElement.classList.toggle("has-session", !!user);
     document.querySelectorAll('[data-auth="in"]').forEach((el) => (el.hidden = !user));
     document.querySelectorAll('[data-auth="out"]').forEach((el) => (el.hidden = !!user));
+    const av = document.getElementById("navAvatar");
+    if (av && user && user.email) { av.textContent = user.email.charAt(0).toUpperCase(); av.parentElement.title = user.email; }
     document.querySelectorAll("[data-signout]").forEach((el) =>
       el.addEventListener("click", (e) => {
         e.preventDefault();

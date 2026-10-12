@@ -22,6 +22,7 @@ def login_markup():
     return f'''<section class="auth">
   <div class="auth-form">
     <div class="auth-card">
+      <span class="auth-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#059669"/><g transform="translate(32 32) scale(1.24) translate(-32 -32)"><path d="M23 15h18a3 3 0 0 1 3 3v31l-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4V18a3 3 0 0 1 3-3z" fill="#fff"/><path d="m26.2 31.8 4.2 4.2 8.2-8.6" fill="none" stroke="#059669" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg></span>
       <h1 id="authTitle">Welcome back</h1>
       <p class="auth-sub" id="authSub">Log in to see your invoices, clients and payments.</p>
       <div class="tabs" role="tablist" aria-label="Log in or sign up">
@@ -33,15 +34,17 @@ def login_markup():
         <button type="button" class="btn btn-white btn-block" id="googleBtn" hidden>{GOOGLE} Continue with Google</button>
         <div class="divider" id="googleDivider" hidden>or with email</div>
         <label class="f"><span class="f-label">Email</span><input class="in" id="email" type="email" autocomplete="email" placeholder="you@business.com" required></label>
-        <label class="f"><span class="f-label">Password</span><input class="in" id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required></label>
+        <label class="f"><span class="f-label">Password</span><span class="pw-wrap"><input class="in" id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required><button type="button" class="pw-eye" id="pwEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="pw-slash" d="M4 4l16 16"/></svg></button></span></label>
         <button class="btn btn-primary btn-block btn-lg" id="authSubmit" type="submit">Log in</button>
+        <p class="auth-terms" id="authTerms" hidden>By creating an account you agree to the <a href="/terms/">Terms of use</a> and <a href="/privacy/">Privacy policy</a>.</p>
         <p class="auth-links"><a href="#" id="magic">Email me a login link</a><a href="#" id="forgot">Forgot password?</a></p>
+        <p class="auth-trust"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/></svg>Your password is stored encrypted, and only you can see your invoices.</p>
       </form>
       <form id="resetForm" hidden>
         <label class="f"><span class="f-label">New password</span><input class="in" id="newPassword" type="password" autocomplete="new-password" minlength="8" required></label>
         <button class="btn btn-primary btn-block" type="submit">Save new password</button>
       </form>
-      <p class="hint auth-foot">You can also <a href="/#create">make and download invoices</a> without an account. Your saved invoices are private to you.</p>
+      <p class="auth-foot">No account needed to <a href="/#create">make and download invoices</a>.</p>
     </div>
   </div>
   <aside class="auth-side" aria-label="Why create an account">

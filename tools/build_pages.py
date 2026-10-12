@@ -6,7 +6,13 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
-V = "25"  # asset version, bump to bust browser caches
+import hashlib as _hl, glob as _gl
+def _asset_version(root):
+    h = _hl.md5()
+    for f in sorted(_gl.glob(os.path.join(root, "assets/css/style.css")) + _gl.glob(os.path.join(root, "assets/js/*.js")) + _gl.glob(os.path.join(root, "assets/brand/*.svg"))):
+        h.update(open(f, "rb").read())
+    return h.hexdigest()[:8]
+V = _asset_version(sys.argv[1] if len(sys.argv) > 1 else ".")  # changes whenever a stylesheet or script changes
 SESSION_JS = '<script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>'
 
 SPEC_JS = '<script type="speculationrules">{"prefetch":[{"source":"document","where":{"and":[{"href_matches":"/*"},{"not":{"href_matches":["/login/*","/dashboard/*","/*\\\\?*"]}}]},"eagerness":"moderate"}]}</script>'
@@ -37,6 +43,7 @@ GUIDES = [
     ("/payment-reminder/", "Payment reminder emails"),
 ]
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
+TOOL_PATHS = {"/quote-generator/", "/receipt-generator/", "/proforma-invoice/", "/estimate-maker/", "/timesheet-invoice/", "/contractor-invoice/", "/cleaning-invoice/", "/consulting-invoice/", "/photography-invoice/", "/self-employed-invoice/"}
 def _svg(path):
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>'
 TOOL_ICONS = {
@@ -124,7 +131,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
       <div class="nav-main">
         <a href="/"{' aria-current="page"' if path == "/" else ""}>Invoice generator</a>
         <div class="nav-drop">
-          <button type="button" class="nav-drop-btn" aria-expanded="false">Tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
+          <button type="button" class="nav-drop-btn{' is-active' if path in TOOL_PATHS else ''}" aria-expanded="false">Tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
           <div class="nav-panel">
             {TOOLS_MENU}
           </div>
@@ -135,6 +142,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
       <div class="nav-actions">
         <a href="#" data-auth="in" data-signout hidden>Log out</a>
         <a class="btn btn-primary btn-sm" href="/dashboard/" data-auth="in" hidden>Dashboard</a>
+        <a class="nav-avatar" href="/dashboard/#settings" data-auth="in" hidden aria-label="Your account"><span id="navAvatar">?</span></a>
         <a href="/login/" data-auth="out">Log in</a>
         <a class="btn btn-primary btn-sm" href="/login/?signup=1" data-auth="out">Sign up free</a>
       </div>
@@ -143,8 +151,14 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 </header>
 '''
 
-FOOT = '''<footer class="site-footer">
-  <div class="wrap">
+TRUST = [
+    ('<path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/>', "Private by default", "Nothing you type leaves your browser unless you save it to an account."),
+    ('<rect x="4.5" y="10.5" width="15" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>', "Secure sign-in", "HTTPS everywhere, passwords stored encrypted, and only you can open your invoices."),
+    ('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 14l2 2 4-4"/>', "Free, no watermark", "Every PDF is clean and yours. No trial, no card, no limit on invoices."),
+    ('<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/>', "Made for anywhere", "28 currencies, A4 or US Letter, and local date and number formats."),
+]
+TRUST_HTML = "".join(f'<li><span class="ft-ico">{_svg(i)}</span><span><b>{t}</b><small>{d}</small></span></li>' for i, t, d in TRUST)
+FOOT_CTA = '''  <div class="wrap">
     <div class="foot-cta">
       <div>
         <h2>Make your next invoice in under a minute</h2>
@@ -156,10 +170,14 @@ FOOT = '''<footer class="site-footer">
       </div>
     </div>
   </div>
+'''
+FOOT = '''<footer class="site-footer">
+<!--CTA-->  <div class="wrap"><ul class="foot-trust" aria-label="Why people trust invoice-gen.net">''' + TRUST_HTML + '''</ul></div>
   <div class="wrap foot-grid">
     <div class="foot-brand">
       <a class="brand" href="/" aria-label="invoice-gen.net home">''' + LOGO_SVG + WORDMARK + '''</a>
       <p>Professional invoices, quotes and receipts for freelancers and small businesses around the world.</p>
+      <a class="foot-mail" href="mailto:support@invoice-gen.net">''' + _svg('<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6.5 8.5-6.5"/>') + '''support@invoice-gen.net</a>
     </div>
     <div>
       <h2>Tools</h2>
@@ -180,13 +198,12 @@ FOOT = '''<footer class="site-footer">
         <li><a href="/contact/">Contact</a></li>
         <li><a href="/privacy/">Privacy policy</a></li>
         <li><a href="/terms/">Terms of use</a></li>
-        <li><a href="/login/">Log in</a></li>
       </ul>
     </div>
   </div>
   <div class="wrap foot-base">
-    <span>&copy; <span data-year>2026</span> invoice-gen.net</span>
-    <span>Nothing you type is stored on our servers unless you save it to your account.</span>
+    <span>&copy; <span data-year>2026</span> invoice-gen.net. All rights reserved.</span>
+    <nav class="foot-legal" aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></nav>
   </div>
 </footer>
 '''
@@ -199,7 +216,7 @@ PDF_JS = '''<script src="/assets/vendor/jspdf.umd.min.js?v=2.5.1" defer></script
 <script src="/assets/vendor/jspdf.plugin.autotable.min.js?v=3.8.2" defer></script>
 '''
 
-def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=True):
+def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=True, cta=True):
     h = head(title, desc, path, ld, noindex)
     if not chrome:
         a = h.index('<header class="site-header">'); b = h.index('</header>') + len('</header>\n')
@@ -207,7 +224,7 @@ def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=Tru
         h = h.replace('<body>', '<body class="app-body">')
         # dashboard: no saved login in this browser -> straight to the login page, before anything renders
         h = h.replace('</head>', '<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent("/dashboard/"+location.hash));</script>\n</head>')
-    html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
+    html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT.replace("<!--CTA-->", FOOT_CTA if cta else "") if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
     out = os.path.join(ROOT, path.strip("/"), "index.html") if path != "/" else os.path.join(ROOT, "index.html")
     if path.endswith(".html"):
         out = os.path.join(ROOT, path.strip("/"))
@@ -468,7 +485,7 @@ tool_page("/self-employed-invoice/", "Invoice",
      ("Is it free?", "Yes. Free to make, download and print, with no watermark.")])
 
 page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.net to save invoices and clients and email invoices to your clients.",
-     LOGIN, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/auth.js?v={V}" defer></script>\n', noindex=True)
+     LOGIN, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/auth.js?v={V}" defer></script>\n', noindex=True, cta=False)
 
 # ---------------------------------------------------------------- dashboard
 DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
@@ -721,9 +738,9 @@ article("/contact/", "Contact invoice-gen.net", "Contact the invoice-gen.net tea
 article("/privacy/", "Privacy Policy | invoice-gen.net", "How invoice-gen.net collects, uses and protects your information, including invoices, client details and account data.",
         "Privacy policy", "Privacy policy", '''  <p><em>Last updated: 8 October 2026</em></p>
   <h2>Without an account</h2>
-  <p>Invoices you make without an account stay in your own browser (local storage). They are not sent to our servers. PDFs are created in your browser.</p>
+  <p>Invoices you make without an account stay in your browser tab and are cleared when you close it. They are not sent to our servers. PDFs are created in your browser.</p>
   <h2>With an account</h2>
-  <p>We store your email address, your invoices, clients and business details so you can use them again. Data is stored with Supabase and protected so that only your account can read it.</p>
+  <p>We store your email address, your invoices, clients and business details so you can use them again. Data is stored with Supabase and protected so that only your account can read it. Passwords are stored encrypted (hashed); we cannot see them. We do not sell your data.</p>
   <h2>Emailing invoices</h2>
   <p>When you send an invoice by email, we pass the recipient's address, your message and the PDF to our email provider (Resend) to deliver it. We keep a record of the send (time and recipient) to prevent abuse.</p>
   <h2>Cookies and analytics</h2>
