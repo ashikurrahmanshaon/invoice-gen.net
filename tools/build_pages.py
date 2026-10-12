@@ -113,7 +113,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
           </div>
         </div>
         <a href="/invoice-template/"{' aria-current="page"' if path == "/invoice-template/" else ""}>Templates</a>
-        <a href="/how-to-make-an-invoice/"{' aria-current="page"' if path == "/how-to-make-an-invoice/" else ""}>Guide</a>
+        <a href="/guides/"{' aria-current="page"' if path == "/guides/" else ""}>Guides</a>
       </div>
       <div class="nav-actions">
         <a href="#" data-auth="in" data-signout hidden>Log out</a>
@@ -666,6 +666,17 @@ article("/payment-reminder/", "Payment Reminder Email Templates for Unpaid Invoi
   </ul>
 ''' + faq_html(PR_FAQ) + CTA, ld=[faq_ld(PR_FAQ)])
 
+article("/guides/", "Invoicing Guides: Templates, Payment Terms and Reminders | invoice-gen.net",
+        "Free guides for freelancers and small businesses: how to make an invoice, payment terms, reminders, receipts, and invoice templates for your type of work.",
+        "Invoicing guides", "Guides", '''  <p>Short, practical guides to invoicing and getting paid. Each one links to a free generator so you can put it into practice straight away.</p>
+  <h2>Getting paid</h2>
+  <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in GUIDES) + '''</ul>
+  <h2>Invoice templates by business</h2>
+  <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in INDUSTRY) + '''<li><a href="/timesheet-invoice/">Timesheet invoice for restaurant and hourly staff</a></li></ul>
+  <h2>Other documents</h2>
+  <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS if u != "/") + '''</ul>
+''' + CTA)
+
 article("/about/", "About invoice-gen.net", "invoice-gen.net is a free invoice generator for freelancers and small businesses.",
         "About invoice-gen.net", "About", '''  <p class="lead">invoice-gen.net is a free online invoice generator for freelancers, small shops and growing businesses that need a professional invoice without buying accounting software.</p>
   <div class="facts">
@@ -731,7 +742,7 @@ TODAY = datetime.date.today().isoformat()
 SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS if u != "/"] + [
     ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
     ("/freelance-invoice/", "monthly", "0.8")] + [(u, "monthly", "0.8") for u, n in INDUSTRY if u != "/freelance-invoice/"] + [
-    ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
+    ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
