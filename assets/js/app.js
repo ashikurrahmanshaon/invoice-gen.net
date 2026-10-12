@@ -225,6 +225,7 @@
   /* ---------- design ---------- */
   function setAccent(color, save) {
     inv.accent = color;
+    if (save) inv.accentPicked = true;
     $("#sheet").style.setProperty("--accent", color);
     $$(".swatch").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.color === color)));
     if (save) changed();
@@ -391,7 +392,7 @@
   async function saveProfile() {
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
       name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
-      currency: inv.currency, region: inv.region, accent: inv.accent, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
+      currency: inv.currency, region: inv.region, accent: inv.accent, accentPicked: !!inv.accentPicked, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
       taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms, service: inv.service, hourRate: inv.hourRate
     });
     IG.store.set("ig_profile", p);
@@ -470,7 +471,7 @@
   function newInvoice() {
     if (!window.confirm("Start a new invoice? Your business details and logo stay; the client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
-    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate, mode: inv.mode, service: inv.service, hourRate: inv.hourRate, shipTo: inv.shipTo };
+    const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, accentPicked: inv.accentPicked, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate, mode: inv.mode, service: inv.service, hourRate: inv.hourRate, shipTo: inv.shipTo };
     inv = Object.assign(IG.blankInvoice(), keep);
     const url = new URL(window.location.href);
     url.searchParams.delete("id");
@@ -803,7 +804,7 @@
     } else {
       inv = Object.assign(IG.blankInvoice(), draft);
       if (!inv.tplPicked) inv.template = "classic";
-      if (!inv.tplPicked && /^#(111111|2b5cff|5b4dff|0b0f0c|1d4ed8)$/i.test(inv.accent || "")) inv.accent = "#047857";
+      if (!inv.accentPicked) inv.accent = IG.DEFAULT_ACCENT;
     }
     // keyword pages (quote, receipt, estimate...) open with their own document title
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
