@@ -1842,3 +1842,26 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .sh-brand .logo-remove[hidden] { display: none; }
 .sheet.t-modern .sh-brand .logo-remove { color: rgba(255, 255, 255, .75); }
 @media print { .sh-brand .logo-remove { display: none !important; } }
+
+/* =====================================================================
+   All tools page
+   ===================================================================== */
+.tools-head { padding-bottom: 8px; }
+.tools-head .lede { max-width: 56ch; margin-top: 10px; color: var(--muted); }
+.tools-band { padding-block: 44px; }
+.tools-band h2 { font-size: clamp(1.3rem, 2vw, 1.6rem); margin: 0 0 18px; }
+.tool-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.tc { display: flex; align-items: center; gap: 14px; height: 100%; padding: 18px; border-radius: var(--r-card); background: #fff; color: var(--ink); text-decoration: none; box-shadow: 0 0 0 1px var(--rule), 0 1px 2px rgba(15, 23, 42, .04); transition: box-shadow .2s, transform .2s var(--ease-out); }
+.tc:hover { box-shadow: 0 0 0 1.5px var(--brand), 0 10px 24px -16px rgba(6, 78, 59, .35); transform: translateY(-2px); }
+.tc-ico { width: 44px; height: 44px; flex: none; display: grid; place-items: center; border-radius: 12px; background: var(--brand-soft); color: var(--brand); transition: background .2s, color .2s; }
+.tc-ico svg { width: 22px; height: 22px; }
+.tc:hover .tc-ico { background: var(--brand); color: #fff; }
+.tc-t { flex: 1; min-width: 0; }
+.tc-t b { display: block; font-size: 1rem; font-weight: 700; letter-spacing: -.01em; }
+.tc-t small { display: block; margin-top: 3px; font-size: .86rem; line-height: 1.45; color: var(--muted); }
+.tc-go { width: 30px; height: 30px; flex: none; display: grid; place-items: center; border-radius: 50%; color: var(--faint); transition: color .2s, background .2s, transform .2s var(--ease-out); }
+.tc-go svg { width: 16px; height: 16px; }
+.tc:hover .tc-go { color: var(--brand-ink); background: var(--brand-soft); transform: translateX(2px); }
+.tool-grid-sm .tc { padding: 16px 18px; }
+@media (max-width: 1000px) { .tool-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 640px) { .tool-grid { grid-template-columns: 1fr; gap: 10px; } .tools-band { padding-block: 32px; } .tc { padding: 14px 16px; } }

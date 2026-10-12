@@ -130,12 +130,7 @@ def head(title, desc, path, extra_ld=None, noindex=False):
     <nav class="nav" id="nav" aria-label="Main">
       <div class="nav-main">
         <a href="/"{' aria-current="page"' if path == "/" else ""}>Invoice generator</a>
-        <div class="nav-drop">
-          <button type="button" class="nav-drop-btn{' is-active' if path in TOOL_PATHS else ''}" aria-expanded="false">Tools <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg></button>
-          <div class="nav-panel">
-            {TOOLS_MENU}
-          </div>
-        </div>
+        <a href="/invoice-tools/"{' aria-current="page"' if path == "/invoice-tools/" or path in TOOL_PATHS else ""}>Tools</a>
         <a href="/invoice-template/"{' aria-current="page"' if path == "/invoice-template/" else ""}>Templates</a>
         <a href="/guides/"{' aria-current="page"' if path == "/guides/" else ""}>Guides</a>
       </div>
@@ -181,7 +176,7 @@ FOOT = '''<footer class="site-footer">
     </div>
     <div>
       <h2>Tools</h2>
-      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''</ul>
+      <ul><li><a href="/invoice-tools/">All tools</a></li>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''</ul>
     </div>
     <div>
       <h2>By business</h2>
@@ -766,6 +761,59 @@ article("/terms/", "Terms of Use | invoice-gen.net", "The terms for using invoic
   <p class="hint">These terms are a starting point. Have them reviewed for the laws that apply to your business.</p>''')
 
 # ---------------------------------------------------------------- 404
+
+# ---------------------------------------------------------------- all tools page
+INDUSTRY_DESC = {
+    "/contractor-invoice/": "Labour and materials on separate lines, deposit taken off.",
+    "/cleaning-invoice/": "Each visit with start and end time, hours worked out for you.",
+    "/consulting-invoice/": "Hourly, day rate or monthly retainer billing.",
+    "/photography-invoice/": "Session, editing, prints and travel, with a booking deposit.",
+    "/self-employed-invoice/": "A simple invoice under your own name.",
+    "/freelance-invoice/": "Hourly or project work, clients at home or abroad.",
+}
+GUIDE_DESC = {
+    "/how-to-make-an-invoice/": "What to include, step by step, with a checklist.",
+    "/invoice-template/": "What the free template includes and how to fill it in.",
+    "/invoice-vs-receipt/": "What each one is for, and when to send it.",
+    "/payment-terms/": "Net 30, due on receipt and deposits, with wording to copy.",
+    "/payment-reminder/": "Three polite to firm emails for unpaid invoices.",
+}
+ARROW_SVG = _svg('<path d="M5 12h14m-5-5 5 5-5 5"/>')
+def _card(u, n, d, icon=""):
+    ico = f'<span class="tc-ico">{_svg(icon)}</span>' if icon else ""
+    return f'<li><a class="tc" href="{u}">{ico}<span class="tc-t"><b>{n}</b><small>{d}</small></span><span class="tc-go" aria-hidden="true">{ARROW_SVG}</span></a></li>'
+
+TOOLS_MAIN = f"""<section class="page-head tools-head">
+  <div class="wrap">
+    <p class="crumbs"><a href="/">Home</a> / Tools</p>
+    <h1>Free invoicing tools</h1>
+    <p class="lede">Every tool opens the same simple editor, set up for that job. No sign-up, no watermark.</p>
+  </div>
+</section>
+<section class="band tools-band" aria-labelledby="t-docs">
+  <div class="wrap">
+    <h2 id="t-docs">Documents</h2>
+    <ul class="tool-grid">{"".join(_card(u, n, d, TOOL_ICONS.get(u, "")) for u, n, d in TOOLS)}</ul>
+  </div>
+</section>
+<section class="band band-line tools-band" aria-labelledby="t-biz">
+  <div class="wrap">
+    <h2 id="t-biz">Invoice templates by business</h2>
+    <ul class="tool-grid tool-grid-sm">{"".join(_card(u, n, INDUSTRY_DESC.get(u, "")) for u, n in INDUSTRY)}</ul>
+  </div>
+</section>
+<section class="band band-line tools-band" aria-labelledby="t-guides">
+  <div class="wrap">
+    <h2 id="t-guides">Guides</h2>
+    <ul class="tool-grid tool-grid-sm">{"".join(_card(u, n, GUIDE_DESC.get(u, "")) for u, n in GUIDES)}</ul>
+  </div>
+</section>"""
+page("/invoice-tools/", "Free Invoicing Tools: Invoice, Quote, Receipt and More",
+     "All free invoicing tools in one place: invoice, quote, receipt, proforma, estimate and timesheet generators, templates by business and practical guides.",
+     TOOLS_MAIN, "", [{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
+        {"@type": "ListItem", "position": 2, "name": "Tools", "item": SITE + "/invoice-tools/"}]}])
+
 page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist.",
      '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/how-to-make-an-invoice/">Read the guide</a></p></section>''',
      noindex=True)
@@ -774,7 +822,7 @@ page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist."
 import datetime
 TODAY = datetime.date.today().isoformat()
 SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS if u != "/"] + [
-    ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
+    ("/invoice-tools/", "monthly", "0.8"), ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
     ("/freelance-invoice/", "monthly", "0.8")] + [(u, "monthly", "0.8") for u, n in INDUSTRY if u != "/freelance-invoice/"] + [
     ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
