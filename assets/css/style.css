@@ -1801,3 +1801,44 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
   .sheet .sh-meta > .meta-extra { grid-row: 6; }
 }
 @media print { .reg-check, .reg-rate { display: none !important; } }
+
+/* =====================================================================
+   Invoice top-left: your logo, or your business name when there is none
+   ===================================================================== */
+.sh-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; max-width: 46%; border-radius: 14px; transition: background .2s, box-shadow .2s; }
+.sh-brand.drag { background: var(--brand-soft); box-shadow: 0 0 0 2px var(--brand); }
+.sheet .sh-brand .logo-drop { width: auto; height: auto; max-width: 220px; padding: 4px; border: 0; background: none; display: block; }
+.sheet .sh-brand .logo-drop[hidden] { display: none; }
+.sheet .sh-brand .logo-drop img { display: block; max-width: 210px; max-height: 84px; width: auto; height: auto; object-fit: contain; }
+.sheet .sh-brand .logo-drop:hover { background: var(--desk); }
+.brand-word { all: unset; cursor: text; display: block; max-width: 100%; }
+.brand-word b { display: block; font-size: clamp(1.25rem, 2.2vw, 1.6rem); font-weight: 750; letter-spacing: -.03em; line-height: 1.15; color: var(--ink); overflow-wrap: anywhere; }
+.brand-word.is-empty b { color: #b6bfcb; }
+.brand-word:hover b { text-decoration: underline; text-decoration-color: #cbd5e1; text-underline-offset: 4px; }
+.brand-word:focus-visible { outline: 2px solid var(--brand); outline-offset: 4px; border-radius: 6px; }
+.brand-word[hidden], .add-logo[hidden] { display: none; }
+.add-logo { display: inline-flex; align-items: center; gap: 7px; min-height: 34px; padding: 6px 14px 6px 11px; border: 1px dashed #c9d3de; border-radius: 999px; background: #fff; color: var(--muted); font: 600 .82rem var(--font); cursor: pointer; transition: border-color .2s, color .2s, background .2s; }
+.add-logo .ico { width: 16px; height: 16px; color: var(--brand); }
+.add-logo small { font-weight: 500; color: var(--faint); font-size: .74rem; }
+.add-logo:hover { border-color: var(--brand); border-style: solid; color: var(--brand-ink); background: var(--brand-soft); }
+.sheet.t-modern .brand-word b { color: #fff; }
+.sheet.t-modern .brand-word.is-empty b { color: rgba(255, 255, 255, .55); }
+.sheet.t-modern .add-logo { background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .4); color: #fff; }
+.sheet.t-modern .add-logo .ico, .sheet.t-modern .add-logo small { color: rgba(255, 255, 255, .8); }
+.sheet.t-modern .sh-brand .logo-drop { background: #fff; border-radius: 12px; padding: 6px; }
+@media (max-width: 860px) {
+  .sh-brand { max-width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px; }
+  .brand-word b { font-size: 1.25rem; }
+  .add-logo { min-height: 40px; flex: none; }
+  .add-logo small { display: none; }
+  .sheet .sh-brand .logo-drop img { max-height: 64px; max-width: 180px; }
+}
+@media print { .add-logo, .brand-word.is-empty { display: none !important; } }
+@media (max-width: 860px) { .sh-top { flex-direction: column; } }
+.auth-pill { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 14px; padding: 5px 12px; border-radius: 999px; background: var(--brand-soft); color: var(--brand-ink); font-size: .78rem; font-weight: 650; }
+.auth-pill::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--brand); }
+.sh-brand .logo-remove { all: unset; cursor: pointer; font-size: .78rem; font-weight: 600; color: var(--faint); padding: 2px 4px; border-radius: 6px; transition: color .15s; }
+.sh-brand .logo-remove:hover { color: var(--bad); }
+.sh-brand .logo-remove[hidden] { display: none; }
+.sheet.t-modern .sh-brand .logo-remove { color: rgba(255, 255, 255, .75); }
+@media print { .sh-brand .logo-remove { display: none !important; } }

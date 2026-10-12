@@ -77,9 +77,14 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
       <div class="sheet t-classic" id="sheet">
         <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
         <div class="sh-top">
-          <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
-            <img id="logoImg" alt="Your logo" hidden>
-            <span class="logo-empty" id="logoHint">{I(ICONS["image"])}<b>+ Add your logo</b></span>
+          <div class="sh-brand" id="shBrand">
+            <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Change your logo" hidden>
+              <img id="logoImg" alt="Your logo" hidden>
+              <span class="logo-empty" id="logoHint" hidden></span>
+            </div>
+            <button type="button" class="logo-remove" id="logoRemove" hidden>Remove logo</button>
+            <button type="button" class="brand-word" id="brandWord" aria-label="Edit your business name"><b id="brandName">Your business</b></button>
+            <button type="button" class="add-logo" id="addLogo">{I(ICONS["image"])}<span>Add logo</span><small>optional</small></button>
             <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
           </div>
           <div class="sh-title">
@@ -98,7 +103,6 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
         </div>
-        <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
 
         <div class="sh-parties">
           <div class="party" data-section="from">

@@ -88,6 +88,15 @@
         }
         doc.addImage(inv.logo, fmt, L, y, w, h, undefined, "FAST");
       } catch (e) { /* skip a logo jsPDF can't read */ }
+    } else if (String(inv.from.name || "").trim()) {
+      // no logo: the business name takes its place
+      doc.setFont("helvetica", "bold"); doc.setFontSize(16); doc.setTextColor(...(onBand ? [255, 255, 255] : ink));
+      const nm = doc.splitTextToSize(clean(inv.from.name.trim()), (R - L) * 0.48);
+      doc.text(nm.slice(0, 2), L, y + 7);
+      if (inv.from.email) {
+        doc.setFont("helvetica", "normal"); doc.setFontSize(9); doc.setTextColor(...(onBand ? mix(accent, 0.7) : soft));
+        doc.text(clean(inv.from.email), L, y + 7 + Math.min(nm.length, 2) * 6.2);
+      }
     }
 
     // title + meta (right)

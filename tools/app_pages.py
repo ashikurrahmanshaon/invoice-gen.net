@@ -22,7 +22,7 @@ def login_markup():
     return f'''<section class="auth">
   <div class="auth-form">
     <div class="auth-card">
-      <span class="auth-mark" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="32" fill="#059669"/><g transform="translate(32 32) scale(1.24) translate(-32 -32)"><path d="M23 15h18a3 3 0 0 1 3 3v31l-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4-3-2.4-3 2.4V18a3 3 0 0 1 3-3z" fill="#fff"/><path d="m26.2 31.8 4.2 4.2 8.2-8.6" fill="none" stroke="#059669" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></g></svg></span>
+      <span class="auth-pill">Free account, no card needed</span>
       <h1 id="authTitle">Welcome back</h1>
       <p class="auth-sub" id="authSub">Log in to see your invoices, clients and payments.</p>
       <div class="tabs" role="tablist" aria-label="Log in or sign up">

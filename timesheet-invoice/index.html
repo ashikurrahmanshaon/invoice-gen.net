@@ -14,26 +14,26 @@
 <meta property="og:title" content="Timesheet Invoice Generator: Bill Hours and Shifts (Free PDF)">
 <meta property="og:description" content="Turn your shifts into an invoice. Add date, start, end and break; hours and totals work themselves out. For restaurant, kitchen and hourly work. Free PDF.">
 <meta property="og:url" content="https://invoice-gen.net/timesheet-invoice/">
-<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=2e33d4eb">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=ed79e3c0">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Timesheet Invoice Generator: Bill Hours and Shifts (Free PDF)">
 <meta name="twitter:description" content="Turn your shifts into an invoice. Add date, start, end and break; hours and totals work themselves out. For restaurant, kitchen and hourly work. Free PDF.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=2e33d4eb">
-<link rel="icon" href="/favicon.ico?v=2e33d4eb" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=2e33d4eb" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=2e33d4eb" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=2e33d4eb" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=2e33d4eb">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=2e33d4eb" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=2e33d4eb">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=ed79e3c0">
+<link rel="icon" href="/favicon.ico?v=ed79e3c0" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=ed79e3c0" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=ed79e3c0" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=ed79e3c0" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=ed79e3c0">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=ed79e3c0" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=ed79e3c0">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.min.css?v=2e33d4eb">
+<link rel="stylesheet" href="/assets/css/style.min.css?v=ed79e3c0">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
@@ -94,9 +94,14 @@
       <div class="sheet t-classic" id="sheet">
         <div class="stamp" id="stamp" aria-hidden="true">Paid</div>
         <div class="sh-top">
-          <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Add your logo">
-            <img id="logoImg" alt="Your logo" hidden>
-            <span class="logo-empty" id="logoHint"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg><b>+ Add your logo</b></span>
+          <div class="sh-brand" id="shBrand">
+            <div class="logo-drop" id="logoDrop" role="button" tabindex="0" aria-label="Change your logo" hidden>
+              <img id="logoImg" alt="Your logo" hidden>
+              <span class="logo-empty" id="logoHint" hidden></span>
+            </div>
+            <button type="button" class="logo-remove" id="logoRemove" hidden>Remove logo</button>
+            <button type="button" class="brand-word" id="brandWord" aria-label="Edit your business name"><b id="brandName">Your business</b></button>
+            <button type="button" class="add-logo" id="addLogo"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg><span>Add logo</span><small>optional</small></button>
             <input type="file" id="logoFile" accept="image/png,image/jpeg,image/webp" hidden>
           </div>
           <div class="sh-title">
@@ -115,7 +120,6 @@
             <button type="button" class="add-field" id="addField">+ Add field</button>
           </div>
         </div>
-        <button type="button" class="link-btn logo-remove" id="logoRemove" hidden>Remove logo</button>
 
         <div class="sh-parties">
           <div class="party" data-section="from">
@@ -463,11 +467,11 @@
     <nav class="foot-legal" aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></nav>
   </div>
 </footer>
-<script src="/assets/js/config.js?v=2e33d4eb" defer></script>
-<script src="/assets/js/core.js?v=2e33d4eb" defer></script>
-<script src="/assets/js/motion.js?v=2e33d4eb" defer></script>
-<script src="/assets/js/invoice.js?v=2e33d4eb" defer></script>
-<script src="/assets/js/pdf.js?v=2e33d4eb" defer></script>
-<script src="/assets/js/app.js?v=2e33d4eb" defer></script>
+<script src="/assets/js/config.js?v=ed79e3c0" defer></script>
+<script src="/assets/js/core.js?v=ed79e3c0" defer></script>
+<script src="/assets/js/motion.js?v=ed79e3c0" defer></script>
+<script src="/assets/js/invoice.js?v=ed79e3c0" defer></script>
+<script src="/assets/js/pdf.js?v=ed79e3c0" defer></script>
+<script src="/assets/js/app.js?v=ed79e3c0" defer></script>
 </body>
 </html>

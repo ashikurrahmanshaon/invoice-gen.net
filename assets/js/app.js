@@ -329,9 +329,19 @@
 
   /* ---------- logo ---------- */
   function showLogo() {
-    const img = $("#logoImg");
-    if (inv.logo) { img.src = inv.logo; img.hidden = false; $("#logoHint").hidden = true; $("#logoRemove").hidden = false; $("#logoDrop").classList.add("has-logo"); }
-    else { img.hidden = true; img.removeAttribute("src"); $("#logoHint").hidden = false; $("#logoRemove").hidden = true; $("#logoDrop").classList.remove("has-logo"); }
+    const img = $("#logoImg"), has = !!inv.logo;
+    if (has) { img.src = inv.logo; img.hidden = false; } else { img.hidden = true; img.removeAttribute("src"); }
+    $("#logoDrop").hidden = !has; $("#logoDrop").classList.toggle("has-logo", has);
+    $("#logoRemove").hidden = !has;
+    $("#brandWord").hidden = has; $("#addLogo").hidden = has;
+    brandName();
+  }
+  /* no logo: the business name stands in its place, as on most real invoices */
+  function brandName() {
+    const n = $("#brandName"); if (!n) return;
+    const name = String(inv.from.name || "").trim();
+    n.textContent = name || "Your business";
+    n.parentElement.classList.toggle("is-empty", !name);
   }
   function readLogo(file) {
     if (!file) return;
@@ -636,6 +646,7 @@
         let v = el.value;
         if (["discount", "taxRate", "shipping", "paid", "hourRate"].includes(el.dataset.f)) v = v.replace(",", ".").replace(/[^\d.]/g, "");
         setPath(inv, el.dataset.f, v);
+        if (el.dataset.f === "from.name") brandName();
         if (el.dataset.f === "taxRate") {
           if (inv.taxNote && Number(v) > 0) { inv.taxNote = ""; $("#taxNote").value = ""; }
           rateHint();
@@ -758,10 +769,13 @@
     // logo
     const drop = $("#logoDrop");
     drop.addEventListener("click", () => $("#logoFile").click());
+    $("#addLogo").addEventListener("click", () => $("#logoFile").click());
+    $("#brandWord").addEventListener("click", () => { const f = $('[data-f="from.name"]'); f.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "center" }); setTimeout(() => f.focus({ preventScroll: true }), 250); });
+    const brand = $("#shBrand");
+    brand.addEventListener("dragover", (e) => { e.preventDefault(); brand.classList.add("drag"); });
+    brand.addEventListener("dragleave", () => brand.classList.remove("drag"));
+    brand.addEventListener("drop", (e) => { e.preventDefault(); brand.classList.remove("drag"); readLogo(e.dataTransfer.files[0]); });
     drop.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("#logoFile").click(); } });
-    drop.addEventListener("dragover", (e) => { e.preventDefault(); drop.classList.add("drag"); });
-    drop.addEventListener("dragleave", () => drop.classList.remove("drag"));
-    drop.addEventListener("drop", (e) => { e.preventDefault(); drop.classList.remove("drag"); readLogo(e.dataTransfer.files[0]); });
     $("#logoFile").addEventListener("change", (e) => { readLogo(e.target.files[0]); e.target.value = ""; });
     $("#logoRemove").addEventListener("click", () => { inv.logo = null; inv.logoW = 0; inv.logoH = 0; showLogo(); changed(); });
 
