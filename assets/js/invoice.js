@@ -65,15 +65,23 @@
     return Math.random().toString(36).slice(2, 10);
   };
 
-  IG.nextNumber = function () {
-    const n = IG.store.get("ig_counter", 0) + 1;
-    return "INV-" + String(n).padStart(4, "0");
+  /* every document type has its own number sequence: INV-0001, QUO-0001, REC-0001…
+     (invoices keep the original counter so existing numbering carries on) */
+  IG.PREFIX = { invoice: "INV", quote: "QUO", estimate: "EST", receipt: "REC", proforma: "PRO" };
+  const counterKey = (pre) => (pre === "INV" ? "ig_counter" : "ig_counter_" + pre);
+  IG.docPrefix = function (title) { return IG.PREFIX[IG.docKind(title || "Invoice")]; };
+  IG.nextNumber = function (title) {
+    const pre = IG.docPrefix(title);
+    return pre + "-" + String(IG.store.get(counterKey(pre), 0) + 1).padStart(4, "0");
   };
+  IG.isAutoNumber = function (num) { return /^(INV|QUO|EST|REC|PRO)-\d{4,}$/.test(String(num || "")); };
   IG.bumpNumber = function (num) {
     const m = /(\d+)\s*$/.exec(num || "");
     if (!m) return;
+    const p = /^(QUO|EST|REC|PRO)/i.exec(num || "");
+    const key = counterKey(p ? p[1].toUpperCase() : "INV");
     const n = parseInt(m[1], 10);
-    if (n > IG.store.get("ig_counter", 0)) IG.store.set("ig_counter", n);
+    if (n > IG.store.get(key, 0)) IG.store.set(key, n);
   };
 
   IG.blankInvoice = function (profile) {
@@ -86,7 +94,7 @@
       region: reg,
       unit: "qty",
       fields: [],
-      number: IG.nextNumber(),
+      number: IG.nextNumber(IG.REGIONS[reg].title || "Invoice"),
       issueDate: today,
       dueDate: IG.addDays(today, p.dueDays != null ? p.dueDays : 14),
       poNumber: "",

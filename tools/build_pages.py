@@ -347,10 +347,10 @@ tool_page("/receipt-generator/", "Receipt",
         ("Payment date", "The day the money was received."),
         ("What was paid for", "Each item or service with its price."),
         ("Amount and currency", "The total received, with tax shown if you charge it."),
-        ("Payment method", "Cash, card, bank transfer or PayPal. Add it in the notes."),
+        ("Payment method", "Cash, card, bank transfer or PayPal. Pick it under Paid by."),
         ("Your business details", "Name, address and tax ID if you have one.")]),
     [("What is the difference between a receipt and an invoice?", "An invoice asks for payment. A receipt confirms that payment has been received. Many businesses send an invoice first and a receipt once the client pays."),
-     ("How do I show that the receipt is paid?", "Set the status to Paid in the options panel. The receipt gets a Paid stamp and the balance due shows zero once you enter the amount paid."),
+     ("How do I show that the receipt is paid?", "Receipts are marked as paid automatically. The amount paid matches the total, the balance shows zero and the PDF gets a Paid stamp. For a part payment, change the amount paid."),
      ("Is the receipt generator free?", "Yes, it's free with no limit and no watermark. You don't need an account to download or print receipts."),
      ("Can I email a receipt?", "Yes. With a free account, press Send by email and your customer receives the receipt as a PDF attachment.")])
 

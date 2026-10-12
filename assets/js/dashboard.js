@@ -20,7 +20,17 @@
     settings: ["Settings", "Your business details and account."]
   };
 
+  /* quotes, estimates, receipts and proformas are listed, but only invoices count as money billed */
+  function kindOf(r) {
+    const t = r.title || (r.data && r.data.title);
+    if (t) return IG.docKind(t);
+    const m = /^(QUO|EST|REC|PRO)/i.exec(r.number || "");
+    return m ? { QUO: "quote", EST: "estimate", REC: "receipt", PRO: "proforma" }[m[1].toUpperCase()] : "invoice";
+  }
+  const billable = (r) => kindOf(r) === "invoice";
+  const KIND_NAME = { quote: "Quote", estimate: "Estimate", receipt: "Receipt", proforma: "Proforma" };
   function eff(r) {
+    if (!billable(r)) return r.status;
     if (r.status === "sent" && r.due_date && r.due_date < today && Number(r.balance) > 0) return "overdue";
     return r.status;
   }
@@ -51,8 +61,9 @@
   /* ---------- overview ---------- */
   function renderOverview() {
     const cur = mainCurrency();
-    const mine = invoices.filter((r) => r.currency === cur);
-    const others = invoices.length - mine.length;
+    const bill = invoices.filter(billable);
+    const mine = bill.filter((r) => r.currency === cur);
+    const others = bill.length - mine.length;
     const nonDraft = mine.filter((r) => r.status !== "draft");
     const paid = mine.filter((r) => r.status === "paid");
     const open = mine.filter((r) => r.status !== "paid" && r.status !== "draft");
@@ -135,9 +146,10 @@
 
   /* ---------- invoices ---------- */
   function rowHtml(r) {
-    const s = eff(r);
+    const s = eff(r), k = kindOf(r), D = IG.DOCS[k];
+    const when = D.receipt ? "paid " + (IG.prettyDate(r.issue_date) || "") : (D.validity ? "valid until " : "due ") + (IG.prettyDate(r.due_date) || "not set");
     return '<div class="row" data-id="' + r.id + '">' +
-      '<a class="row-main" href="/?id=' + r.id + '#create"><span class="avatar sm">' + esc(initials(r.client_name)) + '</span><span class="row-text"><b>' + esc(r.client_name || "No client") + "</b><small>" + esc(r.number) + ", due " + esc(IG.prettyDate(r.due_date) || "not set") + "</small></span></a>" +
+      '<a class="row-main" href="/?id=' + r.id + '#create"><span class="avatar sm">' + esc(initials(r.client_name)) + '</span><span class="row-text"><b>' + esc(r.client_name || "No client") + (KIND_NAME[k] ? ' <em class="kind-tag">' + KIND_NAME[k] + "</em>" : "") + "</b><small>" + esc(r.number) + ", " + esc(when) + "</small></span></a>" +
       '<span class="row-amt">' + IG.money(Number(r.total), r.currency) + "</span>" + pill(s) +
       '<div class="row-menu"><button type="button" class="icon-btn sm" data-menu="' + r.id + '" aria-label="Actions for ' + esc(r.number) + '" aria-haspopup="true"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div>' +
       "</div>";
@@ -225,13 +237,14 @@
       return;
     }
     grid.innerHTML = list.map((c) => {
-      const theirs = invoices.filter((r) => (r.client_name || "").toLowerCase() === c.name.toLowerCase());
+      const all = invoices.filter((r) => (r.client_name || "").toLowerCase() === c.name.toLowerCase());
+      const theirs = all.filter(billable);
       const cur = theirs[0] ? theirs[0].currency : mainCurrency();
       const billed = sum(theirs.filter((r) => r.status !== "draft"), "total");
       const owed = sum(theirs.filter((r) => r.status !== "paid" && r.status !== "draft"), "balance");
       return '<article class="client-card" data-cid="' + c.id + '">' +
         '<div class="cc-top"><span class="avatar">' + esc(initials(c.name)) + '</span><div><b>' + esc(c.name) + "</b><small>" + esc(c.email || "No email") + "</small></div></div>" +
-        '<dl class="cc-stats"><div><dt>Billed</dt><dd>' + IG.money(billed, cur) + "</dd></div><div><dt>Owed</dt><dd class=\"" + (owed ? "owed" : "") + "\">" + IG.money(owed, cur) + "</dd></div><div><dt>Invoices</dt><dd>" + theirs.length + "</dd></div></dl>" +
+        '<dl class="cc-stats"><div><dt>Billed</dt><dd>' + IG.money(billed, cur) + "</dd></div><div><dt>Owed</dt><dd class=\"" + (owed ? "owed" : "") + "\">" + IG.money(owed, cur) + "</dd></div><div><dt>Documents</dt><dd>" + all.length + "</dd></div></dl>" +
         '<div class="cc-actions"><button type="button" class="btn btn-soft btn-sm" data-bill="' + c.id + '">New invoice</button><button type="button" class="link-btn danger" data-del-client="' + c.id + '">Delete</button></div>' +
         "</article>";
     }).join("") || '<div class="empty card"><h3>No clients match</h3></div>';
@@ -272,7 +285,7 @@
   async function load() {
     {
       const [a, b, c] = await Promise.all([
-        IG.cloud.from("invoices").select("id,number,client_name,client_email,issue_date,due_date,currency,total,balance,status,created_at").order("created_at", { ascending: false }),
+        IG.cloud.from("invoices").select("id,number,client_name,client_email,issue_date,due_date,currency,total,balance,status,created_at,title:data->>title").order("created_at", { ascending: false }),
         IG.cloud.from("clients").select("*").order("name"),
         IG.cloud.from("profiles").select("data").eq("id", user.id).maybeSingle()
       ]);

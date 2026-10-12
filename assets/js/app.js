@@ -146,6 +146,10 @@
       syncDueIn();
     }
     if (D.receipt) inv.paidManual = false;
+    if (!inv.id && IG.isAutoNumber(inv.number) && inv.number.slice(0, 3) !== IG.docPrefix(inv.title)) {
+      inv.number = IG.nextNumber(inv.title);
+      const n = $("#f-number"); if (n) n.value = inv.number;
+    }
   }
 
   /* ---------- region rules: labels, extra boxes, checklist ---------- */
@@ -268,6 +272,7 @@
     update();
   }
 
+  const docWord = () => (inv.title || "Invoice").trim().toLowerCase();
   function docLabels() {
     const L = IG.docLabels(inv.title), set = (sel, txt) => { const e = $(sel); if (e && e.textContent !== txt) e.textContent = txt; };
     set('label[for="f-number"]', L.no); set('label[for="f-due"]', L.due); set(".t-due > span", L.bal);
@@ -429,7 +434,7 @@
       flag(el, "Add at least one item with a rate.");
       return false;
     }
-    if (!String(inv.number).trim()) { flag($("#f-number"), "Add an invoice number."); return false; }
+    if (!String(inv.number).trim()) { { const w = IG.docLabels(inv.title).no.replace(/\.$/, "").toLowerCase().replace(" no", " number"); flag($("#f-number"), "Add " + (/^[aeiou]/.test(w) ? "an " : "a ") + w + "."); } return false; }
     return true;
   }
 
@@ -601,17 +606,19 @@
   }
 
   function newInvoice() {
-    if (!window.confirm("Start a new invoice? Your business details and logo stay; the client and items are cleared.")) return;
+    if (!window.confirm("Start a new " + docWord() + "? Your business details and logo stay; the client and items are cleared.")) return;
     IG.bumpNumber(inv.number);
     const keep = { from: inv.from, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, accent: inv.accent, accentPicked: inv.accentPicked, currency: inv.currency, region: inv.region, unit: inv.unit, fields: (inv.fields || []).map((f) => ({ label: f.label, value: "" })), template: inv.template, tplPicked: inv.tplPicked, notes: inv.notes, terms: inv.terms, taxLabel: inv.taxLabel, taxRate: inv.taxRate, mode: inv.mode, service: inv.service, hourRate: inv.hourRate, shipTo: inv.shipTo };
-    inv = Object.assign(IG.blankInvoice(), keep);
+    inv = Object.assign(IG.blankInvoice(), keep, { title: inv.title });
+    inv.number = IG.nextNumber(inv.title);
+    if (IG.doc(inv.title).dueDays !== IG.DOCS.invoice.dueDays) inv.dueDate = IG.addDays(inv.issueDate, IG.doc(inv.title).dueDays);
     const url = new URL(window.location.href);
     url.searchParams.delete("id");
     window.history.replaceState(null, "", url);
     fillFields();
     changed();
     $('[data-f="to.name"]').focus();
-    IG.toast("New invoice " + inv.number + " started.", "ok");
+    IG.toast("New " + docWord() + " " + inv.number + " started.", "ok");
   }
 
   /* ---------- email ---------- */
@@ -623,6 +630,8 @@
     $("#sendSubject").value = (inv.title || "Invoice") + " " + inv.number + " from " + inv.from.name;
     $("#sendMsg").value = "Hi " + (inv.to.name || "there") + ",\n\nPlease find attached " + (inv.title || "invoice").toLowerCase() + " " + inv.number +
       " for " + IG.money(t.balance, inv.currency) + (inv.dueDate ? ", due on " + IG.prettyDate(inv.dueDate) : "") + ".\n\nThank you,\n" + inv.from.name;
+    $("#sendTitle").textContent = "Email this " + docWord();
+    $("#sendNow").lastChild.textContent = " Send " + docWord();
     $("#sendLoginNote").hidden = !!user;
     $("#sendNow").disabled = !user;
     $("#sendErr").hidden = true;
@@ -657,7 +666,7 @@
       if (data && data.error) throw new Error(data.error);
       if (inv.status === "draft") { inv.status = "sent"; $("#status").value = "sent"; saveCloud(true); update(); }
       closeSend();
-      IG.toast("Invoice sent to " + to + ".", "ok");
+      IG.toast((inv.title || "Invoice") + " sent to " + to + ".", "ok");
     } catch (e) {
       sendError("Not sent: " + (e.message || "check your connection and try again."));
     } finally {
@@ -670,7 +679,7 @@
     let r;
     try { r = IG.savePdf(inv); } catch (e) { return sendError(e.message); }
     const href = "mailto:" + encodeURIComponent($("#sendTo").value.trim()) + "?subject=" + encodeURIComponent($("#sendSubject").value) +
-      "&body=" + encodeURIComponent($("#sendMsg").value + "\n\n(The invoice PDF is attached.)");
+      "&body=" + encodeURIComponent($("#sendMsg").value + "\n\n(The " + docWord() + " PDF is attached.)");
     closeSend();
     if (!r.direct) { showReady(r, "Save the PDF, then attach it to your email."); return; }
     IG.toast("PDF downloaded. Attach it to the email that opens.");
@@ -976,9 +985,7 @@
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
     if (pageDoc && (!inv.title || IG.DOC_TITLES.indexOf(inv.title) >= 0)) {
       inv.title = pageDoc === "Invoice" ? (IG.R(inv).title || "Invoice") : pageDoc;
-      const pre3 = { Quotation: "QUO", Receipt: "REC", Estimate: "EST", "Proforma Invoice": "PRO", Invoice: "INV" }[pageDoc];
-      const m = /^(INV|QUO|REC|EST|PRO)-(\d+)$/.exec(inv.number || "");
-      if (pre3 && m) inv.number = pre3 + "-" + m[2];
+      if (!inv.id && IG.isAutoNumber(inv.number) && inv.number.slice(0, 3) !== IG.docPrefix(inv.title)) inv.number = IG.nextNumber(inv.title);
     }
     const pageMode = ($("#create") && $("#create").dataset.mode) || "";
     const pageUnit = ($("#create") && $("#create").dataset.unit) || "";
@@ -1009,7 +1016,7 @@
     } else if (dup) {
       const { data } = await IG.cloud.from("invoices").select("data").eq("id", dup).maybeSingle();
       if (data) {
-        inv = Object.assign(IG.blankInvoice(), data.data, { id: null, status: "draft", number: IG.nextNumber(), issueDate: IG.isoDate(new Date()) });
+        inv = Object.assign(IG.blankInvoice(), data.data, { id: null, status: "draft", number: IG.nextNumber(data.data.title), issueDate: IG.isoDate(new Date()) });
         inv.dueDate = IG.addDays(inv.issueDate, 14);
         fillFields();
       }
