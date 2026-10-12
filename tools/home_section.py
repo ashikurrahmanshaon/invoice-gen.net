@@ -89,6 +89,10 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
               <label for="f-issue">Date</label>{fi("issueDate", "", "Issue date", "date", extra=' id="f-issue"')}
               <label for="f-due">Due date</label>{fi("dueDate", "", "Due date", "date", extra=' id="f-due"')}
               <label for="f-po">PO / ref.</label>{fi("poNumber", "Optional", "PO or reference", extra=' id="f-po"')}
+              <div class="meta-region" id="metaRegion">
+                <label for="f-supply" class="reg-supply" hidden>Date of supply</label>{fi("supplyDate", "", "Date of supply", "date", cls="reg-supply", extra=' id="f-supply" hidden')}
+                <label for="f-pos" class="reg-pos" hidden>Place of supply</label>{fi("placeOfSupply", "State, e.g. Maharashtra (27)", "Place of supply", cls="reg-pos", extra=' id="f-pos" hidden')}
+              </div>
               <div class="meta-extra" id="metaExtra"></div>
             </div>
             <button type="button" class="add-field" id="addField">+ Add field</button>
@@ -104,6 +108,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             {pf("Your address", ta("from.address", "Street, city, postcode", "Your address"))}
             {pf("Your phone", fi("from.phone", "Optional", "Your phone", "tel", extra=' autocomplete="tel"'))}
             {pf("Tax / VAT ID", fi("from.taxId", "Optional", "Your tax number"))}
+            <div class="reg-bank" hidden>{pf("Bank details", ta("from.bank", "IBAN, BIC and bank name", "Bank details"))}</div>
           </div>
           <div class="party" data-section="to">
             <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
@@ -112,13 +117,14 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             {pf("Client email", fi("to.email", "client@company.com", "Client email", "email", extra=' autocomplete="off" inputmode="email"'))}
             {pf("Client address", ta("to.address", "Street, city, postcode", "Client address"))}
             {pf("Client phone", fi("to.phone", "Optional", "Client phone", "tel", extra=' autocomplete="off"'))}
+            <div class="reg-ctax" hidden>{pf("Client VAT ID", fi("to.taxId", "Needed for business clients", "Client tax number", extra=' autocomplete="off"'))}</div>
             <label class="ship-to ts-only"><span>Work address <small>shown as Ship to</small></span>{ta("shipTo", "Where the work was done (optional)", "Work address")}</label>
           </div>
         </div>
 
         <div class="sh-items std-only" data-section="items">
           <span class="sh-label"><span class="sh-step"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Items <small>what you are charging for</small></span>
-          <div class="items-head" aria-hidden="true"><span>Item</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
+          <div class="items-head" aria-hidden="true"><span>Item</span><span class="h-code" id="hCode">HSN/SAC</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
           <p class="items-hint" id="itemsHint">Describe the work, then enter how many and the price. The amount and totals work themselves out.</p>
           <button type="button" class="add-line" id="addLine">{I(ICONS["plus"])} Add line item</button>
@@ -156,10 +162,14 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
             <div class="t-row t-adj"><span>Discount</span><span class="t-in">{fi("discount", "0", "Discount", extra=' inputmode="decimal"')}<span class="seg seg-xs" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span><b id="tDisc"></b></div>
             <div class="t-row t-adj"><span class="t-tax">{fi("taxLabel", "Tax", "Tax name", cls="fi-label")}</span><span class="t-in">{fi("taxRate", "0", "Tax rate in percent", extra=' inputmode="decimal"')}<em>%</em></span><b id="tTax"></b></div>
+            <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in">{fi("shipping", "0", "Shipping", extra=' inputmode="decimal"')}</span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
             <div class="t-row t-adj"><span>Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+            <p class="t-incl" id="tIncl" hidden></p>
+            <p class="t-words" id="tWords" hidden></p>
+            <p class="t-note" id="tNote" hidden></p>
           </div>
         </div>
       </div>
@@ -198,6 +208,16 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
 
       <div class="sp-card">
         <label class="sp-field"><span class="sp-h">Region style</span><select class="in" id="region"></select><small class="sp-sub" id="regionHint"></small></label>
+        <div class="reg-rate" id="regRate"></div>
+        <div class="sp-field" id="gstWrap" hidden><span class="sp-h" id="gstLabel">GST type</span>
+          <div class="seg seg-full" id="gstSeg" role="group" aria-labelledby="gstLabel">
+            <button type="button" data-gst="intra" aria-pressed="true">Same state</button>
+            <button type="button" data-gst="inter" aria-pressed="false">Other state</button>
+          </div>
+        </div>
+        <label class="sp-field" id="taxNoteWrap" hidden><span class="sp-h">Tax note</span>
+          <select class="in" id="taxNote"><option value="">None</option><option value="rc">Reverse charge</option><option value="exempt">VAT exempt (small business)</option></select>
+        </label>
         <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
         <div class="sp-field std-only"><span class="sp-h" id="unitLabel">Bill items by</span>
           <div class="seg seg-full" id="unitSeg" role="group" aria-labelledby="unitLabel">
@@ -223,6 +243,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <option value="paid">Paid (adds a PAID stamp)</option>
           </select>
         </label>
+        <details class="reg-check" id="regCheck"><summary><span id="regCheckTitle">What this invoice needs</span><b id="regCheckCount"></b></summary><ul id="regCheckList"></ul></details>
         <button type="button" class="link-btn sp-profile" id="profileBtn">{I(ICONS["user"])} Use my details on every new invoice</button>
       </div>
     </aside>
@@ -291,7 +312,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
     <dl class="feat">
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="#d1fae5"/><path d="M14 3v5h5M12 11v6m0 0-2.5-2.5M12 17l2.5-2.5"/></svg></span>PDF download</dt><dd>A clean A4 or US Letter PDF with your logo. No watermark.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="2" fill="#d1fae5"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2" fill="#d1fae5"/></svg></span>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
-      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies</dt><dd>US Dollar, Euro, Pound, Canadian and Australian Dollar, Yen and more, formatted correctly.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies, 9 regions</dt><dd>Pick your region and the invoice follows local rules: VAT, GST, ABN, GSTIN or TRN, the right title and date format.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9z" fill="#d1fae5"/><circle cx="8" cy="8" r="1.5"/><path d="m10 15 5-5"/></svg></span>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z" fill="#d1fae5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>Quotation, receipt, proforma</dt><dd>Change the title at the top of the page and the PDF follows.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M12 7v5l3 2"/></svg></span>Timesheet invoices</dt><dd>Add shifts with start, end and break. Hours work themselves out, night shifts too. <a href="/timesheet-invoice/">Try it</a></dd></div>

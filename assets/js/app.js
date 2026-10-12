@@ -40,6 +40,7 @@
     $("#currency").value = inv.currency;
     $("#status").value = inv.status || "draft";
     renderFields();
+    regionApply();
     syncDueIn();
     $$("[data-disc]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.disc === (inv.discountType === "%" ? "%" : "flat"))));
     setAccent(inv.accent, false);
@@ -62,6 +63,7 @@
     inv.mode = m;
     if (!Array.isArray(inv.shifts) || !inv.shifts.length) inv.shifts = [IG.blankShift(inv.issueDate)];
     $("#create").classList.toggle("is-ts", m === "timesheet");
+    $("#sheet").classList.toggle("has-code", !!IG.R(inv).code && m !== "timesheet");
     $$("#modeSwitch [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === m)));
     if (save && was !== m) {
       const sec = $(m === "timesheet" ? ".sh-time" : ".sh-items");
@@ -108,6 +110,70 @@
   }
   function shiftsDone() { return Number(inv.hourRate) > 0 && IG.totalHours(inv) > 0; }
 
+  /* ---------- region rules: labels, extra boxes, checklist ---------- */
+  function setLabel(input, text) {
+    if (!input) return;
+    const l = input.closest(".pf") && input.closest(".pf").querySelector(".pf-l");
+    if (l && !l.querySelector("em")) l.textContent = text;
+    input.setAttribute("aria-label", text);
+  }
+  function regionApply() {
+    const R = IG.R(inv), sheet = $("#sheet");
+    sheet.dataset.region = inv.region;
+    const ft = $('[data-f="from.taxId"]');
+    if (ft) { setLabel(ft, R.taxId || "Tax / VAT ID"); ft.placeholder = R.taxIdPh || "Optional"; }
+    const ct = $(".reg-ctax");
+    if (ct) { ct.hidden = !R.clientTaxId; if (R.clientTaxId) setLabel($('[data-f="to.taxId"]'), R.clientTaxId); }
+    const bk = $(".reg-bank"); if (bk) bk.hidden = !R.bank;
+    $$(".reg-supply").forEach((e) => (e.hidden = !R.supply));
+    const ls = $('label[for="f-supply"]'); if (ls && R.supply) ls.textContent = R.supply;
+    $$(".reg-pos").forEach((e) => (e.hidden = !R.pos));
+    sheet.classList.toggle("has-code", !!R.code && !isTs());
+    const hc = $("#hCode"); if (hc) hc.textContent = R.code || "";
+    $$(".ir-code .ir-l").forEach((e) => (e.textContent = R.code || ""));
+    $("#gstWrap").hidden = !R.split;
+    $$("#gstSeg [data-gst]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.gst === (inv.gstSplit === "inter" ? "inter" : "intra"))));
+    const tn = $("#taxNote"), allowed = R.notes || [];
+    $("#taxNoteWrap").hidden = !allowed.length;
+    $$("#taxNote option").forEach((o) => (o.hidden = !!o.value && allowed.indexOf(o.value) < 0));
+    if (inv.taxNote && allowed.indexOf(inv.taxNote) < 0) inv.taxNote = "";
+    tn.value = inv.taxNote || "";
+    rateHint();
+    renderCheck();
+  }
+  function rateHint() {
+    const R = IG.R(inv), box = $("#regRate"); if (!box) return;
+    const same = R.rate != null && Number(inv.taxRate) === R.rate;
+    box.innerHTML = '<p>' + esc(R.rateHint || "") + '</p>' +
+      (R.rate != null && !same ? '<button type="button" class="chip" id="useRate">Use ' + R.rate + "% " + esc(R.tax) + "</button>" : "");
+  }
+  function checkItems() {
+    const R = IG.R(inv);
+    const has = (v) => !!String(v || "").trim();
+    const all = {
+      title: ['The words "Tax Invoice" at the top', () => /tax invoice/i.test(inv.title || "")],
+      number: ["Invoice number", () => has(inv.number)],
+      date: ["Issue date", () => has(inv.issueDate)],
+      supply: [(R.supply || "Date of supply") + ", if different", () => has(inv.supplyDate)],
+      from: ["Your name and address", () => has(inv.from.name) && has(inv.from.address)],
+      taxId: ["Your " + (R.taxId || "tax ID"), () => has(inv.from.taxId)],
+      to: ["Client name and address", () => has(inv.to.name) && has(inv.to.address)],
+      pos: ["Place of supply (state)", () => has(inv.placeOfSupply)],
+      items: ["Each item with quantity and price", () => itemsDone()],
+      rate: [(inv.taxLabel || R.tax) + " rate and amount", () => Number(inv.taxRate) > 0 || !!inv.taxNote],
+      due: ["Due date or payment terms", () => has(inv.dueDate)]
+    };
+    return (R.check || []).map((k) => [all[k][0], all[k][1]()]);
+  }
+  function renderCheck() {
+    const list = $("#regCheckList"); if (!list) return;
+    const items = checkItems(), done = items.filter((x) => x[1]).length;
+    $("#regCheckTitle").textContent = IG.R(inv).name + " checklist";
+    $("#regCheckCount").textContent = done + "/" + items.length;
+    $("#regCheckCount").classList.toggle("all", done === items.length);
+    list.innerHTML = items.map(([t, ok]) => '<li class="' + (ok ? "ok" : "") + '"><i aria-hidden="true"></i>' + esc(t) + "</li>").join("");
+  }
+
   /* ---------- region, units, extra fields ---------- */
   function regionHint() {
     const h = $("#regionHint"); if (!h) return;
@@ -148,6 +214,7 @@
       row.className = "item-row";
       row.innerHTML =
         '<label class="ir-desc"><span class="ir-l">Item ' + (i + 1) + '</span><textarea class="fi" rows="1" data-i="' + i + '" data-k="desc" placeholder="Description of item or service"></textarea></label>' +
+        '<label class="ir-code"><span class="ir-l">' + esc(IG.R(inv).code || "Code") + '</span><input class="fi" data-i="' + i + '" data-k="code" placeholder="' + esc(IG.R(inv).code || "") + '" aria-label="Code, item ' + (i + 1) + '"></label>' +
         '<label class="ir-qty"><span class="ir-l">Qty</span><input class="fi" inputmode="decimal" data-i="' + i + '" data-k="qty" aria-label="Quantity, item ' + (i + 1) + '"></label>' +
         '<label class="ir-rate"><span class="ir-l">Rate</span><input class="fi" inputmode="decimal" data-i="' + i + '" data-k="rate" placeholder="0.00" aria-label="Rate, item ' + (i + 1) + '"></label>' +
         '<span class="ir-amt"><span class="ir-l">Amount</span><b data-amount="' + i + '"></b></span>' +
@@ -155,6 +222,7 @@
       box.appendChild(row);
       $('[data-k="desc"]', row).value = it.desc || "";
       $('[data-k="qty"]', row).value = it.qty;
+      $('[data-k="code"]', row).value = it.code || "";
       $('[data-k="rate"]', row).value = it.rate ? it.rate : "";
       autosize($('[data-k="desc"]', row));
     });
@@ -219,6 +287,17 @@
     if (bal.textContent && bal.textContent !== nb && !reduce()) { const r = bal.parentElement; r.classList.remove("bump"); void r.offsetWidth; r.classList.add("bump"); }
     bal.textContent = nb;
     $("#stamp").hidden = inv.status !== "paid";
+    const R = IG.R(inv);
+    const sp = $("#tSplit");
+    if (sp) {
+      const lines = R.split ? IG.taxLines(inv, t) : [];
+      sp.hidden = !lines.length;
+      sp.innerHTML = lines.map(([k, v]) => '<span>' + esc(k) + "</span><b>" + M(v) + "</b>").join("");
+    }
+    const tw = $("#tWords"); if (tw) { tw.hidden = !R.words || !t.total; tw.textContent = R.words ? "Amount in words: " + IG.amountInWords(t.total, inv.currency) : ""; }
+    const ti = $("#tIncl"); if (ti) { ti.hidden = !R.inclNote || !t.tax; ti.textContent = R.inclNote ? "Total includes " + (inv.taxLabel || R.tax) + " of " + M(t.tax) : ""; }
+    const tn = $("#tNote"); if (tn) { tn.hidden = !inv.taxNote; tn.textContent = inv.taxNote ? IG.TAX_NOTES[inv.taxNote] : ""; }
+    renderCheck();
     return t;
   }
 
@@ -391,7 +470,7 @@
 
   async function saveProfile() {
     const p = Object.assign({}, IG.store.get("ig_profile", {}), {
-      name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId,
+      name: inv.from.name, email: inv.from.email, address: inv.from.address, phone: inv.from.phone, taxId: inv.from.taxId, bank: inv.from.bank,
       currency: inv.currency, region: inv.region, accent: inv.accent, accentPicked: !!inv.accentPicked, template: inv.template, tplPicked: !!inv.tplPicked, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH,
       taxLabel: inv.taxLabel, taxRate: inv.taxRate, notes: inv.notes, terms: inv.terms, service: inv.service, hourRate: inv.hourRate
     });
@@ -557,6 +636,7 @@
         let v = el.value;
         if (["discount", "taxRate", "shipping", "paid", "hourRate"].includes(el.dataset.f)) v = v.replace(",", ".").replace(/[^\d.]/g, "");
         setPath(inv, el.dataset.f, v);
+        if (el.dataset.f === "taxRate") rateHint();
         if (el.dataset.f === "issueDate" || el.dataset.f === "dueDate") {
           if (el.dataset.f === "issueDate" && $("#dueIn").value !== "") { inv.dueDate = IG.addDays(inv.issueDate, +$("#dueIn").value); $('[data-f="dueDate"]').value = inv.dueDate; }
           syncDueIn();
@@ -564,7 +644,7 @@
       } else if (el.dataset.k) {
         const it = inv.items[+el.dataset.i];
         if (!it) return;
-        it[el.dataset.k] = el.dataset.k === "desc" ? el.value : el.value.replace(",", ".").replace(/[^\d.]/g, "");
+        it[el.dataset.k] = el.dataset.k === "desc" || el.dataset.k === "code" ? el.value : el.value.replace(",", ".").replace(/[^\d.]/g, "");
       } else return;
       update();
       changed();
@@ -719,8 +799,23 @@
       inv.region = reg.value; IG.setRegion(inv.region);
       if (!inv.taxLabel || IG.TAX_NAMES.indexOf(inv.taxLabel) >= 0) { inv.taxLabel = nw.tax; const tl = $('[data-f="taxLabel"]'); if (tl) tl.value = nw.tax; }
       if (inv.currency === old.cur && nw.cur) { inv.currency = nw.cur; $("#currency").value = nw.cur; }
+      if (IG.REGION_TITLES.indexOf(inv.title) >= 0 && nw.title && inv.title !== nw.title) { inv.title = nw.title; const ti = $('[data-f="title"]'); if (ti) ti.value = nw.title; }
+      regionApply(); renderItems();
       regionHint(); update(); changed();
       IG.toast(nw.name + " style: " + (nw.paper === "letter" ? "US Letter" : "A4") + " paper, local number and date format.", "ok");
+    });
+    $("#gstSeg").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-gst]"); if (!b) return;
+      inv.gstSplit = b.dataset.gst; regionApply(); update(); changed();
+    });
+    $("#taxNote").addEventListener("change", (e) => { inv.taxNote = e.target.value; update(); changed(); });
+    $("#regRate").addEventListener("click", (e) => {
+      if (!e.target.closest("#useRate")) return;
+      const R = IG.R(inv);
+      inv.taxRate = String(R.rate); if (!inv.taxLabel || IG.TAX_NAMES.indexOf(inv.taxLabel) >= 0) inv.taxLabel = R.tax;
+      $('[data-f="taxRate"]').value = inv.taxRate; $('[data-f="taxLabel"]').value = inv.taxLabel;
+      rateHint(); update(); changed();
+      IG.toast(R.rate + "% " + R.tax + " added.", "ok");
     });
     $("#unitSeg").addEventListener("click", (e) => {
       const b = e.target.closest("[data-unit]"); if (!b) return;
@@ -809,7 +904,7 @@
     // keyword pages (quote, receipt, estimate...) open with their own document title
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
     if (pageDoc && (!inv.title || IG.DOC_TITLES.indexOf(inv.title) >= 0)) {
-      inv.title = pageDoc;
+      inv.title = pageDoc === "Invoice" ? (IG.R(inv).title || "Invoice") : pageDoc;
       const pre3 = { Quotation: "QUO", Receipt: "REC", Estimate: "EST", "Proforma Invoice": "PRO", Invoice: "INV" }[pageDoc];
       const m = /^(INV|QUO|REC|EST|PRO)-(\d+)$/.exec(inv.number || "");
       if (pre3 && m) inv.number = pre3 + "-" + m[2];

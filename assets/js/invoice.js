@@ -60,7 +60,7 @@
     const reg = IG.REGIONS[p.region] ? p.region : IG.guessRegion();
     return {
       id: null,
-      title: "Invoice",
+      title: IG.REGIONS[reg].title || "Invoice",
       region: reg,
       unit: "qty",
       fields: [],
@@ -80,9 +80,14 @@
         email: p.email || "",
         address: p.address || "",
         phone: p.phone || "",
-        taxId: p.taxId || ""
+        taxId: p.taxId || "",
+        bank: p.bank || ""
       },
-      to: { name: "", email: "", address: "", phone: "" },
+      to: { name: "", email: "", address: "", phone: "", taxId: "" },
+      supplyDate: "",
+      placeOfSupply: "",
+      gstSplit: "intra",
+      taxNote: "",
       items: [{ id: IG.uid(), desc: "", qty: 1, rate: 0 }],
       mode: "standard",
       service: p.service || "",
@@ -162,26 +167,109 @@
     return { lines, subtotal, discount, tax, shipping, total, paid, balance };
   };
 
-  /* Regional styles: number format, date format, paper size and the usual tax name */
+  /* Regional styles. Each profile follows that region's invoice rules:
+     UK: HMRC full VAT invoice · EU: VAT Directive art. 226 · India: CGST Rule 46
+     UAE: FTA tax invoice · Australia: ATO tax invoice · Canada: CRA GST/HST
+     Japan: qualified invoice system. Fields that a region doesn't use stay hidden. */
   IG.REGIONS = {
-    us: { name: "United States", locale: "en-US", paper: "letter", tax: "Sales tax", date: "mdy", cur: "USD" },
-    uk: { name: "United Kingdom", locale: "en-GB", paper: "a4", tax: "VAT", date: "dmy-text", cur: "GBP" },
-    eu: { name: "Europe", locale: "de-DE", paper: "a4", tax: "VAT", date: "dmy-dot", cur: "EUR" },
-    ca: { name: "Canada / Australia", locale: "en-CA", paper: "letter", tax: "GST", date: "dmy-text", cur: "CAD" },
-    asia: { name: "East Asia", locale: "en-SG", paper: "a4", tax: "Tax", date: "iso", cur: "USD" },
-    sa: { name: "South Asia", locale: "en-IN", paper: "a4", tax: "GST", date: "dmy-slash", cur: "INR" },
-    me: { name: "Middle East", locale: "en-AE", paper: "a4", tax: "VAT", date: "dmy-slash", cur: "AED" }
+    us: { name: "United States", locale: "en-US", paper: "letter", tax: "Sales tax", date: "mdy", cur: "USD",
+      title: "Invoice", taxId: "EIN / Tax ID", taxIdPh: "Optional", rateHint: "Sales tax depends on the state and city.",
+      check: ["number", "date", "from", "to", "items", "due"] },
+    uk: { name: "United Kingdom", locale: "en-GB", paper: "a4", tax: "VAT", date: "dmy-text", cur: "GBP",
+      title: "Invoice", taxId: "VAT reg. no.", taxIdPh: "GB123456789", clientTaxId: "Client VAT no.", supply: "Tax point", rate: 20,
+      rateHint: "Standard VAT is 20%. Only charge VAT if you are VAT registered.", notes: ["rc", "exempt"],
+      check: ["number", "date", "supply", "from", "taxId", "to", "items", "rate"] },
+    eu: { name: "Europe", locale: "de-DE", paper: "a4", tax: "VAT", date: "dmy-dot", cur: "EUR",
+      title: "Invoice", taxId: "VAT ID", taxIdPh: "DE123456789", clientTaxId: "Client VAT ID", supply: "Date of supply", bank: true, layout: "eu",
+      rateHint: "VAT is set by each country, from 17% to 27%. Small businesses that are exempt can add the exemption note.", notes: ["rc", "exempt"],
+      check: ["number", "date", "supply", "from", "taxId", "to", "items", "rate"] },
+    ca: { name: "Canada", locale: "en-CA", paper: "letter", tax: "GST", date: "dmy-text", cur: "CAD",
+      title: "Invoice", taxId: "GST/HST no.", taxIdPh: "123456789 RT0001", rate: 5,
+      rateHint: "GST is 5%. Provinces with HST use 13% to 15%; name the tax HST if so.",
+      check: ["number", "date", "from", "taxId", "to", "items", "rate"] },
+    au: { name: "Australia / New Zealand", locale: "en-AU", paper: "a4", tax: "GST", date: "dmy-slash", cur: "AUD",
+      title: "Tax Invoice", taxId: "ABN", taxIdPh: "51 824 753 556", clientTaxId: "Client ABN", rate: 10, inclNote: true,
+      rateHint: "GST is 10% in Australia and 15% in New Zealand (use GST number instead of ABN).",
+      check: ["title", "number", "date", "from", "taxId", "to", "items", "rate"] },
+    jp: { name: "Japan", locale: "ja-JP", paper: "a4", tax: "Consumption tax", date: "ymd-slash", cur: "JPY",
+      title: "Invoice", taxId: "Registration no.", taxIdPh: "T1234567890123", supply: "Transaction date", rate: 10, rateSummary: true,
+      rateHint: "Standard rate 10%, reduced rate 8% for food and newspapers. The tax is shown per rate.",
+      check: ["number", "supply", "from", "taxId", "to", "items", "rate"] },
+    asia: { name: "Asia (other)", locale: "en-SG", paper: "a4", tax: "GST", date: "dmy-slash", cur: "SGD",
+      title: "Invoice", taxId: "Tax / GST reg. no.", taxIdPh: "Optional",
+      rateHint: "Singapore GST is 9%. Use your local tax name and rate.",
+      check: ["number", "date", "from", "to", "items"] },
+    sa: { name: "India / South Asia", locale: "en-IN", paper: "a4", tax: "GST", date: "dmy-slash", cur: "INR",
+      title: "Tax Invoice", taxId: "GSTIN", taxIdPh: "22AAAAA0000A1Z5", clientTaxId: "Client GSTIN", pos: true, code: "HSN/SAC",
+      split: true, words: true, sign: true, rate: 18, layout: "in",
+      rateHint: "Common GST rates are 5%, 12%, 18% and 28%. Same state: CGST + SGST. Other state: IGST.",
+      check: ["title", "number", "date", "from", "taxId", "to", "pos", "items", "rate"] },
+    me: { name: "Middle East (UAE, Gulf)", locale: "en-AE", paper: "a4", tax: "VAT", date: "dmy-slash", cur: "AED",
+      title: "Tax Invoice", taxId: "TRN", taxIdPh: "100123456700003", clientTaxId: "Client TRN", supply: "Date of supply", rate: 5,
+      rateHint: "UAE VAT is 5%; Saudi Arabia 15%. Show the TRN of both sides on B2B invoices.", notes: ["rc"],
+      check: ["title", "number", "date", "supply", "from", "taxId", "to", "items", "rate"] }
   };
-  IG.TAX_NAMES = ["Tax", "Sales tax", "VAT", "GST", "Sales Tax"];
+  IG.TAX_NOTES = {
+    rc: "Reverse charge: the customer is liable for the VAT on this supply.",
+    exempt: "VAT exempt: no VAT is charged under the small business scheme."
+  };
+  IG.TAX_NAMES = ["Tax", "Sales tax", "VAT", "GST", "Sales Tax", "Consumption tax"];
+  IG.REGION_TITLES = ["Invoice", "Tax Invoice"];
   IG.guessRegion = function () {
     const l = (navigator.language || "en-US").toLowerCase();
-    if (l === "en-gb" || l === "en-ie") return "uk";
-    if (/^en-(ca|au|nz)/.test(l) || /^fr-ca/.test(l)) return "ca";
+    if (l === "en-gb" || l === "en-ie") return l === "en-ie" ? "eu" : "uk";
+    if (/^en-(au|nz)/.test(l)) return "au";
+    if (/^en-ca/.test(l) || /^fr-ca/.test(l)) return "ca";
+    if (/^ja/.test(l)) return "jp";
     if (/^(de|fr|es|it|nl|pt|pl|sv|da|fi|nb|no|cs|sk|hu|ro|el|bg|hr|sl|et|lv|lt)/.test(l)) return "eu";
-    if (/^(ja|zh|ko|th|vi|id|ms|fil)/.test(l) || /^en-(sg|my|ph|hk)/.test(l)) return "asia";
-    if (/^(hi|bn|ur|ta|te|ne|si)/.test(l) || /^en-(in|pk|bd|lk|np)/.test(l)) return "sa";
+    if (/^(zh|ko|th|vi|id|ms|fil)/.test(l) || /^en-(sg|my|ph|hk)/.test(l)) return "asia";
+    if (/^(hi|bn|ur|ta|te|ne|si|mr|gu|kn|ml|pa)/.test(l) || /^en-(in|pk|bd|lk|np)/.test(l)) return "sa";
     if (/^(ar|he|fa)/.test(l) || /^en-(ae|sa|qa|kw|bh|om)/.test(l)) return "me";
     return "us";
+  };
+  IG.R = function (inv) { return IG.REGIONS[(inv && inv.region) || IG.region] || IG.REGIONS.us; };
+
+  /* India: tax split into CGST + SGST (same state) or IGST (other state) */
+  IG.taxLines = function (inv, t) {
+    const R = IG.R(inv), rate = parseFloat(inv.taxRate) || 0;
+    if (!t.tax && !rate) return [];
+    if (R.split) {
+      if (inv.gstSplit === "inter") return [["IGST (" + rate + "%)", t.tax]];
+      const half = Math.round((t.tax / 2 + Number.EPSILON) * 100) / 100;
+      const r2 = Math.round(rate / 2 * 100) / 100;
+      return [["CGST (" + r2 + "%)", half], ["SGST (" + r2 + "%)", Math.round((t.tax - half) * 100) / 100]];
+    }
+    return [[(inv.taxLabel || R.tax || "Tax") + " (" + rate + "%)", t.tax]];
+  };
+
+  /* Amount in words, as written on Indian (lakh, crore) and international invoices */
+  const ONES = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+  const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+  function below1000(n) {
+    let s = "";
+    if (n >= 100) { s += ONES[Math.floor(n / 100)] + " hundred"; n %= 100; if (n) s += " and "; }
+    if (n >= 20) { s += TENS[Math.floor(n / 10)]; if (n % 10) s += "-" + ONES[n % 10]; }
+    else if (n) s += ONES[n];
+    return s;
+  }
+  function words(n, indian) {
+    if (n === 0) return "zero";
+    const parts = [];
+    const units = indian ? [[1e7, "crore"], [1e5, "lakh"], [1e3, "thousand"]] : [[1e9, "billion"], [1e6, "million"], [1e3, "thousand"]];
+    for (const [v, w] of units) { if (n >= v) { parts.push(words(Math.floor(n / v), indian) + " " + w); n %= v; } }
+    if (n) parts.push(below1000(n));
+    return parts.join(" ");
+  }
+  const CUR_WORDS = { INR: ["rupees", "paise"], USD: ["dollars", "cents"], EUR: ["euros", "cents"], GBP: ["pounds", "pence"], AED: ["dirhams", "fils"], SAR: ["riyals", "halalas"], BDT: ["taka", "paisa"], PKR: ["rupees", "paisa"], NPR: ["rupees", "paisa"], LKR: ["rupees", "cents"], AUD: ["dollars", "cents"], CAD: ["dollars", "cents"], SGD: ["dollars", "cents"] };
+  IG.amountInWords = function (amount, currency) {
+    const a = Math.abs(Math.round((amount || 0) * 100));
+    const whole = Math.floor(a / 100), frac = a % 100;
+    const cw = CUR_WORDS[currency] || [currency, "cents"];
+    const indian = ["INR", "BDT", "PKR", "NPR"].indexOf(currency) >= 0;
+    let s = words(whole, indian) + " " + cw[0];
+    if (frac) s += " and " + words(frac, false) + " " + cw[1];
+    s += " only";
+    return s.charAt(0).toUpperCase() + s.slice(1);
   };
   IG.region = "us";
   IG.setRegion = function (r) { IG.region = IG.REGIONS[r] ? r : "us"; };
@@ -197,6 +285,7 @@
       case "dmy-dot": return dd + "." + mm + "." + y;
       case "dmy-slash": return dd + "/" + mm + "/" + y;
       case "iso": return y + "-" + mm + "-" + dd;
+      case "ymd-slash": return y + "/" + mm + "/" + dd;
       default: return d.getDate() + " " + MON[d.getMonth()] + " " + y;
     }
   };
@@ -224,11 +313,14 @@
 
   /* PDF fonts only cover Latin-1 + €, so swap other symbols for the ISO code */
   IG.moneyPdf = function (amount, currency) {
-    const s = IG.money(amount, currency);
+    const s = IG.money(amount, currency).replace("\uFFE5", "\u00A5");
     // eslint-disable-next-line no-control-regex
     if (/^[\u0000-ÿ€\s\-−.,0-9]*$/.test(s)) return s.replace("−", "-");
-    const digits = new Intl.NumberFormat((IG.REGIONS[IG.region] || IG.REGIONS.us).locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(Math.abs(amount || 0));
-    return (amount < 0 ? "-" : "") + currency + " " + digits;
+    let fd = 2;
+    try { fd = new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions().maximumFractionDigits; } catch (e) { /* keep 2 */ }
+    const digits = new Intl.NumberFormat((IG.REGIONS[IG.region] || IG.REGIONS.us).locale, { minimumFractionDigits: fd, maximumFractionDigits: fd }).format(Math.abs(amount || 0));
+    const sym = { INR: "Rs.", PKR: "Rs.", NPR: "Rs.", LKR: "Rs." }[currency] || currency;
+    return (amount < 0 ? "-" : "") + sym + " " + digits;
   };
 
   IG.validEmail = function (s) {

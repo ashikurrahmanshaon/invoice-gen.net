@@ -56,10 +56,13 @@
     if (IG.isTimesheet && IG.isTimesheet(inv)) return buildTimesheet(doc, inv, t, M, accent);
 
     const T = ["modern", "minimal"].indexOf(inv.template) >= 0 ? inv.template : "classic";
+    const RG = IG.R(inv);
+    const EU = RG.layout === "eu", IN = RG.layout === "in";
+    const BOTTOM = EU ? 34 : 18;
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
     const onBand = T === "modern";
     const extraFields = (inv.fields || []).filter((f) => String(f.label || "").trim() && String(f.value || "").trim());
-    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length;
+    const metaCount = 3 + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN ? 1 : 0);
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
@@ -94,11 +97,18 @@
     doc.text(clean(inv.title || "Invoice"), R, y + 8, { align: "right" });
     doc.setFontSize(9.5);
     let my = y + 17;
+    if (IN) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(7.5); doc.setTextColor(...(onBand ? mix(accent, 0.7) : faint));
+      doc.text("ORIGINAL FOR RECIPIENT", R, y + 13.5, { align: "right" });
+      doc.setFontSize(9.5); my += 3;
+    }
     const meta = [
       [IG.docLabels(inv.title).no, inv.number],
       ["Issue date", IG.prettyDate(inv.issueDate)],
       [IG.docLabels(inv.title).due, IG.prettyDate(inv.dueDate)]
     ];
+    if (RG.supply && inv.supplyDate) meta.push([RG.supply, IG.prettyDate(inv.supplyDate)]);
+    if (RG.pos && inv.placeOfSupply) meta.push(["Place of supply", inv.placeOfSupply]);
     if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
     extraFields.forEach((f) => meta.push([String(f.label).trim(), String(f.value).trim()]));
     meta.forEach(([k, v]) => {
@@ -117,50 +127,68 @@
     // parties
     y = onBand ? Math.max(bandH, my + 4) + 12 : Math.max(my, y + 30) + (T === "minimal" ? 12 : 8);
     const colW = (R - L - 10) / 2;
-    function party(label, p, x) {
+    function party(label, p, x, taxLabel) {
       let py = y;
       doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...faint);
       doc.text(label, x, py); py += 5.5;
       doc.setFontSize(11); doc.setTextColor(...ink);
       if (p.name) { doc.text(doc.splitTextToSize(clean(p.name), colW), x, py); py += 5.5; }
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
-      [p.address, p.email, p.phone, p.taxId ? "Tax ID: " + p.taxId : ""].forEach((line) => {
+      [p.address, p.email, p.phone, p.taxId ? (taxLabel || "Tax ID") + ": " + p.taxId : ""].forEach((line) => {
         if (!line) return;
         const parts = doc.splitTextToSize(clean(line), colW);
         doc.text(parts, x, py); py += parts.length * 4.6;
       });
       return py;
     }
-    const endA = party("From", inv.from, L);
-    const endB = party("Bill to", inv.to, L + colW + 10);
+    if (EU && inv.from.name) {
+      // sender line above the address, as on European business letters
+      const sl = clean([inv.from.name].concat(String(inv.from.address || "").split(/\n+/)).filter(Boolean).join(" - "));
+      doc.setFont("helvetica", "normal"); doc.setFontSize(6.8); doc.setTextColor(...faint);
+      const sw = Math.min(doc.getTextWidth(sl), colW);
+      doc.text(doc.splitTextToSize(sl, colW)[0], L + colW + 10, y - 6);
+      doc.setDrawColor(...mix(faint, 0.5)); doc.setLineWidth(0.15); doc.line(L + colW + 10, y - 5, L + colW + 10 + sw, y - 5);
+    }
+    const endA = party("From", inv.from, L, RG.taxId);
+    const endB = party(IN ? "Bill to (recipient)" : "Bill to", inv.to, L + colW + 10, RG.clientTaxId || RG.taxId);
     y = Math.max(endA, endB) + 8;
 
     // items table
+    const CODE = RG.code && inv.items.some((it) => String(it.code || "").trim()) ? RG.code : "";
     const body = inv.items
       .filter((it) => String(it.desc).trim() || Number(it.rate) || Number(it.qty) !== 1)
-      .map((it, i) => [clean(it.desc || "-"), String(it.qty || 0), M(Number(it.rate) || 0), M(t.lines[inv.items.indexOf(it)] || 0)]);
+      .map((it, i) => {
+        const r = [clean(it.desc || "-"), String(it.qty || 0), M(Number(it.rate) || 0), M(t.lines[inv.items.indexOf(it)] || 0)];
+        if (CODE) r.splice(1, 0, clean(it.code || ""));
+        return r;
+      });
+    const head = ["Description", (IG.UNITS[inv.unit] || IG.UNITS.qty).q, (IG.UNITS[inv.unit] || IG.UNITS.qty).r, "Amount"];
+    if (CODE) head.splice(1, 0, CODE);
+    const nCols = head.length;
     doc.autoTable({
       startY: y,
-      margin: { left: L, right: W - R },
-      head: [["Description", (IG.UNITS[inv.unit] || IG.UNITS.qty).q, (IG.UNITS[inv.unit] || IG.UNITS.qty).r, "Amount"]],
-      body: body.length ? body : [["-", "", "", M(0)]],
+      margin: { left: L, right: W - R, bottom: BOTTOM },
+      head: [head],
+      body: body.length ? body : [CODE ? ["-", "", "", "", M(0)] : ["-", "", "", M(0)]],
       theme: "plain",
       styles: { font: "helvetica", fontSize: 9.5, textColor: ink, cellPadding: { top: 3.2, bottom: 3.2, left: 3, right: 3 }, lineColor: [237, 240, 244], lineWidth: { bottom: 0.3 } },
       headStyles: T === "minimal"
         ? { fillColor: false, textColor: ink, fontStyle: "bold", fontSize: 8.5, lineColor: accent, lineWidth: { bottom: 0.7 } }
         : { fillColor: accent, textColor: [255, 255, 255], fontStyle: "bold", fontSize: 8.5, lineWidth: 0 },
-      columnStyles: { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 20 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
-      didParseCell: (d) => { if (d.section === "head" && d.column.index > 0) d.cell.styles.halign = "right"; }
+      columnStyles: CODE
+        ? { 0: { cellWidth: "auto" }, 1: { cellWidth: 24 }, 2: { halign: "right", cellWidth: 16 }, 3: { halign: "right", cellWidth: 30 }, 4: { halign: "right", cellWidth: 32 } }
+        : { 0: { cellWidth: "auto" }, 1: { halign: "right", cellWidth: 20 }, 2: { halign: "right", cellWidth: 32 }, 3: { halign: "right", cellWidth: 34 } },
+      didParseCell: (d) => { if (d.section === "head" && d.column.index > (CODE ? 1 : 0)) d.cell.styles.halign = "right"; }
     });
     y = doc.lastAutoTable.finalY + 8;
 
     // totals
     const rows = [["Subtotal", M(t.subtotal)]];
     if (t.discount) rows.push(["Discount" + (inv.discountType === "%" ? " (" + inv.discount + "%)" : ""), "-" + M(t.discount)]);
-    if (t.tax) rows.push([clean(inv.taxLabel || "Tax") + " (" + inv.taxRate + "%)", M(t.tax)]);
+    IG.taxLines(inv, t).forEach(([k, v]) => rows.push([clean(k), M(v)]));
     if (t.shipping) rows.push(["Shipping", M(t.shipping)]);
     const needed = rows.length * 6 + 30;
-    if (y + needed > H - 20) { doc.addPage(); y = 20; }
+    if (y + needed > H - BOTTOM - 2) { doc.addPage(); y = 20; }
     const TX = R - 78;
     doc.setFontSize(9.5);
     rows.forEach(([k, v]) => {
@@ -195,13 +223,28 @@
     doc.text(IG.docLabels(inv.title).bal, TX, y + 1.5); doc.text(M(t.balance), R, y + 1.5, { align: "right" });
     const balanceY = y;
     const balancePage = doc.getCurrentPageInfo().pageNumber;
-    y += 16;
+    y += 10;
+    // regional lines under the totals
+    const after = [];
+    if (RG.inclNote && t.tax) after.push("Total includes " + (inv.taxLabel || RG.tax) + " of " + M(t.tax));
+    if (RG.rateSummary && t.tax) after.push("Taxable amount at " + inv.taxRate + "%: " + M(t.subtotal - t.discount) + "    " + (inv.taxLabel || RG.tax) + " " + inv.taxRate + "%: " + M(t.tax));
+    if (RG.words && t.total) after.push("Amount in words: " + IG.amountInWords(t.total, cur));
+    doc.setFont("helvetica", "italic"); doc.setFontSize(8.8); doc.setTextColor(...soft);
+    after.forEach((line) => {
+      const parts = doc.splitTextToSize(clean(line), R - L);
+      doc.text(parts, R, y, { align: "right" }); y += parts.length * 4.4 + 1;
+    });
+    if (inv.taxNote && IG.TAX_NOTES[inv.taxNote]) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...ink);
+      doc.text(clean(IG.TAX_NOTES[inv.taxNote]), L, y + 2); y += 7;
+    }
+    y += 6;
 
     // notes & terms
     function block(label, text) {
       if (!String(text || "").trim()) return;
       const lines = doc.splitTextToSize(clean(text), R - L);
-      if (y + lines.length * 4.6 + 10 > H - 18) { doc.addPage(); y = 20; }
+      if (y + lines.length * 4.6 + 10 > H - BOTTOM) { doc.addPage(); y = 20; }
       doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...faint);
       doc.text(label, L, y); y += 5;
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
@@ -209,6 +252,17 @@
     }
     block("Notes", inv.notes);
     block("Terms", inv.terms);
+
+    if (RG.sign) {
+      if (y + 26 > H - BOTTOM) { doc.addPage(); y = 24; }
+      const sx = R - 70;
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9); doc.setTextColor(...ink);
+      doc.text(clean("For " + (inv.from.name || "")), R, y + 2, { align: "right" });
+      doc.setDrawColor(...mix(faint, 0.4)); doc.setLineWidth(0.3); doc.line(sx, y + 18, R, y + 18);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5); doc.setTextColor(...soft);
+      doc.text("Authorised signatory", R, y + 22.5, { align: "right" });
+      y += 28;
+    }
 
     // paid stamp, beside the totals
     if (inv.status === "paid") {
@@ -221,10 +275,21 @@
 
     // footer on every page
     const pages = doc.getNumberOfPages();
-    for (let i = 1; pages > 1 && i <= pages; i++) {
+    const cols = EU ? [
+      [inv.from.name].concat(String(inv.from.address || "").split(/\n+/)),
+      [inv.from.email, inv.from.phone, inv.from.taxId ? (RG.taxId + ": " + inv.from.taxId) : ""],
+      String(inv.from.bank || "").split(/\n+/)
+    ].map((c) => c.filter((x) => String(x || "").trim()).slice(0, 4)) : null;
+    for (let i = 1; i <= pages; i++) {
       doc.setPage(i);
+      if (cols && cols.some((c) => c.length)) {
+        const fy = H - 27, cw = (R - L) / 3;
+        doc.setDrawColor(219, 226, 234); doc.setLineWidth(0.3); doc.line(L, fy - 4, R, fy - 4);
+        doc.setFont("helvetica", "normal"); doc.setFontSize(7.2); doc.setTextColor(...soft);
+        cols.forEach((c, ci) => c.forEach((line, li) => doc.text(doc.splitTextToSize(clean(line), cw - 4)[0], L + ci * cw, fy + li * 3.6)));
+      }
       doc.setFont("helvetica", "normal"); doc.setFontSize(8); doc.setTextColor(...faint);
-      if (pages > 1) doc.text("Page " + i + " of " + pages, R, H - 10, { align: "right" });
+      if (pages > 1) doc.text("Page " + i + " of " + pages, R, H - 8, { align: "right" });
     }
     return doc;
   };
@@ -260,7 +325,8 @@
     const nm = doc.splitTextToSize(clean(inv.from.name || ""), leftW);
     doc.text(nm, L, ly); ly += nm.length * 6.6;
     doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
-    [inv.from.address, inv.from.email, inv.from.phone, inv.from.taxId ? "Tax / VAT ID: " + inv.from.taxId : ""].forEach((line) => {
+    const RGt = IG.R(inv);
+    [inv.from.address, inv.from.email, inv.from.phone, inv.from.taxId ? (RGt.taxId || "Tax / VAT ID") + ": " + inv.from.taxId : ""].forEach((line) => {
       if (!String(line || "").trim()) return;
       const parts = doc.splitTextToSize(clean(line), leftW);
       doc.text(parts, L, ly); ly += parts.length * 4.5;
@@ -308,7 +374,7 @@
       });
       return py;
     }
-    const endA = party("Bill To:", [inv.to.name, inv.to.address, inv.to.email, inv.to.phone], true, L);
+    const endA = party("Bill To:", [inv.to.name, inv.to.address, inv.to.email, inv.to.phone, inv.to.taxId ? (RGt.clientTaxId || RGt.taxId) + ": " + inv.to.taxId : ""], true, L);
     let endB = endA;
     if (hasShip) {
       const DX = L + colW + 5;
@@ -383,7 +449,7 @@
     line("Rate:", M(rate) + " / h");
     line("Subtotal:", M(t.subtotal));
     if (t.discount) line("Discount" + (inv.discountType === "%" ? " (" + inv.discount + "%)" : "") + ":", "-" + M(t.discount));
-    if (Number(inv.taxRate) > 0) line((inv.taxLabel || "Tax") + " (" + inv.taxRate + "%):", M(t.tax));
+    if (Number(inv.taxRate) > 0) IG.taxLines(inv, t).forEach(([k, v]) => line(k + ":", M(v)));
     if (t.shipping) line("Shipping:", M(t.shipping));
     divider();
     line("Total:", M(t.total), true, 11);

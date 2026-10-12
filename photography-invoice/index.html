@@ -14,26 +14,26 @@
 <meta property="og:title" content="Photography Invoice Template: Shoots, Editing, Prints (Free)">
 <meta property="og:description" content="Make a photography invoice for shoots, editing, prints and travel. Free template with your logo, deposits and PDF download. For wedding, event and portrait work.">
 <meta property="og:url" content="https://invoice-gen.net/photography-invoice/">
-<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=6abc2172">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=1920aaf7">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Photography Invoice Template: Shoots, Editing, Prints (Free)">
 <meta name="twitter:description" content="Make a photography invoice for shoots, editing, prints and travel. Free template with your logo, deposits and PDF download. For wedding, event and portrait work.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=6abc2172">
-<link rel="icon" href="/favicon.ico?v=6abc2172" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=6abc2172" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=6abc2172" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=6abc2172" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=6abc2172">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=6abc2172" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=6abc2172">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=1920aaf7">
+<link rel="icon" href="/favicon.ico?v=1920aaf7" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=1920aaf7" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=1920aaf7" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=1920aaf7" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=1920aaf7">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=1920aaf7" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=1920aaf7">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.min.css?v=6abc2172">
+<link rel="stylesheet" href="/assets/css/style.min.css?v=1920aaf7">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": "https://invoice-gen.net/"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": "https://invoice-gen.net/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"}</script>
@@ -106,6 +106,10 @@
               <label for="f-issue">Date</label><input class="fi " type="date" data-f="issueDate" placeholder="" aria-label="Issue date" id="f-issue">
               <label for="f-due">Due date</label><input class="fi " type="date" data-f="dueDate" placeholder="" aria-label="Due date" id="f-due">
               <label for="f-po">PO / ref.</label><input class="fi " data-f="poNumber" placeholder="Optional" aria-label="PO or reference" id="f-po">
+              <div class="meta-region" id="metaRegion">
+                <label for="f-supply" class="reg-supply" hidden>Date of supply</label><input class="fi reg-supply" type="date" data-f="supplyDate" placeholder="" aria-label="Date of supply" id="f-supply" hidden>
+                <label for="f-pos" class="reg-pos" hidden>Place of supply</label><input class="fi reg-pos" data-f="placeOfSupply" placeholder="State, e.g. Maharashtra (27)" aria-label="Place of supply" id="f-pos" hidden>
+              </div>
               <div class="meta-extra" id="metaExtra"></div>
             </div>
             <button type="button" class="add-field" id="addField">+ Add field</button>
@@ -121,6 +125,7 @@
             <label class="pf"><span class="pf-l">Your address</span><textarea class="fi " rows="2" data-f="from.address" placeholder="Street, city, postcode" aria-label="Your address"></textarea></label>
             <label class="pf"><span class="pf-l">Your phone</span><input class="fi " type="tel" data-f="from.phone" placeholder="Optional" aria-label="Your phone" autocomplete="tel"></label>
             <label class="pf"><span class="pf-l">Tax / VAT ID</span><input class="fi " data-f="from.taxId" placeholder="Optional" aria-label="Your tax number"></label>
+            <div class="reg-bank" hidden><label class="pf"><span class="pf-l">Bank details</span><textarea class="fi " rows="2" data-f="from.bank" placeholder="IBAN, BIC and bank name" aria-label="Bank details"></textarea></label></div>
           </div>
           <div class="party" data-section="to">
             <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
@@ -129,13 +134,14 @@
             <label class="pf"><span class="pf-l">Client email</span><input class="fi " type="email" data-f="to.email" placeholder="client@company.com" aria-label="Client email" autocomplete="off" inputmode="email"></label>
             <label class="pf"><span class="pf-l">Client address</span><textarea class="fi " rows="2" data-f="to.address" placeholder="Street, city, postcode" aria-label="Client address"></textarea></label>
             <label class="pf"><span class="pf-l">Client phone</span><input class="fi " type="tel" data-f="to.phone" placeholder="Optional" aria-label="Client phone" autocomplete="off"></label>
+            <div class="reg-ctax" hidden><label class="pf"><span class="pf-l">Client VAT ID</span><input class="fi " data-f="to.taxId" placeholder="Needed for business clients" aria-label="Client tax number" autocomplete="off"></label></div>
             <label class="ship-to ts-only"><span>Work address <small>shown as Ship to</small></span><textarea class="fi " rows="2" data-f="shipTo" placeholder="Where the work was done (optional)" aria-label="Work address"></textarea></label>
           </div>
         </div>
 
         <div class="sh-items std-only" data-section="items">
           <span class="sh-label"><span class="sh-step"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Items <small>what you are charging for</small></span>
-          <div class="items-head" aria-hidden="true"><span>Item</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
+          <div class="items-head" aria-hidden="true"><span>Item</span><span class="h-code" id="hCode">HSN/SAC</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
           <p class="items-hint" id="itemsHint">Describe the work, then enter how many and the price. The amount and totals work themselves out.</p>
           <button type="button" class="add-line" id="addLine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add line item</button>
@@ -173,10 +179,14 @@
             <div class="t-row"><span>Subtotal</span><b id="tSub"></b></div>
             <div class="t-row t-adj"><span>Discount</span><span class="t-in"><input class="fi " data-f="discount" placeholder="0" aria-label="Discount" inputmode="decimal"><span class="seg seg-xs" role="group" aria-label="Discount type"><button type="button" data-disc="%">%</button><button type="button" data-disc="flat">Fixed</button></span></span><b id="tDisc"></b></div>
             <div class="t-row t-adj"><span class="t-tax"><input class="fi fi-label" data-f="taxLabel" placeholder="Tax" aria-label="Tax name"></span><span class="t-in"><input class="fi " data-f="taxRate" placeholder="0" aria-label="Tax rate in percent" inputmode="decimal"><em>%</em></span><b id="tTax"></b></div>
+            <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in"><input class="fi " data-f="shipping" placeholder="0" aria-label="Shipping" inputmode="decimal"></span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
             <div class="t-row t-adj"><span>Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+            <p class="t-incl" id="tIncl" hidden></p>
+            <p class="t-words" id="tWords" hidden></p>
+            <p class="t-note" id="tNote" hidden></p>
           </div>
         </div>
       </div>
@@ -215,6 +225,16 @@
 
       <div class="sp-card">
         <label class="sp-field"><span class="sp-h">Region style</span><select class="in" id="region"></select><small class="sp-sub" id="regionHint"></small></label>
+        <div class="reg-rate" id="regRate"></div>
+        <div class="sp-field" id="gstWrap" hidden><span class="sp-h" id="gstLabel">GST type</span>
+          <div class="seg seg-full" id="gstSeg" role="group" aria-labelledby="gstLabel">
+            <button type="button" data-gst="intra" aria-pressed="true">Same state</button>
+            <button type="button" data-gst="inter" aria-pressed="false">Other state</button>
+          </div>
+        </div>
+        <label class="sp-field" id="taxNoteWrap" hidden><span class="sp-h">Tax note</span>
+          <select class="in" id="taxNote"><option value="">None</option><option value="rc">Reverse charge</option><option value="exempt">VAT exempt (small business)</option></select>
+        </label>
         <label class="sp-field"><span class="sp-h">Currency</span><select class="in" id="currency"></select></label>
         <div class="sp-field std-only"><span class="sp-h" id="unitLabel">Bill items by</span>
           <div class="seg seg-full" id="unitSeg" role="group" aria-labelledby="unitLabel">
@@ -240,6 +260,7 @@
             <option value="paid">Paid (adds a PAID stamp)</option>
           </select>
         </label>
+        <details class="reg-check" id="regCheck"><summary><span id="regCheckTitle">What this invoice needs</span><b id="regCheckCount"></b></summary><ul id="regCheckList"></ul></details>
         <button type="button" class="link-btn sp-profile" id="profileBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.6"/><path d="M5 20a7 7 0 0 1 14 0"/></svg> Use my details on every new invoice</button>
       </div>
     </aside>
@@ -325,7 +346,7 @@
     <dl class="feat">
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" fill="#d1fae5"/><path d="M14 3v5h5M12 11v6m0 0-2.5-2.5M12 17l2.5-2.5"/></svg></span>PDF download</dt><dd>A clean A4 or US Letter PDF with your logo. No watermark.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="2" fill="#d1fae5"/><rect x="13" y="4" width="8" height="7" rx="2"/><rect x="13" y="13" width="8" height="7" rx="2" fill="#d1fae5"/></svg></span>Three designs</dt><dd>Classic, Modern and Minimal, each in six colours.</dd></div>
-      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies</dt><dd>US Dollar, Euro, Pound, Canadian and Australian Dollar, Yen and more, formatted correctly.</dd></div>
+      <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2.1 0 2.9 6 1.4 6 4.3 0 1.2-1.3 2.1-3 2.1-1.4 0-2.6-.6-3.1-1.6M12 6.5v11"/></svg></span>28 currencies, 9 regions</dt><dd>Pick your region and the invoice follows local rules: VAT, GST, ABN, GSTIN or TRN, the right title and date format.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12V5a2 2 0 0 1 2-2h7l9 9-9 9z" fill="#d1fae5"/><circle cx="8" cy="8" r="1.5"/><path d="m10 15 5-5"/></svg></span>Tax, discount, shipping</dt><dd>Name your own tax, give a percent or fixed discount, record part payments.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5L6 21z" fill="#d1fae5"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></span>Quotation, receipt, proforma</dt><dd>Change the title at the top of the page and the PDF follows.</dd></div>
       <div><dt><span class="feat-ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" fill="#d1fae5"/><path d="M12 7v5l3 2"/></svg></span>Timesheet invoices</dt><dd>Add shifts with start, end and break. Hours work themselves out, night shifts too. <a href="/timesheet-invoice/">Try it</a></dd></div>
@@ -442,11 +463,11 @@
     <nav class="foot-legal" aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></nav>
   </div>
 </footer>
-<script src="/assets/js/config.js?v=6abc2172" defer></script>
-<script src="/assets/js/core.js?v=6abc2172" defer></script>
-<script src="/assets/js/motion.js?v=6abc2172" defer></script>
-<script src="/assets/js/invoice.js?v=6abc2172" defer></script>
-<script src="/assets/js/pdf.js?v=6abc2172" defer></script>
-<script src="/assets/js/app.js?v=6abc2172" defer></script>
+<script src="/assets/js/config.js?v=1920aaf7" defer></script>
+<script src="/assets/js/core.js?v=1920aaf7" defer></script>
+<script src="/assets/js/motion.js?v=1920aaf7" defer></script>
+<script src="/assets/js/invoice.js?v=1920aaf7" defer></script>
+<script src="/assets/js/pdf.js?v=1920aaf7" defer></script>
+<script src="/assets/js/app.js?v=1920aaf7" defer></script>
 </body>
 </html>
