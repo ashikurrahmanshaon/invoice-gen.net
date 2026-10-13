@@ -13,6 +13,7 @@
 window.IG_CONFIG = {
   SUPABASE_URL: "https://qmzwikvsmvdzirurzkxb.supabase.co",
   SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFtendpa3ZzbXZkemlydXJ6a3hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTE1MjUyNjksImV4cCI6MjEwNzEwMTI2OX0.cV3XHbPJFPUmJbkVaF2VeF-JFOWfpXU9hd_RF4BlFrA",
+  GOOGLE_LOGIN: true,    // shows "Continue with Google" straight away (set false to hide it)
   SITE_URL: "https://invoice-gen.net",
   SITE_NAME: "invoice-gen.net",
   SUPPORT_EMAIL: "support@invoice-gen.net",

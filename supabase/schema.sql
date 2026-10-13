@@ -49,6 +49,7 @@ create table if not exists public.email_log (
   sent_at timestamptz not null default now()
 );
 create index if not exists email_log_user_idx on public.email_log (user_id, sent_at desc);
+create index if not exists email_log_invoice_idx on public.email_log (invoice_id);
 
 -- keep updated_at fresh
 create or replace function public.touch_updated_at() returns trigger
@@ -98,3 +99,52 @@ do $$ begin
   alter publication supabase_realtime add table public.invoices;
 exception when duplicate_object then null;
 end $$;
+
+-- Account info, kept apart from "data" (which holds the business details for invoices)
+alter table public.profiles add column if not exists email text;
+alter table public.profiles add column if not exists full_name text;
+alter table public.profiles add column if not exists avatar_url text;
+alter table public.profiles add column if not exists provider text;
+alter table public.profiles add column if not exists created_at timestamptz not null default now();
+alter table public.profiles add column if not exists last_sign_in timestamptz;
+
+-- Save every new account automatically (email, Google name and photo, sign-in method)
+create or replace function public.handle_new_user() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  insert into public.profiles (id, email, full_name, avatar_url, provider, created_at, last_sign_in)
+  values (
+    new.id, new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', new.raw_user_meta_data->>'name'),
+    new.raw_user_meta_data->>'avatar_url',
+    coalesce(new.raw_app_meta_data->>'provider', 'email'),
+    new.created_at, new.last_sign_in_at
+  )
+  on conflict (id) do update set
+    email = excluded.email,
+    full_name = coalesce(excluded.full_name, public.profiles.full_name),
+    avatar_url = coalesce(excluded.avatar_url, public.profiles.avatar_url),
+    provider = excluded.provider,
+    last_sign_in = excluded.last_sign_in;
+  return new;
+end $$;
+revoke execute on function public.handle_new_user() from public, anon, authenticated;
+
+drop trigger if exists on_auth_user_created on auth.users;
+create trigger on_auth_user_created after insert on auth.users
+  for each row execute function public.handle_new_user();
+
+-- keep the email and last sign-in time up to date
+drop trigger if exists on_auth_user_updated on auth.users;
+create trigger on_auth_user_updated after update of email, last_sign_in_at, raw_user_meta_data on auth.users
+  for each row execute function public.handle_new_user();
+
+-- add profiles for accounts that already exist
+insert into public.profiles (id, email, full_name, avatar_url, provider, created_at, last_sign_in)
+select u.id, u.email,
+  coalesce(u.raw_user_meta_data->>'full_name', u.raw_user_meta_data->>'name'),
+  u.raw_user_meta_data->>'avatar_url',
+  coalesce(u.raw_app_meta_data->>'provider', 'email'),
+  u.created_at, u.last_sign_in_at
+from auth.users u
+on conflict (id) do nothing;

@@ -1940,3 +1940,18 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
   .sheet .sh-totals .t-adj:has(.seg-xs) { grid-template-columns: minmax(0, 1fr) 146px minmax(64px, auto); }
   .sheet .sh-totals .t-adj:has(.seg-xs) .t-in { width: 146px; }
 }
+
+/* ===== Sign-in: password strength + caps lock ===== */
+.pw-meter { display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+.pw-meter[hidden] { display: none; }
+.pw-bar { flex: 1; height: 5px; border-radius: 99px; background: #e8edf2; overflow: hidden; }
+.pw-bar i { display: block; height: 100%; width: 12%; border-radius: inherit; background: #e5484d; transition: width .25s ease, background .25s ease; }
+.pw-meter[data-lvl="1"] .pw-bar i { width: 40%; background: #f5a524; }
+.pw-meter[data-lvl="2"] .pw-bar i { width: 72%; background: #22a06b; }
+.pw-meter[data-lvl="3"] .pw-bar i { width: 100%; background: #0e9f6e; }
+.pw-meter small, .pw-caps { font-size: 12.5px; color: #64748b; white-space: nowrap; }
+.pw-caps { display: block; margin-top: 6px; color: #b54708; font-weight: 500; }
+.pw-caps[hidden] { display: none; }
+#googleBtn { transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .1s ease; }
+#googleBtn:hover { background: #f8fafc; border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
+#googleBtn:active { transform: translateY(1px); }

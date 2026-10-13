@@ -57,6 +57,7 @@
     $("#forgot").hidden = m !== "login";
     const t = $("#authTerms"); if (t) t.hidden = m === "login";
     $("#password").setAttribute("placeholder", m === "login" ? "Your password" : "At least 8 characters");
+    meter();
     msg("");
   }
 
@@ -68,6 +69,25 @@
     eye.setAttribute("aria-label", show ? "Hide password" : "Show password");
     pw.focus();
   });
+
+  /* password strength, shown only while creating an account */
+  function meter() {
+    const box = $("#pwMeter"); if (!box) return;
+    const pw = $("#password").value;
+    box.hidden = mode !== "signup" || !pw;
+    let n = 0;
+    if (pw.length >= 8) n++;
+    if (pw.length >= 12) n++;
+    if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) n++;
+    if (/\d/.test(pw)) n++;
+    if (/[^A-Za-z0-9]/.test(pw)) n++;
+    const lvl = pw.length < 8 ? 0 : n <= 2 ? 1 : n <= 3 ? 2 : 3;
+    box.dataset.lvl = lvl;
+    $("#pwHint").textContent = ["Use 8 or more characters", "Okay. Longer is safer", "Good password", "Strong password"][lvl];
+  }
+  function caps(e) {
+    const c = $("#pwCaps"); if (c && e.getModifierState) c.hidden = !e.getModifierState("CapsLock");
+  }
 
   async function submit(e) {
     e.preventDefault();
@@ -127,17 +147,18 @@
     msg("Password reset link sent to " + email + ". Check spam if you can't see it.", "ok");
   }
 
-  // The Google button appears by itself once Google is switched on in Supabase (Authentication → Providers).
-  async function showGoogleIfEnabled() {
+  // The Google button is in the page from the start. It is only hidden if config.js
+  // turns it off, or if Supabase says Google sign-in is switched off.
+  function setGoogle(on) { $("#googleBtn").hidden = !on; $("#googleDivider").hidden = !on; }
+  async function checkGoogle() {
     const cfg = window.IG_CONFIG || {};
-    if (!IG.cloudReady || !cfg.SUPABASE_URL) return;
+    if (cfg.GOOGLE_LOGIN === false || !cfg.SUPABASE_URL || !cfg.SUPABASE_ANON_KEY) return setGoogle(false);
     try {
       const r = await fetch(cfg.SUPABASE_URL.replace(/\/$/, "") + "/auth/v1/settings", { headers: { apikey: cfg.SUPABASE_ANON_KEY } });
+      if (!r.ok) return;
       const s = await r.json();
-      const on = !!(s && s.external && s.external.google);
-      $("#googleBtn").hidden = !on;
-      $("#googleDivider").hidden = !on;
-    } catch (e) { /* stay hidden */ }
+      if (s && s.external && s.external.google === false) setGoogle(false);
+    } catch (e) { /* keep it showing */ }
   }
 
   async function google() {
@@ -179,10 +200,13 @@
     $("#magic").addEventListener("click", magicLink);
     $("#forgot").addEventListener("click", forgot);
     $("#googleBtn").addEventListener("click", google);
+    $("#password").addEventListener("input", meter);
+    $("#password").addEventListener("keyup", caps);
+    $("#password").addEventListener("blur", () => { const c = $("#pwCaps"); if (c) c.hidden = true; });
     $("#resetForm").addEventListener("submit", setNewPassword);
     linkError();
+    checkGoogle();
     IG.loadCloud().then(async () => {
-      showGoogleIfEnabled();
       if (!IG.cloudReady) return;
       IG.cloud.auth.onAuthStateChange((event) => {
         if (event === "PASSWORD_RECOVERY") {

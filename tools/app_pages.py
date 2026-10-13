@@ -31,10 +31,10 @@ def login_markup():
       </div>
       <p class="form-msg" id="authMsg" hidden></p>
       <form id="authForm" novalidate>
-        <button type="button" class="btn btn-white btn-block" id="googleBtn" hidden>{GOOGLE} Continue with Google</button>
-        <div class="divider" id="googleDivider" hidden>or with email</div>
+        <button type="button" class="btn btn-white btn-block" id="googleBtn">{GOOGLE} Continue with Google</button>
+        <div class="divider" id="googleDivider">or with email</div>
         <label class="f"><span class="f-label">Email</span><input class="in" id="email" type="email" autocomplete="email" placeholder="you@business.com" required></label>
-        <label class="f"><span class="f-label">Password</span><span class="pw-wrap"><input class="in" id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required><button type="button" class="pw-eye" id="pwEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="pw-slash" d="M4 4l16 16"/></svg></button></span></label>
+        <label class="f"><span class="f-label">Password</span><span class="pw-wrap"><input class="in" id="password" type="password" autocomplete="current-password" minlength="8" placeholder="At least 8 characters" required><button type="button" class="pw-eye" id="pwEye" aria-label="Show password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path class="pw-slash" d="M4 4l16 16"/></svg></button></span><span class="pw-meter" id="pwMeter" hidden aria-live="polite"><span class="pw-bar"><i></i></span><small id="pwHint">Use 8 or more characters</small></span><small class="pw-caps" id="pwCaps" hidden>Caps Lock is on</small></label>
         <button class="btn btn-primary btn-block btn-lg" id="authSubmit" type="submit">Log in</button>
         <p class="auth-terms" id="authTerms" hidden>By creating an account you agree to the <a href="/terms/">Terms of use</a> and <a href="/privacy/">Privacy policy</a>.</p>
         <p class="auth-links"><a href="#" id="magic">Email me a login link</a><a href="#" id="forgot">Forgot password?</a></p>
