@@ -17,7 +17,8 @@ ErrorDocument 404 /404.html
   RewriteRule ^(.*/)?index\.html$ /$1 [L,R=301]
   # old URLs from earlier versions of the site -> the matching page today (301 keeps rankings)
   RewriteRule ^(free-invoice-generator|invoice-generator|invoice-maker|online-invoice-generator|create-invoice)(/.*)?$ / [L,R=301,NC]
-  RewriteRule ^(app|invoices|customers|products|settings)(/.*)?$ /dashboard/ [L,R=301,NC]
+  RewriteRule ^(invoices|customers|products|settings)(/.*)?$ /dashboard/ [L,R=301,NC]
+  RewriteRule ^app/.+$ /dashboard/ [L,R=301,NC]
   RewriteRule ^blog/?$ /guides/ [L,R=301,NC]
   RewriteRule ^blog/professional-invoice-guide-small-business/?$ /how-to-make-an-invoice/ [L,R=301,NC]
   RewriteRule ^blog/multi-currency-invoice-best-practices/?$ /freelance-invoice/ [L,R=301,NC]

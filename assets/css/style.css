@@ -1955,3 +1955,55 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 #googleBtn { transition: background .15s ease, border-color .15s ease, box-shadow .15s ease, transform .1s ease; }
 #googleBtn:hover { background: #f8fafc; border-color: #cbd5e1; box-shadow: 0 2px 8px rgba(15,23,42,.06); }
 #googleBtn:active { transform: translateY(1px); }
+
+/* ===== Logged-in app: invoice editor inside the workspace (/app/) ===== */
+.ws .app-main { padding-bottom: 0; }
+.ws .gen { background: none; border: 0; padding: 0 0 56px; }
+.ws .gen .wrap { max-width: none; padding-inline: 0; margin: 0; }
+.ws .side-panel { top: 16px !important; }
+.ws-top { position: sticky; top: 0; z-index: 40; background: var(--desk); padding: 18px 0 16px; margin-bottom: 4px; }
+.ws-top .app-title h1 { font-size: clamp(1.35rem, 2vw, 1.7rem); margin: 0; letter-spacing: -.02em; }
+.crumbs-app { display: flex; align-items: center; gap: 6px; font-size: .84rem; color: var(--muted); margin-bottom: 2px; }
+.crumbs-app a { color: var(--muted); text-decoration: none; }
+.crumbs-app a:hover { color: var(--ink); text-decoration: underline; }
+.crumbs-app span[aria-hidden] { opacity: .5; }
+.save-pill { display: inline-flex; align-items: center; gap: 8px; height: 34px; padding: 0 14px; border-radius: 99px; background: var(--paper); border: 1px solid var(--rule); font-size: .84rem; font-weight: 500; color: var(--muted); white-space: nowrap; transition: color .2s, border-color .2s, background .2s; }
+.save-pill .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; flex: none; }
+.save-pill[data-state="saved"] { color: #067a55; border-color: #bfe8d6; background: #effaf5; }
+.save-pill[data-state="saved"] .dot { background: #10b981; }
+.save-pill[data-state="saving"] .dot { background: #f5a524; animation: wsPulse 1s ease-in-out infinite; }
+.save-pill[data-state="need"] .dot { background: #f5a524; }
+.save-pill[data-state="error"] { color: #b42318; border-color: #f4c7c3; background: #fff5f4; }
+.save-pill[data-state="error"] .dot { background: #e5484d; }
+@keyframes wsPulse { 50% { opacity: .35; } }
+@media (prefers-reduced-motion: reduce) { .save-pill .dot { animation: none !important; } }
+@media (max-width: 860px) {
+  .ws-top { position: sticky; top: 0; z-index: 45; flex-wrap: wrap; padding: 8px 14px 0; background: var(--paper); }
+  .ws-top .app-title { order: 3; flex-basis: auto; flex: 1 1 auto; margin: 0 -14px; padding: 10px 14px 10px; background: var(--paper); border-top: 1px solid var(--rule-2); }
+  .ws-top .save-pill { order: 4; margin: 0 0 0 auto; height: 30px; padding: 0 11px; font-size: .78rem; align-self: center; }
+  .ws-top > .side-toggle, .ws-top > .m-brand { margin-bottom: 8px; }
+  .ws .gen { padding-top: 12px; }
+  .ws .side { z-index: 90; }
+  .ws .side-scrim { z-index: 85; }
+}
+@media (max-width: 420px) { .ws-top .save-pill #wsSaveText { max-width: 128px; overflow: hidden; text-overflow: ellipsis; } }
+.ws a.side-link { text-decoration: none; }
+.ws a.side-link:hover { text-decoration: none; }
+.ws .side-panel { top: 104px !important; }
+@media (max-width: 860px) {
+  .ws-top { display: grid !important; grid-template-columns: auto 1fr; grid-template-areas: "tog brand" "title pill"; align-items: center; column-gap: 12px; margin: 0 -14px !important; padding: 8px 14px 10px !important; border-bottom: 1px solid var(--rule); }
+  .ws-top > .side-toggle { grid-area: tog; margin: 0 !important; }
+  .ws-top > .m-brand { grid-area: brand; margin: 0 !important; }
+  .ws-top .app-title { grid-area: title; margin: 8px 0 0 !important; padding: 0 !important; border: 0 !important; background: none !important; min-width: 0; }
+  .ws-top .app-title h1 { font-size: 1.3rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ws-top .save-pill { grid-area: pill; margin: 8px 0 0 !important; justify-self: end; }
+  .crumbs-app { font-size: .78rem; }
+}
+@media (max-width: 860px) {
+  .ws-top { grid-template-columns: auto 1fr auto; grid-template-areas: "tog brand pill" "title title title"; }
+  .ws-top > .m-brand { justify-self: start; }
+  .ws-top .save-pill { margin: 0 !important; }
+  .ws-top .app-title { margin: 10px 0 0 !important; }
+}
+@media (max-width: 440px) { .ws-top .m-brand .brand-name { display: none; } }
+.ws #cloudNote { display: none; }

@@ -218,8 +218,8 @@ def page(path, title, desc, main, scripts="", ld=None, noindex=False, chrome=Tru
         h = h[:a] + h[b:]
         h = h.replace('<body>', '<body class="app-body">')
         # dashboard: no saved login in this browser -> straight to the login page, before anything renders
-        h = h.replace('</head>', '<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent("/dashboard/"+location.hash));</script>\n</head>')
-    if path in ("/login/", "/dashboard/"):
+        h = h.replace('</head>', '<script>if(!document.documentElement.classList.contains("has-session"))location.replace("/login/?next="+encodeURIComponent(location.pathname+location.search+location.hash));</script>\n</head>')
+    if path in ("/login/", "/dashboard/", "/app/"):
         # sign-in pages: start fetching the sign-in library and connecting to the server right away
         h = h.replace("</head>", '<link rel="preconnect" href="https://qmzwikvsmvdzirurzkxb.supabase.co" crossorigin>\n<link rel="preload" href="/assets/vendor/supabase.js?v=2.45.4" as="script">\n</head>', 1)
     html = h + '<main id="main">\n' + main + "\n</main>\n" + (FOOT.replace("<!--CTA-->", FOOT_CTA if cta else "") if chrome else "") + BASE_JS + scripts + "</body>\n</html>\n"
@@ -489,6 +489,16 @@ page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.ne
 DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
 page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
      DASH, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
+
+# ---------------------------------------------------------------- app editor (logged in)
+_ed = home_section.build(FAQ, ICON_DL, ICON_SEND)
+_a = _ed.index('<div class="wrap gen-head">'); _b = _ed.index('<div class="wrap gen-grid">')
+_ed = _ed[:_a] + _ed[_b:]
+_ed = _ed[:_ed.index('<section class="band', _ed.index('</dialog>'))]
+_ed = _ed.replace('aria-labelledby="gen-title"', 'aria-labelledby="wsTitle"')
+WS = app_pages.workspace_markup(_ed, LOGO_SVG, WORDMARK)
+page("/app/", "Invoice editor | invoice-gen.net", "Create and edit invoices in your invoice-gen.net account.",
+     WS, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/app.js?v={V}" defer></script>\n', noindex=True, chrome=False)
 
 # ---------------------------------------------------------------- articles
 import datetime

@@ -443,7 +443,9 @@
   function changed() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => IG.draft.set(inv), 300);
+    wsHead();
     // logged in: save to the account automatically once the basics are filled in
+    if (user && !(inv.from.name.trim() && inv.to.name.trim()) && !inv.id) wsSave("need");
     if (user && inv.from.name.trim() && inv.to.name.trim()) {
       clearTimeout(autoTimer);
       setStatus("saving");
@@ -451,7 +453,34 @@
       autoTimer = setTimeout(run, 1200);
     }
   }
+  /* ---------- logged-in app (/app/): title, save status, menu ---------- */
+  const WS = () => !!document.querySelector(".ws");
+  function wsHead() {
+    if (!WS() || !inv) return;
+    const word = (inv.title || "Invoice").trim() || "Invoice";
+    const title = inv.id ? word + " " + (inv.number || "") : "New " + word.toLowerCase();
+    $("#wsTitle").textContent = title.trim();
+    $("#wsCrumb").textContent = inv.id ? (inv.number || word) : "New";
+    document.title = title.trim() + " | invoice-gen.net";
+  }
+  function wsSave(state) {
+    const pill = $("#wsSave"); if (!pill) return;
+    const small = window.innerWidth < 600;
+    const text = { idle: "Not saved yet", need: small ? "Not saved yet" : "Add your name and client to save", saving: "Saving…", saved: small ? "Saved" : "All changes saved", error: small ? "Not saved" : "Not saved. Check connection" };
+    pill.title = state === "need" ? "Add your business name and your client's name, then it saves by itself." : "";
+    pill.dataset.state = state;
+    $("#wsSaveText").textContent = text[state] || "";
+  }
+  function wsShell() {
+    const side = $("#side"), scrim = $("#scrim");
+    const open = (on) => { side.classList.toggle("open", on); scrim.hidden = !on; };
+    $("#sideToggle").addEventListener("click", () => open(true));
+    scrim.addEventListener("click", () => open(false));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && side.classList.contains("open")) open(false); });
+  }
+
   function setStatus(s) {
+    wsSave(s);
     const n = $("#cloudNote"); if (!n || !user) return;
     const map = { saving: "Saving to your account…", saved: "Saved to your account just now", error: "Not saved. Check your connection." };
     n.dataset.state = s;
@@ -460,7 +489,7 @@
 
   async function saveCloud(quiet) {
     if (!IG.cloud || !user) {
-      if (!quiet) { IG.draft.set(inv); window.location.href = "/login/?next=" + encodeURIComponent("/"); }
+      if (!quiet) { IG.draft.set(inv); window.location.href = "/login/?next=" + encodeURIComponent("/app/"); }
       return false;
     }
     if (cloudSaving) return false;
@@ -478,6 +507,7 @@
       if (res.error) throw res.error;
       inv.id = res.data.id;
       IG.draft.set(inv);
+      wsHead();
       IG.bumpNumber(inv.number);
       const url = new URL(window.location.href);
       url.searchParams.set("id", inv.id);
@@ -965,6 +995,7 @@
   }
 
   async function start() {
+    if (WS()) { wsShell(); document.body.classList.add("app-ready"); }
     bind();
     // warm up the PDF maker: on the first tap in the invoice, or once the page is idle
     const warm = () => IG.loadPdf().catch(() => {});
@@ -999,6 +1030,13 @@
     fillFields();
 
     user = await (IG.headerReady || IG.getUser());
+    wsHead();
+    if (WS()) {
+      if (!user) { window.location.replace("/login/?next=" + encodeURIComponent(location.pathname + location.search)); return; }
+      $("#who").textContent = user.email;
+      $("#avatar").textContent = (user.email || "?").charAt(0).toUpperCase();
+      wsSave(inv.id ? "saved" : (inv.from.name.trim() && inv.to.name.trim()) ? "idle" : "need");
+    }
     const note = $("#cloudNote");
     if (!IG.cfgReady) { $("#saveBtn").hidden = true; return; }
     if (!user) {
@@ -1012,7 +1050,7 @@
     if (id) {
       const { data, error } = await IG.cloud.from("invoices").select("id,data,status").eq("id", id).maybeSingle();
       if (error || !data) IG.toast("That invoice could not be opened. It may have been deleted.", "err");
-      else { inv = Object.assign(IG.blankInvoice(), data.data, { id: data.id, status: data.status }); fillFields(); IG.draft.set(inv); }
+      else { inv = Object.assign(IG.blankInvoice(), data.data, { id: data.id, status: data.status }); fillFields(); IG.draft.set(inv); wsHead(); wsSave("saved"); }
     } else if (dup) {
       const { data } = await IG.cloud.from("invoices").select("data").eq("id", dup).maybeSingle();
       if (data) {

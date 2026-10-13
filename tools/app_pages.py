@@ -67,6 +67,41 @@ def nav_btn(tab, icon, label, count=False):
     c = f'<span class="nav-count" data-count="{tab}"></span>' if count else ''
     return f'<button type="button" class="side-link" data-tab="{tab}">{I(ICONS[icon])}<span>{label}</span>{c}</button>'
 
+def side_links(active):
+    items = [("overview", "home", "Overview"), ("invoices", "doc", "Invoices"), ("clients", "users", "Clients"), ("settings", "gear", "Settings")]
+    return "\n      ".join(
+        f'<a class="side-link" href="/dashboard/#{t}"{' aria-current="page"' if t == active else ''}>{I(ICONS[ic])}<span>{lab}</span></a>' for t, ic, lab in items)
+
+def workspace_markup(editor, LOGO_SVG, WORDMARK):
+    """The invoice editor inside the logged-in app (sidebar + top bar), used at /app/."""
+    return f'''<div class="app ws" id="app">
+  <aside class="side" id="side" aria-label="App menu">
+    <a class="brand" href="/dashboard/" aria-label="Dashboard">{LOGO_SVG}{WORDMARK}</a>
+    <nav class="side-nav">
+      {side_links("invoices")}
+    </nav>
+    <a class="btn btn-primary btn-block side-new" href="/app/?new=1" id="sideNew">{I(ICONS["plus"])} New invoice</a>
+    <div class="side-user">
+      <span class="avatar" id="avatar">?</span>
+      <div class="side-user-text"><b id="who">Loading…</b><button type="button" class="link-btn" data-signout id="signOutBtn">Log out</button></div>
+    </div>
+  </aside>
+  <div class="side-scrim" id="scrim" hidden></div>
+
+  <div class="app-main">
+    <header class="app-top ws-top">
+      <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu">{I(ICONS["menu"])}</button>
+      <a class="brand m-brand" href="/dashboard/" aria-label="Dashboard">{LOGO_SVG}{WORDMARK}</a>
+      <div class="app-title">
+        <nav class="crumbs-app" aria-label="Breadcrumb"><a href="/dashboard/#invoices">Invoices</a><span aria-hidden="true">/</span><span id="wsCrumb">New</span></nav>
+        <h1 id="wsTitle">New invoice</h1>
+      </div>
+      <span class="save-pill" id="wsSave" data-state="idle" role="status" aria-live="polite"><span class="dot"></span><span id="wsSaveText">Not saved yet</span></span>
+    </header>
+{editor}
+  </div>
+</div>'''
+
 def dash_markup(LOGO_SVG, WORDMARK):
     return f'''<div class="app" id="app">
   <aside class="side" id="side" aria-label="Dashboard menu">
@@ -77,7 +112,7 @@ def dash_markup(LOGO_SVG, WORDMARK):
       {nav_btn("clients", "users", "Clients", True)}
       {nav_btn("settings", "gear", "Settings")}
     </nav>
-    <a class="btn btn-primary btn-block side-new" href="/?new=1#create">{I(ICONS["plus"])} New invoice</a>
+    <a class="btn btn-primary btn-block side-new" href="/app/?new=1">{I(ICONS["plus"])} New invoice</a>
     <div class="side-user">
       <span class="avatar" id="avatar">?</span>
       <div class="side-user-text"><b id="who">Loading…</b><button type="button" class="link-btn" data-signout id="signOutBtn">Log out</button></div>
@@ -90,7 +125,7 @@ def dash_markup(LOGO_SVG, WORDMARK):
       <button type="button" class="icon-btn side-toggle" id="sideToggle" aria-label="Open menu">{I(ICONS["menu"])}</button>
       <a class="brand m-brand" href="/" aria-label="invoice-gen.net home">{LOGO_SVG}{WORDMARK}</a>
       <div class="app-title"><h1 id="pageTitle">Overview</h1><p id="pageSub"></p></div>
-      <a class="btn btn-primary top-new" href="/?new=1#create">{I(ICONS["plus"])} <span>New invoice</span></a>
+      <a class="btn btn-primary top-new" href="/app/?new=1">{I(ICONS["plus"])} <span>New invoice</span></a>
     </header>
 
     <section class="panel" data-panel="overview" aria-labelledby="pageTitle">

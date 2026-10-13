@@ -149,13 +149,13 @@
     const s = eff(r), k = kindOf(r), D = IG.DOCS[k];
     const when = D.receipt ? "paid " + (IG.prettyDate(r.issue_date) || "") : (D.validity ? "valid until " : "due ") + (IG.prettyDate(r.due_date) || "not set");
     return '<div class="row" data-id="' + r.id + '">' +
-      '<a class="row-main" href="/?id=' + r.id + '#create"><span class="avatar sm">' + esc(initials(r.client_name)) + '</span><span class="row-text"><b>' + esc(r.client_name || "No client") + (KIND_NAME[k] ? ' <em class="kind-tag">' + KIND_NAME[k] + "</em>" : "") + "</b><small>" + esc(r.number) + ", " + esc(when) + "</small></span></a>" +
+      '<a class="row-main" href="/app/?id=' + r.id + '"><span class="avatar sm">' + esc(initials(r.client_name)) + '</span><span class="row-text"><b>' + esc(r.client_name || "No client") + (KIND_NAME[k] ? ' <em class="kind-tag">' + KIND_NAME[k] + "</em>" : "") + "</b><small>" + esc(r.number) + ", " + esc(when) + "</small></span></a>" +
       '<span class="row-amt">' + IG.money(Number(r.total), r.currency) + "</span>" + pill(s) +
       '<div class="row-menu"><button type="button" class="icon-btn sm" data-menu="' + r.id + '" aria-label="Actions for ' + esc(r.number) + '" aria-haspopup="true"><svg class="ico" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button></div>' +
       "</div>";
   }
   function emptyInvoices() {
-    return '<div class="empty"><div class="empty-art" aria-hidden="true"><span></span><span></span><span></span></div><h3>No invoices yet</h3><p>Create your first invoice. It\'s saved here when you download, send or press Save.</p><a class="btn btn-primary" href="/?new=1#create">Create an invoice</a></div>';
+    return '<div class="empty"><div class="empty-art" aria-hidden="true"><span></span><span></span><span></span></div><h3>No invoices yet</h3><p>Create your first invoice. It\'s saved here when you download, send or press Save.</p><a class="btn btn-primary" href="/app/?new=1">Create an invoice</a></div>';
   }
   function renderInvoices() {
     const counts = { all: invoices.length, draft: 0, sent: 0, overdue: 0, paid: 0 };
@@ -179,9 +179,9 @@
     m.className = "menu-pop";
     m.setAttribute("role", "menu");
     m.innerHTML =
-      '<a role="menuitem" href="/?id=' + r.id + '#create">Open and edit</a>' +
+      '<a role="menuitem" href="/app/?id=' + r.id + '">Open and edit</a>' +
       '<button role="menuitem" type="button" data-act="pdf">Download PDF</button>' +
-      '<a role="menuitem" href="/?dup=' + r.id + '#create">Duplicate</a>' +
+      '<a role="menuitem" href="/app/?dup=' + r.id + '">Duplicate</a>' +
       (r.status !== "paid" ? '<button role="menuitem" type="button" data-act="paid">Mark as paid</button>' : '<button role="menuitem" type="button" data-act="sent">Mark as unpaid</button>') +
       '<button role="menuitem" type="button" data-act="del" class="danger">Delete</button>';
     btn.parentElement.appendChild(m);
@@ -347,7 +347,7 @@
       if (bill) {
         const c = clients.find((x) => x.id === bill.dataset.bill);
         IG.store.set("ig_prefill_client", { name: c.name, email: c.email || "", phone: c.phone || "", address: c.address || "" });
-        window.location.href = "/?new=1#create";
+        window.location.href = "/app/?new=1";
       }
       if (del) {
         const c = clients.find((x) => x.id === del.dataset.delClient);
