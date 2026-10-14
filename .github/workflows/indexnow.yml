@@ -24,3 +24,4 @@ jobs:
           BODY=$(python3 -c "import json,sys;print(json.dumps({'host':'invoice-gen.net','key':'$KEY','keyLocation':'https://invoice-gen.net/$KEY.txt','urlList':json.loads(sys.argv[1])}))" "$URLS")
           code=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$BODY")
           echo "IndexNow answered: $code (200 or 202 = accepted)"
+          case "$code" in 200|202) ;; *) echo "::error::IndexNow did not accept the pages (HTTP $code). Check that https://invoice-gen.net/$KEY.txt is live."; exit 1;; esac
