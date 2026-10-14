@@ -135,6 +135,14 @@
     return user;
   };
 
+  /* "Copy link" in share bars */
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-copy]"); if (!b) return;
+    const done = () => { const t = b.querySelector("span"); if (!t) return; const o = t.textContent; t.textContent = "Copied"; setTimeout(() => (t.textContent = o), 1600); };
+    if (navigator.clipboard) navigator.clipboard.writeText(b.dataset.copy).then(done, () => window.prompt("Copy this link:", b.dataset.copy));
+    else window.prompt("Copy this link:", b.dataset.copy);
+  });
+
   document.addEventListener("DOMContentLoaded", () => {
     IG.headerReady = IG.initHeader();
   });

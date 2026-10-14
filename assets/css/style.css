@@ -2007,3 +2007,11 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 }
 @media (max-width: 440px) { .ws-top .m-brand .brand-name { display: none; } }
 .ws #cloudNote { display: none; }
+
+/* ===== Share bar (guides and generator pages) ===== */
+.share-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 28px 0 0; padding-top: 20px; border-top: 1px solid var(--rule); }
+.share-h { font-size: .86rem; font-weight: 600; color: var(--muted); margin-right: 4px; }
+.share-btn { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 13px; border-radius: 99px; border: 1px solid var(--rule); background: var(--paper); color: var(--ink); font: 500 .86rem var(--font); text-decoration: none; cursor: pointer; transition: border-color .15s, background .15s; }
+.share-btn:hover { border-color: #9fd8bf; background: #f3fbf7; text-decoration: none; }
+.share-btn svg { width: 16px; height: 16px; flex: none; }
+@media (max-width: 520px) { .share-btn span { display: none; } .share-btn { width: 40px; height: 40px; padding: 0; justify-content: center; } .share-h { flex-basis: 100%; } }

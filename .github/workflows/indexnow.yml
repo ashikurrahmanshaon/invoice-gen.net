@@ -1,0 +1,26 @@
+# Tells Bing, Yandex, Seznam, Naver (and through Bing: ChatGPT search, Copilot, DuckDuckGo)
+# that the site's pages changed, so they crawl them fast.
+# Runs: by itself 20 minutes after each push (time to press Deploy in Hostinger),
+# every Monday, or any time from GitHub -> Actions -> "Ping search engines" -> Run workflow.
+name: Ping search engines
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+jobs:
+  indexnow:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Wait for the Hostinger deploy
+        if: github.event_name == 'push'
+        run: sleep 1200
+      - name: Send every page in the sitemap to IndexNow
+        run: |
+          KEY=23b85a06a6d650453de5faeea5989b1f
+          URLS=$(grep -o '<loc>[^<]*</loc>' sitemap.xml | sed 's#</\?loc>##g' | python3 -c 'import sys,json;print(json.dumps([l.strip() for l in sys.stdin if l.strip()]))')
+          BODY=$(python3 -c "import json,sys;print(json.dumps({'host':'invoice-gen.net','key':'$KEY','keyLocation':'https://invoice-gen.net/$KEY.txt','urlList':json.loads(sys.argv[1])}))" "$URLS")
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X POST https://api.indexnow.org/indexnow -H 'Content-Type: application/json; charset=utf-8' -d "$BODY")
+          echo "IndexNow answered: $code (200 or 202 = accepted)"

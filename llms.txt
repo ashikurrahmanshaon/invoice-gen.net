@@ -1,0 +1,39 @@
+# invoice-gen.net
+
+> Free online invoice generator. Make invoices, quotes, receipts, estimates and proforma invoices in the browser and download a PDF, with no sign-up and no watermark. 28 currencies, tax and VAT, discounts, logos, and invoice styles for the US, UK, EU, Canada, Australia, Japan, Asia, the Middle East and more. A free account adds saved invoices, saved clients, a payments dashboard and emailing invoices.
+
+## Free generators
+
+- [Free Invoice Generator: Create & Download PDF Invoices Online](https://invoice-gen.net/): Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.
+- [Free Quote Generator: Create a Professional Quotation PDF | invoice-gen.net](https://invoice-gen.net/quote-generator/): Make a professional quote in minutes. Add your logo, items, tax and a valid-until date, then download the PDF or email it. Free, no sign-up.
+- [Free Receipt Generator: Make a Payment Receipt PDF Online | invoice-gen.net](https://invoice-gen.net/receipt-generator/): Create a professional payment receipt in seconds. Add what was paid, the payment date and method, then download a PDF or email it. Free receipt maker, no sign-up.
+- [Free Proforma Invoice Generator: Create a Proforma PDF Online](https://invoice-gen.net/proforma-invoice/): Create a proforma invoice online for free. Ideal for advance payments, customs and international orders. Add items, tax and shipping, then download the PDF or email it.
+- [Free Estimate Maker: Create a Job Estimate PDF Online | invoice-gen.net](https://invoice-gen.net/estimate-maker/): Make a professional estimate for any job in minutes. Itemise labour and materials, add tax and a valid-until date, then download the PDF or email it. Free, no sign-up.
+- [Timesheet Invoice Generator: Bill Hours and Shifts (Free PDF)](https://invoice-gen.net/timesheet-invoice/): Turn your shifts into an invoice. Add date, start, end and break; hours and totals work themselves out. For restaurant, kitchen and hourly work. Free PDF.
+- [Free Invoicing Tools: Invoice, Quote, Receipt and More](https://invoice-gen.net/invoice-tools/): All free invoicing tools in one place: invoice, quote, receipt, proforma, estimate and timesheet generators, templates by business and practical guides.
+- [Free Invoice Template: Fill In Online and Download PDF | invoice-gen.net](https://invoice-gen.net/invoice-template/): Free invoice template you can fill in online. Add your logo, choose a colour and currency, then download a PDF or email it. No Word or Excel needed.
+
+## Invoices by business
+
+- [Contractor Invoice Template: Labour and Materials (Free PDF)](https://invoice-gen.net/contractor-invoice/): Create a contractor invoice with labour, materials, deposits and tax. Free template for builders, electricians, plumbers and handymen. Download the PDF or email it.
+- [Free Cleaning Invoice Template: Bill Hours and Visits | invoice-gen.net](https://invoice-gen.net/cleaning-invoice/): Make a cleaning invoice in minutes. Add each visit's start and end time and the hours and total are worked out for you. For house and office cleaners. Free PDF.
+- [Consulting Invoice Template: Hourly and Retainer Billing (Free)](https://invoice-gen.net/consulting-invoice/): Create a consulting invoice for hourly work, day rates or retainers. Free template with tax, 28 currencies and PDF download. Email it to your client in one click.
+- [Photography Invoice Template: Shoots, Editing, Prints (Free)](https://invoice-gen.net/photography-invoice/): Make a photography invoice for shoots, editing, prints and travel. Free template with your logo, deposits and PDF download. For wedding, event and portrait work.
+- [Free Self-Employed Invoice Template: Simple PDF Invoices | invoice-gen.net](https://invoice-gen.net/self-employed-invoice/): A simple invoice template for self-employed people and sole traders. Add your name, your client, what you did and the price, then download the PDF. Free, no sign-up.
+- [Freelance Invoice Generator: Bill Clients and Get Paid | invoice-gen.net](https://invoice-gen.net/freelance-invoice/): Create freelance invoices for hourly or project work. Free generator with PDF download, email sending, multiple currencies and payment tracking.
+
+## Guides
+
+- [How to Make an Invoice: Step-by-Step Guide with Checklist | invoice-gen.net](https://invoice-gen.net/how-to-make-an-invoice/): Learn how to make an invoice that gets paid on time: what to include, how to number invoices, payment terms, and a free checklist.
+- [Invoice vs Receipt: The Difference and When to Send Each](https://invoice-gen.net/invoice-vs-receipt/): An invoice asks for payment; a receipt confirms it. Learn the difference, what each must include, and when to send an invoice, a receipt or both.
+- [Invoice Payment Terms Explained: Net 30, Due on Receipt and More](https://invoice-gen.net/payment-terms/): What Net 7, Net 30, due on receipt and 2/10 Net 30 mean, which payment terms to choose, and example wording you can copy onto your invoices.
+- [Payment Reminder Email Templates for Unpaid Invoices | invoice-gen.net](https://invoice-gen.net/payment-reminder/): Polite and firm payment reminder emails you can copy for unpaid and overdue invoices, with tips on when to send each one.
+- [Invoicing Guides: Templates, Payment Terms and Reminders | invoice-gen.net](https://invoice-gen.net/guides/): Free guides for freelancers and small businesses: how to make an invoice, payment terms, reminders, receipts, and invoice templates for your type of work.
+
+## About
+
+- [About invoice-gen.net](https://invoice-gen.net/about/): invoice-gen.net is a free invoice generator for freelancers and small businesses.
+- [Contact invoice-gen.net](https://invoice-gen.net/contact/): Contact the invoice-gen.net team for help, feedback or account questions. We reply by email, usually within one working day.
+- [Privacy Policy | invoice-gen.net](https://invoice-gen.net/privacy/): How invoice-gen.net collects, uses and protects your information, including invoices, client details and account data.
+- [Terms of Use | invoice-gen.net](https://invoice-gen.net/terms/): The terms for using invoice-gen.net, the free online invoice generator, including accounts, acceptable use and liability.
+

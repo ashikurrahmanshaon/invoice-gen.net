@@ -6,6 +6,29 @@ import json, os, sys
 
 ROOT = sys.argv[1]
 SITE = "https://invoice-gen.net"
+# Your social media pages. Paste each full link here once the page exists, e.g.
+# "https://www.facebook.com/invoicegen", "https://x.com/invoicegen", "https://www.linkedin.com/company/invoice-gen"
+# They are added to Google's knowledge panel data and as icons in the footer.
+SOCIAL = []
+from urllib.parse import quote as _q
+
+def og_image(path):
+    """the social share picture for this page (made by tools/og_images.py), or the general one"""
+    slug = "home" if path == "/" else path.strip("/").replace("/", "-")
+    if os.path.exists(os.path.join(ROOT, "assets", "og", slug + ".png")):
+        return f"{SITE}/assets/og/{slug}.png"
+    return f"{SITE}/assets/img/og-image.png"
+
+def share_bar(path, title):
+    u = _q(SITE + path, safe=""); t = _q(title, safe="")
+    links = [
+        ("Facebook", f"https://www.facebook.com/sharer/sharer.php?u={u}", '<path d="M14 8h3V4h-3a4 4 0 0 0-4 4v3H7v4h3v6h4v-6h3l1-4h-4V8z"/>'),
+        ("X", f"https://x.com/intent/post?url={u}&amp;text={t}", '<path d="M4 4l16 16M20 4 4 20"/>'),
+        ("LinkedIn", f"https://www.linkedin.com/sharing/share-offsite/?url={u}", '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 10v7M8 7v.01M12 17v-4a2 2 0 0 1 4 0v4M12 10v7"/>'),
+        ("WhatsApp", f"https://wa.me/?text={t}%20{u}", '<path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9c0 3 3 6 6 6l1-1.5-2-1-1 1c-1 0-2.5-1.5-2.5-2.5l1-1-1-2z"/>'),
+    ]
+    a = "".join(f'<a class="share-btn" href="{h}" target="_blank" rel="noopener nofollow" aria-label="Share on {n}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">{ic}</svg><span>{n}</span></a>' for n, h, ic in links)
+    return f'<div class="share-bar"><span class="share-h">Share this</span>{a}<button type="button" class="share-btn" data-copy="{SITE + path}" aria-label="Copy link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span>Copy link</span></button></div>'
 import hashlib as _hl, glob as _gl
 def _asset_version(root):
     h = _hl.md5()
@@ -73,11 +96,14 @@ open(os.path.join(ROOT, "assets/css/style.min.css"), "w", encoding="utf-8").writ
 def head(title, desc, path, extra_ld=None, noindex=False):
     url = SITE + path
     ld = [{
-        "@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "url": SITE + "/",
-    }, {
-        "@context": "https://schema.org", "@type": "Organization", "name": "invoice-gen.net", "url": SITE + "/",
-        "logo": SITE + "/assets/brand/logo-mark-256.png", "email": "support@invoice-gen.net"
-    }]
+        "@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "alternateName": ["invoice-gen", "Invoice Gen"], "url": SITE + "/",
+        "inLanguage": "en", "publisher": {"@id": SITE + "/#org"},
+    }, dict({
+        "@context": "https://schema.org", "@type": "Organization", "@id": SITE + "/#org", "name": "invoice-gen.net", "url": SITE + "/",
+        "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/icon-512.png", "width": 512, "height": 512},
+        "email": "support@invoice-gen.net",
+        "description": "Free online invoice generator: invoices, quotes, receipts, estimates and proforma invoices as PDF.",
+    }, **({"sameAs": SOCIAL} if SOCIAL else {}))]
     if extra_ld:
         ld += extra_ld
     ld_html = "\n".join('<script type="application/ld+json">' + json.dumps(x, ensure_ascii=False) + "</script>" for x in ld)
@@ -93,18 +119,22 @@ def head(title, desc, path, extra_ld=None, noindex=False):
 <link rel="canonical" href="{url}">
 {SPEC_JS}
 <meta name="theme-color" content="#ffffff">
-<meta property="og:type" content="website">
+<meta property="og:type" content="{'article' if extra_ld and any(x.get("@type") == "Article" for x in extra_ld) else 'website'}">
+<meta property="og:locale" content="en_US">
 <meta property="og:site_name" content="invoice-gen.net">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
 <meta property="og:url" content="{url}">
-<meta property="og:image" content="{SITE}/assets/img/og-image.png?v={V}">
+<meta property="og:image" content="{og_image(path)}?v={V}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:alt" content="{title}">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{title}">
 <meta name="twitter:description" content="{desc}">
-<meta name="twitter:image" content="{SITE}/assets/img/og-image.png?v={V}">
+<meta name="twitter:image" content="{og_image(path)}?v={V}">
+<meta name="twitter:image:alt" content="{title}">
 <link rel="icon" href="/favicon.ico?v={V}" sizes="48x48">
 <link rel="icon" href="/favicon.svg?v={V}" type="image/svg+xml">
 <link rel="icon" href="/favicon-32.png?v={V}" sizes="32x32" type="image/png">
@@ -290,6 +320,7 @@ def related_band(path):
   <div class="wrap">
     <h2>More free generators</h2>
     <ul class="chips-links">{items}</ul>
+    {share_bar(path, "Free online invoice tools")}
   </div>
 </section>
 
@@ -515,12 +546,13 @@ def article(path, title, desc, h1, crumbs_name, body, ld=None):
 </section>
 <article class="article">
 {body}
+{share_bar(path, h1) if path not in ("/about/", "/contact/", "/privacy/", "/terms/") else ""}
 </article>'''
     art_ld = {"@context": "https://schema.org", "@type": "Article", "headline": h1, "description": desc,
               "mainEntityOfPage": SITE + path, "datePublished": "2026-10-01", "dateModified": TODAY,
               "author": {"@type": "Organization", "name": "invoice-gen.net", "url": SITE + "/"},
-              "publisher": {"@type": "Organization", "name": "invoice-gen.net", "logo": {"@type": "ImageObject", "url": SITE + "/assets/brand/logo-mark-256.png"}},
-              "image": SITE + "/assets/img/og-image.png"}
+              "publisher": {"@type": "Organization", "name": "invoice-gen.net", "logo": {"@type": "ImageObject", "url": SITE + "/assets/img/icon-512.png"}},
+              "image": og_image(path)}
     extra = [art_ld] if path not in ("/about/", "/contact/", "/privacy/", "/terms/") else []
     page(path, title, desc, main, "", [crumb_ld] + extra + (ld or []))
 
@@ -840,8 +872,34 @@ SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS
     ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
-    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n')
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
     for u, c, pr in SITEMAP:
-        f.write(f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>{c}</changefreq><priority>{pr}</priority></url>\n")
+        img = og_image(u)
+        im = f"<image:image><image:loc>{img}</image:loc></image:image>" if "/assets/og/" in img else ""
+        f.write(f"  <url><loc>{SITE}{u}</loc><lastmod>{TODAY}</lastmod><changefreq>{c}</changefreq><priority>{pr}</priority>{im}</url>\n")
     f.write("</urlset>\n")
 print("wrote sitemap.xml")
+
+# ---------------------------------------------------------------- llms.txt (for AI answer engines: ChatGPT, Perplexity, Gemini, Claude)
+import re as _re2, html as _html
+def _meta(u):
+    fp = os.path.join(ROOT, "index.html") if u == "/" else os.path.join(ROOT, u.strip("/"), "index.html")
+    t = open(fp, encoding="utf-8").read()
+    title = _html.unescape(_re2.search(r"<title>(.*?)</title>", t).group(1))
+    desc = _html.unescape(_re2.search(r'name="description" content="(.*?)"', t).group(1))
+    return title, desc
+_groups = [("Free generators", [u for u, n, d in TOOLS] + ["/invoice-tools/", "/invoice-template/"]),
+           ("Invoices by business", [u for u, n in INDUSTRY]),
+           ("Guides", ["/how-to-make-an-invoice/", "/invoice-vs-receipt/", "/payment-terms/", "/payment-reminder/", "/guides/"]),
+           ("About", ["/about/", "/contact/", "/privacy/", "/terms/"])]
+with open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8") as f:
+    f.write("# invoice-gen.net\n\n> Free online invoice generator. Make invoices, quotes, receipts, estimates and proforma invoices in the browser and download a PDF, with no sign-up and no watermark. 28 currencies, tax and VAT, discounts, logos, and invoice styles for the US, UK, EU, Canada, Australia, Japan, Asia, the Middle East and more. A free account adds saved invoices, saved clients, a payments dashboard and emailing invoices.\n\n")
+    seen = set()
+    for g, urls in _groups:
+        f.write(f"## {g}\n\n")
+        for u in urls:
+            if u in seen: continue
+            seen.add(u); ti, de = _meta(u)
+            f.write(f"- [{ti}]({SITE}{u}): {de}\n")
+        f.write("\n")
+print("wrote llms.txt")
