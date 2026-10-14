@@ -15,7 +15,7 @@
 <meta property="og:title" content="Dashboard | invoice-gen.net">
 <meta property="og:description" content="Your saved invoices and clients on invoice-gen.net.">
 <meta property="og:url" content="https://invoice-gen.net/dashboard/">
-<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=f7248b4b">
+<meta property="og:image" content="https://invoice-gen.net/assets/img/og-image.png?v=9fd3b524">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:alt" content="Dashboard | invoice-gen.net">
 <meta property="og:image:width" content="1200">
@@ -23,21 +23,21 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Dashboard | invoice-gen.net">
 <meta name="twitter:description" content="Your saved invoices and clients on invoice-gen.net.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=f7248b4b">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/img/og-image.png?v=9fd3b524">
 <meta name="twitter:image:alt" content="Dashboard | invoice-gen.net">
-<link rel="icon" href="/favicon.ico?v=f7248b4b" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=f7248b4b" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=f7248b4b" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=f7248b4b" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=f7248b4b">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=f7248b4b" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=f7248b4b">
+<link rel="icon" href="/favicon.ico?v=9fd3b524" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=9fd3b524" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=9fd3b524" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=9fd3b524" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=9fd3b524">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=9fd3b524" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=9fd3b524">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.min.css?v=f7248b4b">
+<link rel="stylesheet" href="/assets/css/style.min.css?v=9fd3b524">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "alternateName": ["invoice-gen", "Invoice Gen"], "url": "https://invoice-gen.net/", "inLanguage": "en", "publisher": {"@id": "https://invoice-gen.net/#org"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "@id": "https://invoice-gen.net/#org", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": {"@type": "ImageObject", "url": "https://invoice-gen.net/assets/img/icon-512.png", "width": 512, "height": 512}, "email": "support@invoice-gen.net", "description": "Free online invoice generator: invoices, quotes, receipts, estimates and proforma invoices as PDF."}</script>
@@ -147,6 +147,18 @@
               <button class="btn btn-white" type="submit">Change password</button>
             </form>
           </div>
+          <div class="card" id="backupCard">
+            <div class="card-head"><h2>Backup and history</h2></div>
+            <p class="hint">Everything is saved in your account in the cloud. Each change keeps a version, even after you delete an invoice. You can also keep your own copy.</p>
+            <div class="bk-actions">
+              <button type="button" class="btn btn-white" id="bkDownload"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> Download backup</button>
+              <button type="button" class="btn btn-white" id="bkCsv"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg> Export to Excel (CSV)</button>
+              <button type="button" class="btn btn-white" id="bkRestoreBtn"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg> Restore a backup</button>
+              <input type="file" id="bkFile" accept="application/json,.json" hidden>
+            </div>
+            <h3 class="bk-h">Recently deleted</h3>
+            <ul class="bk-deleted" id="deletedList"><li class="bk-empty">Loading…</li></ul>
+          </div>
           <div class="card">
             <div class="card-head"><h2>Your data</h2></div>
             <p class="hint">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a> from your account address.</p>
@@ -157,6 +169,15 @@
     </section>
   </div>
 </div>
+
+<dialog class="modal" id="histModal" aria-labelledby="histTitle">
+  <div class="modal-body">
+    <h2 id="histTitle">Version history</h2>
+    <p class="hint" id="histSub">Every saved version of this invoice. Restore one to make it the current version.</p>
+    <ul class="hist-list" id="histList"></ul>
+  </div>
+  <div class="modal-foot"><button class="btn btn-white" type="button" id="histClose">Close</button></div>
+</dialog>
 
 <dialog class="modal" id="clientModal" aria-labelledby="clientModalTitle">
   <form id="clientForm" method="dialog">
@@ -176,11 +197,11 @@
   </form>
 </dialog>
 </main>
-<script src="/assets/js/config.js?v=f7248b4b" defer></script>
-<script src="/assets/js/core.js?v=f7248b4b" defer></script>
-<script src="/assets/js/motion.js?v=f7248b4b" defer></script>
-<script src="/assets/js/invoice.js?v=f7248b4b" defer></script>
-<script src="/assets/js/pdf.js?v=f7248b4b" defer></script>
-<script src="/assets/js/dashboard.js?v=f7248b4b" defer></script>
+<script src="/assets/js/config.js?v=9fd3b524" defer></script>
+<script src="/assets/js/core.js?v=9fd3b524" defer></script>
+<script src="/assets/js/motion.js?v=9fd3b524" defer></script>
+<script src="/assets/js/invoice.js?v=9fd3b524" defer></script>
+<script src="/assets/js/pdf.js?v=9fd3b524" defer></script>
+<script src="/assets/js/dashboard.js?v=9fd3b524" defer></script>
 </body>
 </html>

@@ -182,6 +182,7 @@
       '<a role="menuitem" href="/app/?id=' + r.id + '">Open and edit</a>' +
       '<button role="menuitem" type="button" data-act="pdf">Download PDF</button>' +
       '<a role="menuitem" href="/app/?dup=' + r.id + '">Duplicate</a>' +
+      '<button role="menuitem" type="button" data-act="hist">Version history</button>' +
       (r.status !== "paid" ? '<button role="menuitem" type="button" data-act="paid">Mark as paid</button>' : '<button role="menuitem" type="button" data-act="sent">Mark as unpaid</button>') +
       '<button role="menuitem" type="button" data-act="del" class="danger">Delete</button>';
     btn.parentElement.appendChild(m);
@@ -197,13 +198,15 @@
 
   async function act(what, r) {
     if (what === "del") {
-      if (!window.confirm("Delete invoice " + r.number + "? This can't be undone.")) return;
+      if (!window.confirm("Delete " + r.number + "? You can bring it back from Settings, Recently deleted.")) return;
       const { error } = await IG.cloud.from("invoices").delete().eq("id", r.id);
       if (error) return IG.toast("Could not delete: " + error.message, "err");
       invoices = invoices.filter((x) => x.id !== r.id);
       renderAll();
-      return IG.toast("Invoice " + r.number + " deleted.");
+      loadDeleted();
+      return IG.toast(r.number + " deleted. Restore it any time from Settings.");
     }
+    if (what === "hist") return openHistory(r);
     if (what === "pdf") {
       try { await IG.loadPdf(); } catch (e) { return IG.toast("The PDF maker could not load. Try again.", "err"); }
       const { data, error } = await IG.cloud.from("invoices").select("data,status").eq("id", r.id).single();
@@ -225,6 +228,100 @@
       renderAll();
       IG.toast(r.number + (what === "paid" ? " marked as paid." : " marked as unpaid."), "ok");
     }
+  }
+
+  /* ---------- history, recently deleted, backups ---------- */
+  const NO_HISTORY = "History starts once the database update is installed.";
+  const when = (iso) => { const d = new Date(iso); return IG.prettyDate(IG.isoDate(d)) + ", " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }); };
+  // the columns the dashboard reads, rebuilt from a saved invoice
+  function rowFrom(data, status, extra) {
+    const inv = Object.assign(IG.blankInvoice(), data, { status: status || data.status || "draft" });
+    const t = IG.calc(inv);
+    return Object.assign({
+      user_id: user.id, number: inv.number, client_name: inv.to.name || null, client_email: inv.to.email || null,
+      issue_date: inv.issueDate || null, due_date: inv.dueDate || null, currency: inv.currency,
+      total: t.total, balance: inv.status === "paid" ? 0 : t.balance, status: inv.status, data: Object.assign({}, data, { status: inv.status })
+    }, extra || {});
+  }
+  async function openHistory(r) {
+    const dlg = $("#histModal"), list = $("#histList");
+    $("#histTitle").textContent = "Version history: " + r.number;
+    list.innerHTML = '<li class="bk-empty">Loading…</li>';
+    dlg.showModal();
+    const { data, error } = await IG.cloud.from("invoice_history").select("id,action,status,total,data,changed_at").eq("invoice_id", r.id).order("changed_at", { ascending: false }).limit(50);
+    if (error) { list.innerHTML = '<li class="bk-empty">' + NO_HISTORY + "</li>"; return; }
+    if (!data.length) { list.innerHTML = '<li class="bk-empty">No earlier versions yet.</li>'; return; }
+    const word = { created: "Created", updated: "Edited", deleted: "Deleted" };
+    list.innerHTML = data.map((h, i) =>
+      '<li><span class="hist-t"><b>' + esc(when(h.changed_at)) + (i === 0 ? ' <em class="kind-tag">Latest</em>' : "") + "</b><small>" + word[h.action] + ", " + esc(h.status || "draft") + ", " + IG.money(h.total || 0, (h.data && h.data.currency) || r.currency) + "</small></span>" +
+      (i === 0 ? "" : '<button type="button" class="btn btn-soft btn-sm" data-restore-ver="' + h.id + '">Restore</button>') + "</li>").join("");
+    list.onclick = async (e) => {
+      const b = e.target.closest("[data-restore-ver]"); if (!b) return;
+      const h = data.find((x) => String(x.id) === b.dataset.restoreVer); if (!h) return;
+      if (!window.confirm("Restore the version from " + when(h.changed_at) + "? The current version stays in the history.")) return;
+      const row = rowFrom(h.data, h.status);
+      const { error: e2 } = await IG.cloud.from("invoices").update(row).eq("id", r.id);
+      if (e2) return IG.toast("Could not restore: " + e2.message, "err");
+      Object.assign(r, row); dlg.close(); renderAll();
+      IG.toast(r.number + " restored.", "ok");
+    };
+  }
+  async function loadDeleted() {
+    const box = $("#deletedList"); if (!box) return;
+    const { data, error } = await IG.cloud.from("invoice_history").select("id,invoice_id,number,status,total,data,changed_at").eq("action", "deleted").order("changed_at", { ascending: false }).limit(30);
+    if (error) { box.innerHTML = '<li class="bk-empty">' + NO_HISTORY + "</li>"; return; }
+    const live = new Set(invoices.map((x) => x.id)), seen = new Set();
+    const gone = (data || []).filter((h) => !live.has(h.invoice_id) && !seen.has(h.invoice_id) && seen.add(h.invoice_id));
+    if (!gone.length) { box.innerHTML = '<li class="bk-empty">Nothing deleted.</li>'; return; }
+    box.innerHTML = gone.map((h) => '<li><span class="hist-t"><b>' + esc(h.number || "Invoice") + " " + esc((h.data && h.data.to && h.data.to.name) || "") + "</b><small>Deleted " + esc(when(h.changed_at)) + ", " + IG.money(h.total || 0, (h.data && h.data.currency) || "USD") + '</small></span><button type="button" class="btn btn-soft btn-sm" data-undelete="' + h.id + '">Restore</button></li>').join("");
+    box.onclick = async (e) => {
+      const b = e.target.closest("[data-undelete]"); if (!b) return;
+      const h = gone.find((x) => String(x.id) === b.dataset.undelete); if (!h) return;
+      b.disabled = true;
+      const { data: ins, error: e2 } = await IG.cloud.from("invoices").insert(rowFrom(h.data, h.status, { id: h.invoice_id })).select("id,number,client_name,client_email,issue_date,due_date,currency,total,balance,status,created_at,title:data->>title").single();
+      if (e2) { b.disabled = false; return IG.toast("Could not restore: " + e2.message, "err"); }
+      invoices.unshift(Object.assign({ title: (h.data && h.data.title) || "Invoice" }, ins)); renderAll(); loadDeleted();
+      IG.toast((h.number || "Invoice") + " is back.", "ok");
+    };
+  }
+  function download(name, text, type) {
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([text], { type }));
+    a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 2000);
+  }
+  async function backupJson() {
+    const [a, b, c] = await Promise.all([
+      IG.cloud.from("invoices").select("*").order("created_at", { ascending: false }),
+      IG.cloud.from("clients").select("*").order("name"),
+      IG.cloud.from("profiles").select("data").eq("id", user.id).maybeSingle()
+    ]);
+    if (a.error) return IG.toast("Could not make the backup: " + a.error.message, "err");
+    const out = { app: "invoice-gen.net", version: 1, exported_at: new Date().toISOString(), account: user.email, profile: (c.data && c.data.data) || profile, clients: b.data || [], invoices: a.data || [] };
+    download("invoice-gen-backup-" + IG.isoDate(new Date()) + ".json", JSON.stringify(out, null, 2), "application/json");
+    IG.toast("Backup downloaded: " + out.invoices.length + " documents and " + out.clients.length + " clients.", "ok");
+  }
+  function backupCsv() {
+    const q = (v) => '"' + String(v == null ? "" : v).replace(/"/g, '""') + '"';
+    const head = ["Number", "Type", "Client", "Client email", "Issue date", "Due date", "Currency", "Total", "Balance", "Status"];
+    const lines = invoices.map((r) => [r.number, KIND_NAME[kindOf(r)] || "Invoice", r.client_name, r.client_email, r.issue_date, r.due_date, r.currency, r.total, r.balance, r.status].map(q).join(","));
+    download("invoice-gen-invoices-" + IG.isoDate(new Date()) + ".csv", "\ufeff" + [head.map(q).join(",")].concat(lines).join("\r\n"), "text/csv");
+    IG.toast(invoices.length + " documents exported. Open the file in Excel or Google Sheets.", "ok");
+  }
+  async function restoreFile(file) {
+    let j;
+    try { j = JSON.parse(await file.text()); } catch (e) { return IG.toast("That file is not an invoice-gen.net backup.", "err"); }
+    if (!j || j.app !== "invoice-gen.net" || !Array.isArray(j.invoices)) return IG.toast("That file is not an invoice-gen.net backup.", "err");
+    if (!window.confirm("Restore " + j.invoices.length + " documents and " + (j.clients || []).length + " clients from " + (j.exported_at || "").slice(0, 10) + "? Documents you have now stay; ones with the same ID are replaced by the backup.")) return;
+    const cl = (j.clients || []).map((c) => ({ id: c.id, user_id: user.id, name: c.name, email: c.email || null, phone: c.phone || null, address: c.address || null }));
+    const iv = j.invoices.map((r) => rowFrom(r.data || {}, r.status, { id: r.id }));
+    if (cl.length) { const { error } = await IG.cloud.from("clients").upsert(cl); if (error) return IG.toast("Could not restore clients: " + error.message, "err"); }
+    for (let i = 0; i < iv.length; i += 100) {
+      const { error } = await IG.cloud.from("invoices").upsert(iv.slice(i, i + 100));
+      if (error) return IG.toast("Could not restore documents: " + error.message, "err");
+    }
+    IG.toast("Backup restored.", "ok");
+    setTimeout(() => location.reload(), 900);
   }
 
   /* ---------- clients ---------- */
@@ -296,6 +393,7 @@
     IG.setRegion(profile.region || IG.guessRegion());
     fillSettings();
     renderAll();
+    loadDeleted();
   }
 
   /* ---------- wiring ---------- */
@@ -324,6 +422,11 @@
     $("#clientSearch").addEventListener("input", renderClients);
 
     const dlg = $("#clientModal");
+    $("#histClose").addEventListener("click", () => $("#histModal").close());
+    $("#bkDownload").addEventListener("click", backupJson);
+    $("#bkCsv").addEventListener("click", backupCsv);
+    $("#bkRestoreBtn").addEventListener("click", () => $("#bkFile").click());
+    $("#bkFile").addEventListener("change", (e) => { const f = e.target.files[0]; e.target.value = ""; if (f) restoreFile(f); });
     $("#addClientBtn").addEventListener("click", () => { $("#clientForm").reset(); dlg.showModal(); dlg.querySelector("input").focus(); });
     $("#clientCancel").addEventListener("click", () => dlg.close());
     $("#clientForm").addEventListener("submit", async (e) => {

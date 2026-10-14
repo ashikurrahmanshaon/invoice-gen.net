@@ -202,6 +202,18 @@ def dash_markup(LOGO_SVG, WORDMARK):
               <button class="btn btn-white" type="submit">Change password</button>
             </form>
           </div>
+          <div class="card" id="backupCard">
+            <div class="card-head"><h2>Backup and history</h2></div>
+            <p class="hint">Everything is saved in your account in the cloud. Each change keeps a version, even after you delete an invoice. You can also keep your own copy.</p>
+            <div class="bk-actions">
+              <button type="button" class="btn btn-white" id="bkDownload">{I(ICONS["doc"])} Download backup</button>
+              <button type="button" class="btn btn-white" id="bkCsv">{I(ICONS["doc"])} Export to Excel (CSV)</button>
+              <button type="button" class="btn btn-white" id="bkRestoreBtn">{I(ICONS["clock"])} Restore a backup</button>
+              <input type="file" id="bkFile" accept="application/json,.json" hidden>
+            </div>
+            <h3 class="bk-h">Recently deleted</h3>
+            <ul class="bk-deleted" id="deletedList"><li class="bk-empty">Loading…</li></ul>
+          </div>
           <div class="card">
             <div class="card-head"><h2>Your data</h2></div>
             <p class="hint">To delete your account and all invoices, email <a href="mailto:support@invoice-gen.net">support@invoice-gen.net</a> from your account address.</p>
@@ -212,6 +224,15 @@ def dash_markup(LOGO_SVG, WORDMARK):
     </section>
   </div>
 </div>
+
+<dialog class="modal" id="histModal" aria-labelledby="histTitle">
+  <div class="modal-body">
+    <h2 id="histTitle">Version history</h2>
+    <p class="hint" id="histSub">Every saved version of this invoice. Restore one to make it the current version.</p>
+    <ul class="hist-list" id="histList"></ul>
+  </div>
+  <div class="modal-foot"><button class="btn btn-white" type="button" id="histClose">Close</button></div>
+</dialog>
 
 <dialog class="modal" id="clientModal" aria-labelledby="clientModalTitle">
   <form id="clientForm" method="dialog">

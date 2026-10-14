@@ -148,3 +148,52 @@ select u.id, u.email,
   u.created_at, u.last_sign_in_at
 from auth.users u
 on conflict (id) do nothing;
+
+-- History: every saved version of an invoice is kept, also after it is deleted (a backup inside the database).
+-- Users can read their own history; only the database itself writes to it.
+create table if not exists public.invoice_history (
+  id bigint generated always as identity primary key,
+  invoice_id uuid not null,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  action text not null check (action in ('created', 'updated', 'deleted')),
+  number text,
+  status text,
+  total numeric(14, 2),
+  data jsonb,
+  changed_at timestamptz not null default now()
+);
+create index if not exists invoice_history_user_idx on public.invoice_history (user_id, changed_at desc);
+create index if not exists invoice_history_invoice_idx on public.invoice_history (invoice_id, changed_at desc);
+alter table public.invoice_history enable row level security;
+drop policy if exists "read own history" on public.invoice_history;
+create policy "read own history" on public.invoice_history for select to authenticated using ((select auth.uid()) = user_id);
+
+create or replace function public.log_invoice_change() returns trigger
+language plpgsql security definer set search_path = '' as $$
+begin
+  if tg_op = 'INSERT' then
+    insert into public.invoice_history (invoice_id, user_id, action, number, status, total, data)
+    values (new.id, new.user_id, 'created', new.number, new.status, new.total, new.data);
+    return new;
+  elsif tg_op = 'UPDATE' then
+    -- autosave runs often: keep at most one version per invoice every 2 minutes, plus every status change
+    if new.status is distinct from old.status or not exists (
+      select 1 from public.invoice_history h
+      where h.invoice_id = new.id and h.changed_at > now() - interval '2 minutes' and h.action <> 'deleted') then
+      insert into public.invoice_history (invoice_id, user_id, action, number, status, total, data)
+      values (new.id, new.user_id, 'updated', new.number, new.status, new.total, new.data);
+    else
+      update public.invoice_history set number = new.number, status = new.status, total = new.total, data = new.data
+      where id = (select h.id from public.invoice_history h where h.invoice_id = new.id order by h.changed_at desc limit 1);
+    end if;
+    return new;
+  else
+    insert into public.invoice_history (invoice_id, user_id, action, number, status, total, data)
+    values (old.id, old.user_id, 'deleted', old.number, old.status, old.total, old.data);
+    return old;
+  end if;
+end $$;
+revoke execute on function public.log_invoice_change() from public, anon, authenticated;
+drop trigger if exists invoices_history on public.invoices;
+create trigger invoices_history after insert or update or delete on public.invoices
+  for each row execute function public.log_invoice_change();

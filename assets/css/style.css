@@ -2033,3 +2033,17 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 @media (min-width: 1001px) { .site-footer .foot-grid { grid-template-columns: 1.3fr repeat(5, 1fr); gap: 28px 22px; } }
 @media (min-width: 1001px) and (max-width: 1200px) { .site-footer .foot-grid { grid-template-columns: repeat(3, 1fr); } .site-footer .foot-brand { grid-column: 1 / -1; } }
 @media (min-width: 1001px) { .site-footer .foot-mail { white-space: nowrap; font-size: .82rem; padding-inline: 12px; } .site-footer .foot-mail svg { flex: none; } }
+
+/* ===== Dashboard: backup, history, recently deleted ===== */
+.bk-actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.bk-actions .btn svg { width: 16px; height: 16px; }
+.bk-h { font-size: .92rem; margin: 18px 0 6px; }
+.bk-deleted, .hist-list { list-style: none; margin: 0; padding: 0; }
+.bk-deleted li, .hist-list li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--rule-2); }
+.bk-deleted li:first-child, .hist-list li:first-child { border-top: 0; }
+.hist-t { display: grid; min-width: 0; }
+.hist-t b { font-size: .9rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-t small { color: var(--muted); font-size: .8rem; }
+.bk-empty { color: var(--muted); font-size: .86rem; justify-content: flex-start !important; }
+.hist-list { max-height: min(60vh, 460px); overflow: auto; }
+@media (min-width: 600px) { #histModal { width: min(520px, calc(100vw - 32px)); } }
