@@ -63,7 +63,7 @@
     const mix = (c, w) => c.map((v) => Math.round(v + (255 - v) * w));
     const onBand = T === "modern";
     const extraFields = (inv.fields || []).filter((f) => String(f.label || "").trim() && String(f.value || "").trim());
-    const metaCount = 3 + (DK.receipt && inv.payMethod ? 1 : 0) + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN && /invoice/i.test(inv.title || "") ? 1 : 0);
+    const metaCount = 3 + (DK.receipt && inv.payMethod ? 1 : 0) + (DK.receipt && inv.payRef ? 1 : 0) + (inv.poNumber ? 1 : 0) + extraFields.length + (RG.supply && inv.supplyDate ? 1 : 0) + (RG.pos && inv.placeOfSupply ? 1 : 0) + (IN && /invoice/i.test(inv.title || "") ? 1 : 0);
     const bandH = Math.max(46, 18 + 17 + metaCount * 5.5 + 4);
 
     // top of the page, per design
@@ -114,20 +114,26 @@
     }
     const meta = [
       [IG.docLabels(inv.title).no, inv.number],
-      ["Issue date", IG.prettyDate(inv.issueDate)],
+      [DK.issue || "Issue date", IG.prettyDate(inv.issueDate)],
       [IG.docLabels(inv.title).due, IG.prettyDate(inv.dueDate)]
     ];
     if (DK.receipt && inv.payMethod) meta.push(["Paid by", inv.payMethod]);
+    if (DK.receipt && inv.payRef) meta.push(["Reference", inv.payRef]);
     if (RG.supply && inv.supplyDate) meta.push([RG.supply, IG.prettyDate(inv.supplyDate)]);
     if (RG.pos && inv.placeOfSupply) meta.push(["Place of supply", inv.placeOfSupply]);
-    if (inv.poNumber) meta.push(["PO / reference", inv.poNumber]);
+    if (inv.poNumber) meta.push([(DK.ref || "PO / reference").replace(/ ref\.$/, " reference"), inv.poNumber]);
     extraFields.forEach((f) => meta.push([String(f.label).trim(), String(f.value).trim()]));
     meta.forEach(([k, v]) => {
       if (!v) return;
+      // long values (a project name, a card reference) push their label left instead of running into it
+      doc.setFont("helvetica", "bold");
+      const full = clean(v); let val = full, cut = full.length;
+      while (doc.getTextWidth(val) > 70 && cut > 4) { cut--; val = full.slice(0, cut).trim() + "..."; }
+      const vw = doc.getTextWidth(val);
       doc.setFont("helvetica", "normal"); doc.setTextColor(...(onBand ? mix(accent, 0.7) : soft));
-      doc.text(k, R - 42, my, { align: "right" });
+      doc.text(k, R - Math.max(42, vw + 5), my, { align: "right" });
       doc.setFont("helvetica", "bold"); doc.setTextColor(...(onBand ? [255, 255, 255] : ink));
-      doc.text(clean(v), R, my, { align: "right" });
+      doc.text(val, R, my, { align: "right" });
       my += 5.5;
     });
     if (T === "minimal") {
@@ -161,8 +167,16 @@
       doc.setDrawColor(...mix(faint, 0.5)); doc.setLineWidth(0.15); doc.line(L + colW + 10, y - 5, L + colW + 10 + sw, y - 5);
     }
     const endA = party("From", inv.from, L, RG.taxId);
-    const endB = party(IN ? "Bill to (recipient)" : "Bill to", inv.to, L + colW + 10, RG.clientTaxId || RG.taxId);
+    const endB = party(IN ? "Bill to (recipient)" : DK.to || "Bill to", inv.to, L + colW + 10, RG.clientTaxId || RG.taxId);
     y = Math.max(endA, endB) + 8;
+    // delivery address (proforma and other shipped orders)
+    if (String(inv.shipTo || "").trim()) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(...faint);
+      doc.text("Ship to", L + colW + 10, y - 2);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
+      const sp = doc.splitTextToSize(clean(inv.shipTo), colW);
+      doc.text(sp, L + colW + 10, y + 3.5); y += sp.length * 4.6 + 8;
+    }
 
     // items table
     const CODE = RG.code && inv.items.some((it) => String(it.code || "").trim()) ? RG.code : "";
@@ -214,7 +228,7 @@
     y += 7;
     if (t.paid && DK.paidRow) {
       doc.setFont("helvetica", "normal"); doc.setFontSize(9.5); doc.setTextColor(...soft);
-      doc.text("Amount paid", TX, y); doc.setTextColor(...ink); doc.text("-" + M(t.paid), R, y, { align: "right" });
+      doc.text(DK.paid || "Amount paid", TX, y); doc.setTextColor(...ink); doc.text("-" + M(t.paid), R, y, { align: "right" });
       y += 6;
     }
     if (T === "modern") {
@@ -235,6 +249,13 @@
     const balanceY = y;
     const balancePage = doc.getCurrentPageInfo().pageNumber;
     y += 10;
+    // deposit asked for up front (quotes, estimates, proformas)
+    if (t.deposit > 0) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9.5); doc.setTextColor(...ink);
+      const dl = (DK.accept ? "Deposit due on acceptance" : "Deposit to confirm the order") + " (" + t.depositRate + "%)";
+      doc.text(dl, TX, y); doc.text(M(t.deposit), R, y, { align: "right" });
+      y += 7;
+    }
     // regional lines under the totals
     const after = [];
     if (RG.inclNote && t.tax) after.push("Total includes " + (inv.taxLabel || RG.tax) + " of " + M(t.tax));
@@ -481,7 +502,7 @@
     divider();
     line("Total:", M(t.total), true, 11);
     if (t.paid) {
-      line("Amount paid:", "-" + M(t.paid));
+      line((DK.paid || "Amount paid") + ":", "-" + M(t.paid));
       room(10);
       doc.setFillColor(...mix(accent, 0.9));
       doc.roundedRect(RX - 2, ry - 5, RW + 2, 8.6, 1.2, 1.2, "F");

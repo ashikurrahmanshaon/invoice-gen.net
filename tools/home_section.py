@@ -8,6 +8,7 @@ def I(path, cls="ico"):
             'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>')
 
 ICONS = {
+    "sparkle": '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>',
     "download": '<path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/>',
     "send": '<path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7z"/>',
     "plus": '<path d="M12 5v14M5 12h14"/>',
@@ -97,6 +98,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
               <div class="meta-region" id="metaRegion">
                 <label for="f-supply" class="reg-supply" hidden>Date of supply</label>{fi("supplyDate", "", "Date of supply", "date", cls="reg-supply", extra=' id="f-supply" hidden')}
                 <label for="f-pay" class="doc-pay" hidden>Paid by</label>{fi("payMethod", "Card, cash, bank transfer…", "Payment method", cls="doc-pay", extra=' id="f-pay" list="payMethods" autocomplete="off" hidden')}
+                <label for="f-payref" class="doc-pay" hidden>Reference</label>{fi("payRef", "Transaction or cheque no.", "Payment reference", cls="doc-pay", extra=' id="f-payref" autocomplete="off" hidden')}
                 <label for="f-pos" class="reg-pos" hidden>Place of supply</label>{fi("placeOfSupply", "State, e.g. Maharashtra (27)", "Place of supply", cls="reg-pos", extra=' id="f-pos" hidden')}
               </div>
               <div class="meta-extra" id="metaExtra"></div>
@@ -117,14 +119,14 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <div class="reg-bank" hidden>{pf("Bank details", ta("from.bank", "IBAN, BIC and bank name", "Bank details"))}</div>
           </div>
           <div class="party" data-section="to">
-            <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
+            <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span id="toWord">Bill to</span> <small>your client</small></span>
             <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
             {pf("Client or company name", fi("to.name", "e.g. Acme Ltd", "Client name", cls="fi-strong", extra=' data-req autocomplete="off"'), True)}
             {pf("Client email", fi("to.email", "client@company.com", "Client email", "email", extra=' autocomplete="off" inputmode="email"'))}
             {pf("Client address", ta("to.address", "Street, city, postcode", "Client address"))}
             {pf("Client phone", fi("to.phone", "Optional", "Client phone", "tel", extra=' autocomplete="off"'))}
             <div class="reg-ctax" hidden>{pf("Client VAT ID", fi("to.taxId", "Needed for business clients", "Client tax number", extra=' autocomplete="off"'))}</div>
-            <label class="ship-to ts-only"><span>Work address <small>shown as Ship to</small></span>{ta("shipTo", "Where the work was done (optional)", "Work address")}</label>
+            <label class="ship-to"><span id="shipLabel">Work address <small>shown as Ship to</small></span>{ta("shipTo", "Where the work was done (optional)", "Work address")}</label>
           </div>
         </div>
 
@@ -132,7 +134,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
           <span class="sh-label"><span class="sh-step"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Items <small>what you are charging for</small></span>
           <div class="items-head" aria-hidden="true"><span>Item</span><span class="h-code" id="hCode">HSN/SAC</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
-          <p class="items-hint" id="itemsHint">Describe the work, then enter how many and the price. The amount and totals work themselves out.</p>
+          <p class="items-hint" id="itemsHint"><span>Describe the work, then enter how many and the price. The amount and totals work themselves out. <button type="button" class="link-btn ex-btn" data-example>Show me an example</button></span></p>
           <button type="button" class="add-line" id="addLine">{I(ICONS["plus"])} Add line item</button>
         </div>
 
@@ -172,8 +174,9 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
             <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in">{fi("shipping", "0", "Shipping", extra=' inputmode="decimal"')}</span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
-            <div class="t-row t-adj t-paid"><span>Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
+            <div class="t-row t-adj t-paid"><span id="paidLabel">Amount paid</span><span class="t-in">{fi("paid", "0", "Amount already paid", extra=' inputmode="decimal"')}</span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+            <div class="t-row t-adj t-dep" id="depRow" hidden><span>Deposit</span><span class="t-in">{fi("deposit", "0", "Deposit in percent", extra=' inputmode="decimal"')}<em>%</em></span><b id="tDep"></b></div>
             <p class="t-incl" id="tIncl" hidden></p>
             <p class="t-words" id="tWords" hidden></p>
             <p class="t-note" id="tNote" hidden></p>
@@ -193,6 +196,7 @@ def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a p
           <li data-step="to"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Who it's for</button></li>
           <li data-step="items"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="std-only">An item with a price</span><span class="ts-only">Shifts and a rate per hour</span></button></li>
         </ul>
+        <button type="button" class="link-btn sp-example ex-btn" data-example>{I(ICONS["sparkle"]) if "sparkle" in ICONS else ""}Fill in a realistic example</button>
       </div>
       <div class="sp-card sp-actions">
         <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button">{ICON_DL} Download PDF</button>

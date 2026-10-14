@@ -15,7 +15,7 @@
 <meta property="og:title" content="Free Invoice Generator: Create & Download PDF Invoices Online">
 <meta property="og:description" content="Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.">
 <meta property="og:url" content="https://invoice-gen.net/">
-<meta property="og:image" content="https://invoice-gen.net/assets/og/home.png?v=cd9123e8">
+<meta property="og:image" content="https://invoice-gen.net/assets/og/home.png?v=361fa989">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:alt" content="Free Invoice Generator: Create & Download PDF Invoices Online">
 <meta property="og:image:width" content="1200">
@@ -23,21 +23,21 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Free Invoice Generator: Create & Download PDF Invoices Online">
 <meta name="twitter:description" content="Make a professional invoice in minutes. Free online invoice generator with PDF download, email sending, 28 currencies, tax, discounts and saved clients.">
-<meta name="twitter:image" content="https://invoice-gen.net/assets/og/home.png?v=cd9123e8">
+<meta name="twitter:image" content="https://invoice-gen.net/assets/og/home.png?v=361fa989">
 <meta name="twitter:image:alt" content="Free Invoice Generator: Create & Download PDF Invoices Online">
-<link rel="icon" href="/favicon.ico?v=cd9123e8" sizes="48x48">
-<link rel="icon" href="/favicon.svg?v=cd9123e8" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png?v=cd9123e8" sizes="32x32" type="image/png">
-<link rel="icon" href="/assets/img/favicon-16.png?v=cd9123e8" sizes="16x16" type="image/png">
-<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=cd9123e8">
-<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=cd9123e8" color="#059669">
-<link rel="manifest" href="/site.webmanifest?v=cd9123e8">
+<link rel="icon" href="/favicon.ico?v=361fa989" sizes="48x48">
+<link rel="icon" href="/favicon.svg?v=361fa989" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png?v=361fa989" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/favicon-16.png?v=361fa989" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/apple-touch-icon.png?v=361fa989">
+<link rel="mask-icon" href="/assets/brand/safari-pinned-tab.svg?v=361fa989" color="#059669">
+<link rel="manifest" href="/site.webmanifest?v=361fa989">
 <meta name="application-name" content="invoice-gen.net">
 <meta name="apple-mobile-web-app-title" content="invoice-gen.net">
 <meta name="msapplication-TileColor" content="#ffffff">
 <meta name="format-detection" content="telephone=no">
 <link rel="preload" href="/assets/fonts/PlusJakartaSans-Variable.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/assets/css/style.min.css?v=cd9123e8">
+<link rel="stylesheet" href="/assets/css/style.min.css?v=361fa989">
 <script>(function(d){d.classList.add("js");try{for(var i=0;i<localStorage.length;i++){if(/^sb-.+-auth-token$/.test(localStorage.key(i))){d.classList.add("has-session");break;}}}catch(e){}})(document.documentElement);</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebSite", "name": "invoice-gen.net", "alternateName": ["invoice-gen", "Invoice Gen"], "url": "https://invoice-gen.net/", "inLanguage": "en", "publisher": {"@id": "https://invoice-gen.net/#org"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Organization", "@id": "https://invoice-gen.net/#org", "name": "invoice-gen.net", "url": "https://invoice-gen.net/", "logo": {"@type": "ImageObject", "url": "https://invoice-gen.net/assets/img/icon-512.png", "width": 512, "height": 512}, "email": "support@invoice-gen.net", "description": "Free online invoice generator: invoices, quotes, receipts, estimates and proforma invoices as PDF."}</script>
@@ -113,6 +113,7 @@
               <div class="meta-region" id="metaRegion">
                 <label for="f-supply" class="reg-supply" hidden>Date of supply</label><input class="fi reg-supply" type="date" data-f="supplyDate" placeholder="" aria-label="Date of supply" id="f-supply" hidden>
                 <label for="f-pay" class="doc-pay" hidden>Paid by</label><input class="fi doc-pay" data-f="payMethod" placeholder="Card, cash, bank transfer…" aria-label="Payment method" id="f-pay" list="payMethods" autocomplete="off" hidden>
+                <label for="f-payref" class="doc-pay" hidden>Reference</label><input class="fi doc-pay" data-f="payRef" placeholder="Transaction or cheque no." aria-label="Payment reference" id="f-payref" autocomplete="off" hidden>
                 <label for="f-pos" class="reg-pos" hidden>Place of supply</label><input class="fi reg-pos" data-f="placeOfSupply" placeholder="State, e.g. Maharashtra (27)" aria-label="Place of supply" id="f-pos" hidden>
               </div>
               <div class="meta-extra" id="metaExtra"></div>
@@ -133,14 +134,14 @@
             <div class="reg-bank" hidden><label class="pf"><span class="pf-l">Bank details</span><textarea class="fi " rows="2" data-f="from.bank" placeholder="IBAN, BIC and bank name" aria-label="Bank details"></textarea></label></div>
           </div>
           <div class="party" data-section="to">
-            <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Bill to <small>your client</small></span>
+            <span class="sh-label"><span class="sh-step"><i>2</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span id="toWord">Bill to</span> <small>your client</small></span>
             <div class="client-pick" id="clientPick" hidden><select class="fi" id="clientSelect" aria-label="Choose a saved client"></select></div>
             <label class="pf"><span class="pf-l">Client or company name <em>Required</em></span><input class="fi fi-strong" data-f="to.name" placeholder="e.g. Acme Ltd" aria-label="Client name" data-req autocomplete="off"></label>
             <label class="pf"><span class="pf-l">Client email</span><input class="fi " type="email" data-f="to.email" placeholder="client@company.com" aria-label="Client email" autocomplete="off" inputmode="email"></label>
             <label class="pf"><span class="pf-l">Client address</span><textarea class="fi " rows="2" data-f="to.address" placeholder="Street, city, postcode" aria-label="Client address"></textarea></label>
             <label class="pf"><span class="pf-l">Client phone</span><input class="fi " type="tel" data-f="to.phone" placeholder="Optional" aria-label="Client phone" autocomplete="off"></label>
             <div class="reg-ctax" hidden><label class="pf"><span class="pf-l">Client VAT ID</span><input class="fi " data-f="to.taxId" placeholder="Needed for business clients" aria-label="Client tax number" autocomplete="off"></label></div>
-            <label class="ship-to ts-only"><span>Work address <small>shown as Ship to</small></span><textarea class="fi " rows="2" data-f="shipTo" placeholder="Where the work was done (optional)" aria-label="Work address"></textarea></label>
+            <label class="ship-to"><span id="shipLabel">Work address <small>shown as Ship to</small></span><textarea class="fi " rows="2" data-f="shipTo" placeholder="Where the work was done (optional)" aria-label="Work address"></textarea></label>
           </div>
         </div>
 
@@ -148,7 +149,7 @@
           <span class="sh-label"><span class="sh-step"><i>3</i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Items <small>what you are charging for</small></span>
           <div class="items-head" aria-hidden="true"><span>Item</span><span class="h-code" id="hCode">HSN/SAC</span><span id="hQty">Qty</span><span id="hRate">Rate</span><span>Amount</span><span></span></div>
           <div class="item-rows" id="itemRows"></div>
-          <p class="items-hint" id="itemsHint">Describe the work, then enter how many and the price. The amount and totals work themselves out.</p>
+          <p class="items-hint" id="itemsHint"><span>Describe the work, then enter how many and the price. The amount and totals work themselves out. <button type="button" class="link-btn ex-btn" data-example>Show me an example</button></span></p>
           <button type="button" class="add-line" id="addLine"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg> Add line item</button>
         </div>
 
@@ -188,8 +189,9 @@
             <div class="t-split" id="tSplit" hidden></div>
             <div class="t-row t-adj"><span>Shipping</span><span class="t-in"><input class="fi " data-f="shipping" placeholder="0" aria-label="Shipping" inputmode="decimal"></span><b id="tShip"></b></div>
             <div class="t-row t-total"><span>Total</span><b id="tTotal"></b></div>
-            <div class="t-row t-adj t-paid"><span>Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
+            <div class="t-row t-adj t-paid"><span id="paidLabel">Amount paid</span><span class="t-in"><input class="fi " data-f="paid" placeholder="0" aria-label="Amount already paid" inputmode="decimal"></span><b id="tPaid"></b></div>
             <div class="t-row t-due"><span>Balance due</span><b id="tBal"></b></div>
+            <div class="t-row t-adj t-dep" id="depRow" hidden><span>Deposit</span><span class="t-in"><input class="fi " data-f="deposit" placeholder="0" aria-label="Deposit in percent" inputmode="decimal"><em>%</em></span><b id="tDep"></b></div>
             <p class="t-incl" id="tIncl" hidden></p>
             <p class="t-words" id="tWords" hidden></p>
             <p class="t-note" id="tNote" hidden></p>
@@ -209,6 +211,7 @@
           <li data-step="to"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span>Who it's for</button></li>
           <li data-step="items"><button type="button"><span class="spp-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg></span><span class="std-only">An item with a price</span><span class="ts-only">Shifts and a rate per hour</span></button></li>
         </ul>
+        <button type="button" class="link-btn sp-example ex-btn" data-example><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>Fill in a realistic example</button>
       </div>
       <div class="sp-card sp-actions">
         <button class="btn btn-primary btn-lg btn-block" id="downloadBtn" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0-4-4m4 4 4-4M5 19h14"/></svg> Download PDF</button>
@@ -456,11 +459,11 @@
     <nav class="foot-legal" aria-label="Legal"><a href="/privacy/">Privacy</a><a href="/terms/">Terms</a><a href="/contact/">Contact</a></nav>
   </div>
 </footer>
-<script src="/assets/js/config.js?v=cd9123e8" defer></script>
-<script src="/assets/js/core.js?v=cd9123e8" defer></script>
-<script src="/assets/js/motion.js?v=cd9123e8" defer></script>
-<script src="/assets/js/invoice.js?v=cd9123e8" defer></script>
-<script src="/assets/js/pdf.js?v=cd9123e8" defer></script>
-<script src="/assets/js/app.js?v=cd9123e8" defer></script>
+<script src="/assets/js/config.js?v=361fa989" defer></script>
+<script src="/assets/js/core.js?v=361fa989" defer></script>
+<script src="/assets/js/motion.js?v=361fa989" defer></script>
+<script src="/assets/js/invoice.js?v=361fa989" defer></script>
+<script src="/assets/js/pdf.js?v=361fa989" defer></script>
+<script src="/assets/js/app.js?v=361fa989" defer></script>
 </body>
 </html>

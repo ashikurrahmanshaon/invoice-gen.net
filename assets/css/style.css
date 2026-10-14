@@ -2015,3 +2015,17 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .share-btn:hover { border-color: #9fd8bf; background: #f3fbf7; text-decoration: none; }
 .share-btn svg { width: 16px; height: 16px; flex: none; }
 @media (max-width: 520px) { .share-btn span { display: none; } .share-btn { width: 40px; height: 40px; padding: 0; justify-content: center; } .share-h { flex-basis: 100%; } }
+
+/* ===== Document types: delivery address, deposit, examples ===== */
+.gen:not(.is-ts):not([data-kind="proforma"]) .ship-to { display: none; }
+.t-dep[hidden] { display: none !important; }
+.t-dep { border-top: 1px dashed var(--rule); margin-top: 6px; padding-top: 10px; }
+.t-dep > span:first-child { color: var(--muted); }
+.ex-btn { font: inherit; font-weight: 600; color: #047857; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; cursor: pointer; }
+.ex-btn:hover { color: #065f46; }
+.sp-example { display: inline-flex; align-items: center; gap: 7px; margin-top: 12px; font-size: .86rem; text-decoration: none; }
+.sp-example svg { width: 16px; height: 16px; }
+.sp-example:hover { text-decoration: underline; }
+@media print { .ex-btn { display: none !important; } }
+.gen[data-kind="quote"] .t-row.t-paid, .gen[data-kind="estimate"] .t-row.t-paid { display: none !important; }
+@media (max-width: 560px) { .t-dep > span:first-child { white-space: nowrap; } }

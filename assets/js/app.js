@@ -128,6 +128,15 @@
     });
     $("#dueInWrap").hidden = !!D.receipt;
     $("#statusWrap").hidden = !!D.receipt;
+    // each type's own words: who it is for, the reference, the paid row, the delivery address
+    const txt = (sel, t) => { const e = $(sel); if (e && e.textContent !== t) e.textContent = t; };
+    txt("#toWord", isTs() && kind === "invoice" ? "Bill to" : D.to || "Bill to");
+    txt('label[for="f-po"]', D.ref || "PO / ref.");
+    txt("#paidLabel", D.paid || "Amount paid");
+    const sl = $("#shipLabel");
+    if (sl) sl.innerHTML = D.ship ? "Ship to <small>delivery address, if different</small>" : "Work address <small>shown as Ship to</small>";
+    const sta = $('[data-f="shipTo"]'); if (sta) sta.placeholder = D.ship ? "Company, street, city, postcode, country" : "Where the work was done (optional)";
+    $("#depRow").hidden = !D.deposit;
     if (D.receipt) { inv.status = "paid"; $("#status").value = "paid"; }
     if (!D.paidRow && Number(inv.paid)) { inv.paid = "0"; const pf = $('[data-f="paid"]'); if (pf) pf.value = "0"; }
   }
@@ -146,6 +155,13 @@
       syncDueIn();
     }
     if (D.receipt) inv.paidManual = false;
+    // proforma: offer the shipping fields buyers and customs expect; drop them again, unfilled, on other types
+    inv.fields = Array.isArray(inv.fields) ? inv.fields : [];
+    const presets = [].concat(...Object.values(IG.DOCS).map((d) => d.fields || []));
+    const before = inv.fields.length;
+    inv.fields = inv.fields.filter((f) => !(presets.indexOf(f.label) >= 0 && !String(f.value || "").trim() && (D.fields || []).indexOf(f.label) < 0));
+    (D.fields || []).forEach((l) => { if (!inv.fields.some((f) => f.label === l) && inv.fields.length < 6) inv.fields.push({ label: l, value: "" }); });
+    if (inv.fields.length !== before || (D.fields || []).length) renderFields();
     if (!inv.id && IG.isAutoNumber(inv.number) && inv.number.slice(0, 3) !== IG.docPrefix(inv.title)) {
       inv.number = IG.nextNumber(inv.title);
       const n = $("#f-number"); if (n) n.value = inv.number;
@@ -331,6 +347,7 @@
     $("#tShip").textContent = M(t.shipping);
     $("#tTotal").textContent = M(t.total);
     $("#tPaid").textContent = t.paid ? "-" + M(t.paid) : M(0);
+    const td = $("#tDep"); if (td) td.textContent = M(t.deposit || 0);
     const bal = $("#tBal"), nb = M(t.balance);
     if (bal.textContent && bal.textContent !== nb && !reduce()) { const r = bal.parentElement; r.classList.remove("bump"); void r.offsetWidth; r.classList.add("bump"); }
     bal.textContent = nb;
@@ -440,19 +457,71 @@
 
   /* ---------- saving ---------- */
   let autoTimer = null;
+  let exFrom = null, exTo = null;
   function changed() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => IG.draft.set(inv), 300);
     wsHead();
     // logged in: save to the account automatically once the basics are filled in
     if (user && !(inv.from.name.trim() && inv.to.name.trim()) && !inv.id) wsSave("need");
-    if (user && inv.from.name.trim() && inv.to.name.trim()) {
+    if (inv.isExample && (inv.from.name !== exFrom || inv.to.name !== exTo)) delete inv.isExample;
+    if (user && inv.from.name.trim() && inv.to.name.trim() && !inv.isExample) {
       clearTimeout(autoTimer);
       setStatus("saving");
       const run = async () => { if (cloudSaving) { autoTimer = setTimeout(run, 800); return; } const ok = await saveCloud(true); setStatus(ok ? "saved" : "error"); };
       autoTimer = setTimeout(run, 1200);
     }
   }
+  /* ---------- realistic examples, one per document type ---------- */
+  function exampleFor(kind) {
+    const today = inv.issueDate || IG.isoDate(new Date());
+    const day = (n) => IG.addDays(today, n);
+    const it = (desc, qty, rate) => ({ id: IG.uid(), desc, qty: String(qty), rate: String(rate), code: "" });
+    const base = { notes: "", poNumber: "", payMethod: "", payRef: "", shipTo: "", deposit: "", discount: 0, shipping: 0, paid: 0, paidManual: false, fields: [] };
+    if (isTs()) {
+      const sh = (d, type, start, end, brk) => Object.assign(IG.blankShift(day(d)), { type, start, end, brk });
+      return Object.assign(base, {
+        from: { name: "Maria Lopez", email: "maria.lopez@example.com", address: "14 Harbour Street\nBristol BS1 4RN", phone: "", taxId: "" },
+        to: { name: "The Copper Kettle Restaurant", email: "accounts@copperkettle.example", address: "2 Market Square\nBristol BS1 1JA", phone: "", taxId: "" },
+        shipTo: "The Copper Kettle, 2 Market Square, Bristol", service: "Line cook", hourRate: "18.50",
+        shifts: [sh(-6, "Breakfast", "06:30", "14:30", 30), sh(-5, "Lunch", "10:00", "18:00", 30), sh(-4, "Dinner", "15:00", "23:00", 30), sh(-2, "Dinner", "16:00", "00:30", 30), sh(-1, "Brunch", "08:00", "15:00", 30)],
+        notes: "Thank you! Hours as signed off on the kitchen rota."
+      });
+    }
+    const ex = {
+      invoice: { from: ["Northline Studio", "hello@northline.example", "48 Clerkenwell Road\nLondon EC1M 5PS"], to: ["Acme Trading Ltd", "accounts@acme.example", "200 Market Street\nManchester M1 1PN"],
+        items: [it("Website design, 5 pages", 1, 2400), it("Copywriting (hours)", 6, 75), it("Domain and hosting setup", 1, 150)], poNumber: "PO-7781", notes: "Thank you for your business!" },
+      quote: { from: ["Oakline Kitchens", "quotes@oakline.example", "Unit 4, Riverside Park\nLeeds LS10 1DJ"], to: ["Sarah and Tom Bennett", "sarah.bennett@example.com", "17 Elm Grove\nLeeds LS6 2AH"],
+        items: [it("Remove old cabinets and worktop", 1, 650), it("Supply and fit kitchen cabinets", 12, 185), it("Quartz worktop, 4.2 m, cut and fitted", 1, 1450), it("Electrics: 6 sockets and under-cabinet lights", 1, 780)],
+        poNumber: "Kitchen renovation, 17 Elm Grove", deposit: "30", notes: "Work can start within 2 weeks of acceptance and takes about 5 working days." },
+      estimate: { from: ["Rapid Flow Plumbing", "office@rapidflow.example", "9 Station Road\nAustin, TX 78701"], to: ["Daniel Reyes", "dan.reyes@example.com", "402 Cedar Lane\nAustin, TX 78704"],
+        items: [it("Labour, 2 plumbers (hours)", 16, 55), it("Copper pipe and fittings", 1, 320), it("Thermostatic shower valve", 1, 210), it("Remove and dispose of old fixtures", 1, 90)],
+        poNumber: "Main bathroom refit", deposit: "25", notes: "Price may change if hidden damage is found behind the walls. We will call you first." },
+      receipt: { from: ["Bright Smile Dental Clinic", "front.desk@brightsmile.example", "21 King Street\nToronto, ON M5H 1A1"], to: ["Priya Sharma", "priya.sharma@example.com", ""],
+        items: [it("Dental check-up and cleaning", 1, 180), it("Two X-rays", 2, 35)], poNumber: "INV-0042", payMethod: "Card", payRef: "VISA **** 4821, auth 58210", notes: "Next check-up due in 6 months." },
+      proforma: { from: ["Sunrise Textiles Ltd", "export@sunrisetextiles.example", "House 12, Road 7, Uttara\nDhaka 1230, Bangladesh"], to: ["Green Thread GmbH", "einkauf@greenthread.example", "Lagerstraße 12\n20457 Hamburg, Germany"],
+        items: [it("Organic cotton T-shirt, size M", 300, 4.8), it("Organic cotton T-shirt, size L", 200, 4.8), it("Screen printing, 2 colours", 500, 0.9)],
+        shipping: 380, poNumber: "GT-PO-2291", deposit: "30", shipTo: "Green Thread GmbH, Warehouse 3, Lagerstraße 12, 20457 Hamburg, Germany",
+        fields: [{ label: "Incoterms", value: "FOB Chattogram" }, { label: "Country of origin", value: "Bangladesh" }, { label: "Shipping date", value: IG.prettyDate(day(21)) }] }
+    }[kind];
+    const party = (a) => ({ name: a[0], email: a[1], address: a[2], phone: "", taxId: "" });
+    return Object.assign(base, ex, { from: party(ex.from), to: party(ex.to) });
+  }
+  function fillExample() {
+    const hasWork = inv.to.name.trim() || inv.items.some((x) => String(x.desc).trim());
+    if (hasWork && !inv.isExample && !window.confirm("Replace what you have typed with an example? You can press New afterwards to start blank.")) return;
+    const kind = IG.docKind(inv.title);
+    const keep = { title: inv.title, mode: inv.mode, region: inv.region, currency: inv.currency, template: inv.template, accent: inv.accent, accentPicked: inv.accentPicked, tplPicked: inv.tplPicked, taxLabel: inv.taxLabel, taxRate: inv.taxRate, terms: inv.terms, unit: inv.unit, logo: inv.logo, logoW: inv.logoW, logoH: inv.logoH, number: inv.number, issueDate: inv.issueDate, dueDate: inv.dueDate, id: inv.id };
+    inv = Object.assign(IG.blankInvoice(), keep, exampleFor(kind), { isExample: true });
+    exFrom = inv.from.name; exTo = inv.to.name;
+    if (kind === "receipt") inv.status = "paid";
+    if (document.documentElement.classList.contains("sheet-open")) closeOptions();
+    fillFields();
+    changed();
+    const sh = $("#sheet"); if (sh) sh.scrollIntoView({ behavior: reduce() ? "auto" : "smooth", block: "start" });
+    IG.toast("Example filled in. Change anything you like, or press New to start blank.", "ok");
+  }
+
   /* ---------- logged-in app (/app/): title, save status, menu ---------- */
   const WS = () => !!document.querySelector(".ws");
   function wsHead() {
@@ -493,6 +562,7 @@
       return false;
     }
     if (cloudSaving) return false;
+    if (!quiet) delete inv.isExample;
     cloudSaving = true;
     try {
       const t = IG.calc(inv);
@@ -718,6 +788,7 @@
 
   /* ---------- wiring ---------- */
   function bind() {
+    $$("[data-example]").forEach((b) => b.addEventListener("click", fillExample));
     const sheet = $("#sheet");
 
     sheet.addEventListener("input", (e) => {

@@ -16,16 +16,25 @@
   // Labels that change with the document type typed at the top (Invoice, Quote, Receipt...)
   IG.DOC_TITLES = ["Invoice", "Quotation", "Quote", "Receipt", "Proforma Invoice", "Estimate", "Tax Invoice", "Bill"];
   /* Each document type has its own wording, defaults and rules */
+  /* Each document type follows its own conventions:
+     to: client heading · ref: reference field · issue: date label · deposit: deposit row · ship: delivery address
+     fields: extra header fields offered on that type (printed only when filled in) */
   IG.DOCS = {
     invoice: { no: "Invoice no.", due: "Due date", bal: "Balance due", dueDays: 14, paidRow: true,
+      to: "Bill to", ref: "PO / ref.", issue: "Issue date",
       terms: "Payment is due by the due date shown above. Thank you for your business." },
-    quote: { no: "Quote no.", due: "Valid until", bal: "Quote total", dueDays: 30, paidRow: false, accept: true, validity: true,
+    quote: { no: "Quote no.", due: "Valid until", bal: "Quote total", dueDays: 30, paidRow: false, accept: true, validity: true, deposit: true,
+      to: "Quote for", ref: "Project", issue: "Quote date",
       terms: "This quote is valid until the date shown above. It covers only the items listed; any extra work will be quoted separately. To accept, sign below or reply to confirm." },
-    estimate: { no: "Estimate no.", due: "Valid until", bal: "Estimated total", dueDays: 30, paidRow: false, accept: true, validity: true,
+    estimate: { no: "Estimate no.", due: "Valid until", bal: "Estimated total", dueDays: 30, paidRow: false, accept: true, validity: true, deposit: true,
+      to: "Estimate for", ref: "Job / site", issue: "Estimate date",
       terms: "This is an estimate based on what we know today. The final price may change if the work changes; we will confirm with you before doing anything extra." },
     receipt: { no: "Receipt no.", due: "Payment date", bal: "Balance", dueDays: 0, paidRow: true, receipt: true,
+      to: "Received from", ref: "For invoice", issue: "Receipt date", paid: "Amount received",
       terms: "Thank you for your payment." },
-    proforma: { no: "Proforma no.", due: "Valid until", bal: "Amount due", dueDays: 14, paidRow: true, validity: true,
+    proforma: { no: "Proforma no.", due: "Valid until", bal: "Amount due", dueDays: 14, paidRow: true, validity: true, deposit: true, ship: true,
+      to: "Bill to", ref: "Order / PO no.", issue: "Issue date",
+      fields: ["Incoterms", "Country of origin", "Shipping date"],
       note: "This is a proforma invoice, not a tax invoice. A final invoice will be issued when the goods or services are delivered.",
       terms: "Payment in advance confirms the order. Prices are valid until the date shown above." }
   };
@@ -133,6 +142,8 @@
       notes: p.notes || "",
       terms: p.terms || IG.DOCS.invoice.terms,
       payMethod: "",
+      payRef: "",
+      deposit: "",
       status: "draft"
     };
   };
@@ -206,7 +217,9 @@
     const total = rd(afterDiscount + tax + shipping);
     const paid = rd(num(inv.paid));
     const balance = rd(total - paid);
-    return { lines, subtotal, discount, tax, shipping, total, paid, balance };
+    const depositRate = IG.doc(inv.title).deposit ? Math.min(100, Math.max(0, num(inv.deposit))) : 0;
+    const deposit = rd(total * depositRate / 100);
+    return { lines, subtotal, discount, tax, shipping, total, paid, balance, depositRate, deposit };
   };
 
   /* Regional styles. Each profile follows that region's invoice rules:
