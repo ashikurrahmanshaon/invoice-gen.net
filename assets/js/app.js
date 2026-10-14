@@ -1083,6 +1083,16 @@
       if (!inv.tplPicked) inv.template = "classic";
       if (!inv.accentPicked) inv.accent = IG.DEFAULT_ACCENT;
     }
+    // country pages (UK VAT, GST, ...) open in that country's style
+    const pageRegion = ($("#create") && $("#create").dataset.region) || "";
+    if (pageRegion && IG.REGIONS[pageRegion] && !inv.id && inv.region !== pageRegion) {
+      const old = IG.REGIONS[inv.region] || IG.REGIONS.us, nw = IG.REGIONS[pageRegion];
+      inv.region = pageRegion;
+      if (!inv.taxLabel || IG.TAX_NAMES.indexOf(inv.taxLabel) >= 0) inv.taxLabel = nw.tax;
+      if (inv.currency === old.cur && nw.cur) inv.currency = nw.cur;
+      if (IG.REGION_TITLES.indexOf(inv.title) >= 0 && nw.title) inv.title = nw.title;
+      if (nw.rate && !(Number(inv.taxRate) > 0) && !inv.taxNote) inv.taxRate = String(nw.rate);
+    }
     // keyword pages (quote, receipt, estimate...) open with their own document title
     const pageDoc = ($("#create") && $("#create").dataset.doc) || "";
     if (pageDoc && (!inv.title || IG.DOC_TITLES.indexOf(inv.title) >= 0)) {

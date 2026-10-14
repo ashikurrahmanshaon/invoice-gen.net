@@ -48,13 +48,13 @@ def ta(path, ph, aria, rows=2, cls=""):
 
 TPLS = [("classic", "Classic"), ("modern", "Modern"), ("minimal", "Minimal")]
 
-def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a professional invoice in seconds. Add your logo, then download a polished PDF or email it straight to your client.", doc="Invoice", extra="", mode="", unit=""):
+def build(FAQ, ICON_DL, ICON_SEND, h1="Free Invoice Generator", lead="Create a professional invoice in seconds. Add your logo, then download a polished PDF or email it straight to your client.", doc="Invoice", extra="", mode="", unit="", region=""):
     tpl_buttons = "".join(
         f'<button type="button" class="tpl-btn" data-template="{k}" aria-pressed="false"><span class="tpl-thumb t-{k}" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>{n}</span></button>'
         for k, n in TPLS)
     faq_html = "\n".join(f'          <details class="qa"><summary>{q}</summary><div class="qa-body"><p>{a}</p></div></details>' for q, a in FAQ)
 
-    return f"""<section class="gen" id="create" aria-labelledby="gen-title"{(' data-doc="' + doc + '"') if doc else ""}{(' data-mode="' + mode + '"') if mode else ""}{(' data-unit="' + unit + '"') if unit else ""}>
+    return f"""<section class="gen" id="create" aria-labelledby="gen-title"{(' data-doc="' + doc + '"') if doc else ""}{(' data-mode="' + mode + '"') if mode else ""}{(' data-unit="' + unit + '"') if unit else ""}{(' data-region="' + region + '"') if region else ""}>
   <div class="wrap gen-head">
     <div>
       <span class="gen-pill"><b>Free</b> No sign-up, no watermark</span>

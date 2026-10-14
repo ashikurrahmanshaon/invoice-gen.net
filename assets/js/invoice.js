@@ -257,7 +257,7 @@
     sa: { name: "India / South Asia", locale: "en-IN", paper: "a4", tax: "GST", date: "dmy-slash", cur: "INR",
       title: "Tax Invoice", taxId: "GSTIN", taxIdPh: "22AAAAA0000A1Z5", clientTaxId: "Client GSTIN", pos: true, code: "HSN/SAC",
       split: true, words: true, sign: true, rate: 18, layout: "in",
-      rateHint: "Common GST rates are 5%, 12%, 18% and 28%. Same state: CGST + SGST. Other state: IGST.",
+      rateHint: "Since 22 Sep 2025 the main GST rates are 5% and 18% (40% for luxury and sin goods). Same state: CGST + SGST. Other state: IGST.",
       check: ["title", "number", "date", "from", "taxId", "to", "pos", "items", "rate"] },
     me: { name: "Middle East (UAE, Gulf)", locale: "en-AE", paper: "a4", tax: "VAT", date: "dmy-slash", cur: "AED",
       title: "Tax Invoice", taxId: "TRN", taxIdPh: "100123456700003", clientTaxId: "Client TRN", supply: "Date of supply", rate: 5,

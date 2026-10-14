@@ -21,6 +21,21 @@
 - [Photography Invoice Template: Shoots, Editing, Prints (Free)](https://invoice-gen.net/photography-invoice/): Make a photography invoice for shoots, editing, prints and travel. Free template with your logo, deposits and PDF download. For wedding, event and portrait work.
 - [Free Self-Employed Invoice Template: Simple PDF Invoices | invoice-gen.net](https://invoice-gen.net/self-employed-invoice/): A simple invoice template for self-employed people and sole traders. Add your name, your client, what you did and the price, then download the PDF. Free, no sign-up.
 - [Freelance Invoice Generator: Bill Clients and Get Paid | invoice-gen.net](https://invoice-gen.net/freelance-invoice/): Create freelance invoices for hourly or project work. Free generator with PDF download, email sending, multiple currencies and payment tracking.
+- [Web Design Invoice Template: Bill Projects, Hours and Hosting (Free)](https://invoice-gen.net/web-design-invoice/): Invoice web design work the professional way: project stages, hours, hosting and maintenance on one clear invoice. Free web designer invoice template, download the PDF.
+- [Graphic Design Invoice Template: Free Designer Invoice PDF](https://invoice-gen.net/graphic-design-invoice/): Make a graphic design invoice with concepts, revision rounds, hours and usage rights. Add your logo and download a polished PDF. Free template for freelance designers.
+- [Construction Invoice Template: Free Builder Invoice with Labour & Materials](https://invoice-gen.net/construction-invoice/): Create a construction invoice with job stages, labour, materials, variations and deposits. Free builder invoice template for contractors and trades. Download the PDF.
+- [Landscaping & Lawn Care Invoice Template (Free PDF)](https://invoice-gen.net/landscaping-invoice/): Invoice lawn care and landscaping jobs in minutes: visits, mowing, planting, materials and disposal fees. Free landscaping invoice template, download or email the PDF.
+- [Tutoring Invoice Template: Bill Lessons by the Hour (Free)](https://invoice-gen.net/tutoring-invoice/): Make a tutoring invoice for private lessons: dates, hours, rate per hour and lesson packages. Free invoice template for tutors and teachers, download the PDF.
+- [Handyman Invoice Template: Free Invoice for Small Jobs & Repairs](https://invoice-gen.net/handyman-invoice/): Invoice small jobs and repairs in minutes: call-out fee, labour by the hour, parts and materials. Free handyman invoice template, make it on your phone and send the PDF.
+
+## Invoices by country
+
+- [UK Invoice Template: Free VAT Invoice Generator (HMRC Rules)](https://invoice-gen.net/uk-invoice-template/): Make a UK invoice that meets HMRC rules: VAT registration number, tax point, VAT at 20%, 5% or 0%, A4 and pounds. Free VAT invoice generator, download the PDF.
+- [GST Tax Invoice Template (Australia & NZ): Free ABN Invoice Generator](https://invoice-gen.net/gst-invoice/): Create an Australian tax invoice with your ABN, GST at 10% and the words Tax Invoice, as the ATO requires. Works for New Zealand GST too. Free PDF, no sign-up.
+- [Canada Invoice Template: Free GST/HST Invoice Generator](https://invoice-gen.net/canada-invoice-template/): Make a Canadian invoice with your GST/HST registration number, GST at 5% or HST for your province, and Canadian dollars. Free invoice generator, download the PDF.
+- [EU VAT Invoice Template: Free Generator with Reverse Charge](https://invoice-gen.net/eu-vat-invoice/): Create a VAT invoice that follows the EU VAT Directive: both VAT IDs, date of supply, VAT per rate, bank details and a reverse charge note. Euro and A4. Free PDF.
+- [UAE VAT Tax Invoice Template: Free TRN Invoice Generator](https://invoice-gen.net/uae-vat-invoice/): Make a UAE tax invoice with your TRN, the customer's TRN, VAT at 5% and amounts in AED, as the FTA requires. Works for Saudi VAT at 15% too. Free PDF.
+- [GST Invoice Format (India): Free GST Bill Generator with HSN](https://invoice-gen.net/gst-invoice-india/): Create a GST tax invoice for India with GSTIN, HSN/SAC codes, place of supply, CGST + SGST or IGST and the amount in words. Free GST bill generator, download the PDF.
 
 ## Guides
 
@@ -29,6 +44,9 @@
 - [Invoice Payment Terms Explained: Net 30, Due on Receipt and More](https://invoice-gen.net/payment-terms/): What Net 7, Net 30, due on receipt and 2/10 Net 30 mean, which payment terms to choose, and example wording you can copy onto your invoices.
 - [Payment Reminder Email Templates for Unpaid Invoices | invoice-gen.net](https://invoice-gen.net/payment-reminder/): Polite and firm payment reminder emails you can copy for unpaid and overdue invoices, with tips on when to send each one.
 - [Invoicing Guides: Templates, Payment Terms and Reminders | invoice-gen.net](https://invoice-gen.net/guides/): Free guides for freelancers and small businesses: how to make an invoice, payment terms, reminders, receipts, and invoice templates for your type of work.
+- [Invoice Number Format: How to Number Your Invoices (with Examples)](https://invoice-gen.net/invoice-number/): How to number invoices: simple sequential formats, year and client prefixes, what tax offices expect, and how to fix a mistake. With examples you can copy.
+- [How to Write a Quote That Wins the Job (with Free Template)](https://invoice-gen.net/how-to-write-a-quote/): How to write a quote clients accept: what to include, how to price it, validity dates, deposits and acceptance. Free quote template to fill in and download as PDF.
+- [Deposit Invoice: How to Ask for a Deposit and Show It on the Final Invoice](https://invoice-gen.net/deposit-invoice/): How to invoice a deposit: how much to ask for, what to write, and how to show the deposit as paid on the final invoice. With a free invoice and quote generator.
 
 ## About
 

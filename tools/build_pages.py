@@ -50,6 +50,9 @@ TOOLS = [
     ("/estimate-maker/", "Estimate maker", "Give a rough cost upfront"),
     ("/timesheet-invoice/", "Timesheet invoice", "Bill shifts and hours worked"),
 ]
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import seo_pages
+COUNTRY = [(x[0], x[1], x[2]) for x in seo_pages.COUNTRY_PAGES]
 INDUSTRY = [
     ("/contractor-invoice/", "Contractor invoice"),
     ("/cleaning-invoice/", "Cleaning invoice"),
@@ -57,16 +60,16 @@ INDUSTRY = [
     ("/photography-invoice/", "Photography invoice"),
     ("/self-employed-invoice/", "Self-employed invoice"),
     ("/freelance-invoice/", "Freelance invoice"),
-]
+] + [(x[0], x[1]) for x in seo_pages.TRADE_PAGES]
 GUIDES = [
     ("/how-to-make-an-invoice/", "How to make an invoice"),
     ("/invoice-template/", "Invoice templates"),
     ("/invoice-vs-receipt/", "Invoice vs receipt"),
     ("/payment-terms/", "Payment terms explained"),
     ("/payment-reminder/", "Payment reminder emails"),
-]
+] + [(x[0], x[1]) for x in seo_pages.GUIDE_PAGES]
 TOOL_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>'
-TOOL_PATHS = {"/quote-generator/", "/receipt-generator/", "/proforma-invoice/", "/estimate-maker/", "/timesheet-invoice/", "/contractor-invoice/", "/cleaning-invoice/", "/consulting-invoice/", "/photography-invoice/", "/self-employed-invoice/"}
+TOOL_PATHS = {x[0] for x in seo_pages.COUNTRY_PAGES + seo_pages.TRADE_PAGES} | {"/quote-generator/", "/receipt-generator/", "/proforma-invoice/", "/estimate-maker/", "/timesheet-invoice/", "/contractor-invoice/", "/cleaning-invoice/", "/consulting-invoice/", "/photography-invoice/", "/self-employed-invoice/"}
 def _svg(path):
     return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + path + '</svg>'
 TOOL_ICONS = {
@@ -80,7 +83,7 @@ TOOL_ICONS = {
 TOOLS_MENU = ('<div class="np-col"><span class="np-h">Documents</span>' +
     "".join(f'<a href="{u}"><span class="np-ico">{_svg(TOOL_ICONS.get(u, ""))}</span><span><b>{n}</b><small>{d}</small></span></a>' for u, n, d in TOOLS) +
     '</div><div class="np-col np-biz"><span class="np-h">By business</span>' +
-    "".join(f'<a href="{u}">{n.replace(" invoice", "")}</a>' for u, n in INDUSTRY) +
+    "".join(f'<a href="{u}">{n.replace(" invoice", "")}</a>' for u, n in INDUSTRY[:8]) +
     '<a class="np-all" href="/guides/">All guides →</a></div>')
 WORDMARK = '<span class="brand-name">invoice-gen<span class="tld">.net</span></span>'
 
@@ -210,7 +213,11 @@ FOOT = '''<footer class="site-footer">
     </div>
     <div>
       <h2>By business</h2>
-      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in INDUSTRY) + '''</ul>
+      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in INDUSTRY[:8]) + '''<li><a href="/invoice-tools/">All templates</a></li></ul>
+    </div>
+    <div>
+      <h2>By country</h2>
+      <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in COUNTRY) + '''</ul>
     </div>
     <div>
       <h2>Guides</h2>
@@ -326,14 +333,14 @@ def related_band(path):
 
 '''
 
-def tool_page(path, doc, title, desc, h1, lead, guide, faq, mode="standard", unit=""):
+def tool_page(path, doc, title, desc, h1, lead, guide, faq, mode="standard", unit="", region=""):
     ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
         {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": a}} for q, a in faq]}
     ld_app = dict(app_ld, name="invoice-gen.net " + h1.lower(), url=SITE + path, description=desc)
     crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
         {"@type": "ListItem", "position": 2, "name": h1, "item": SITE + path}]}
-    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide) + related_band(path), mode=mode, unit=unit)
+    main = home_section.build(faq, ICON_DL, ICON_SEND, h1=h1, lead=lead, doc=doc, extra=guide_band(*guide) + related_band(path), mode=mode, unit=unit, region=region)
     page(path, title, desc, main, GEN_JS, [ld_app, ld_faq, crumb])
 
 tool_page("/timesheet-invoice/", "Invoice",
@@ -520,6 +527,10 @@ page("/login/", "Log in or sign up | invoice-gen.net", "Log in to invoice-gen.ne
 DASH = app_pages.dash_markup(LOGO_SVG, WORDMARK)
 page("/dashboard/", "Dashboard | invoice-gen.net", "Your saved invoices and clients on invoice-gen.net.",
      DASH, f'<script src="/assets/js/invoice.js?v={V}" defer></script>\n<script src="/assets/js/pdf.js?v={V}" defer></script>\n<script src="/assets/js/dashboard.js?v={V}" defer></script>\n', noindex=True, chrome=False)
+
+# ---------------------------------------------------------------- country and trade pages (tools/seo_pages.py)
+for _p in seo_pages.COUNTRY_PAGES + seo_pages.TRADE_PAGES:
+    tool_page(_p[0], _p[3], _p[4], _p[5], _p[6], _p[7], _p[8], _p[9], mode=_p[10], unit=_p[11], region=_p[12])
 
 # ---------------------------------------------------------------- app editor (logged in)
 _ed = home_section.build(FAQ, ICON_DL, ICON_SEND)
@@ -740,6 +751,9 @@ article("/payment-reminder/", "Payment Reminder Email Templates for Unpaid Invoi
   </ul>
 ''' + faq_html(PR_FAQ) + CTA, ld=[faq_ld(PR_FAQ)])
 
+for _g in seo_pages.GUIDE_PAGES:
+    article(_g[0], _g[3], _g[4], _g[5], _g[1], _g[6] + "\n" + CTA)
+
 article("/guides/", "Invoicing Guides: Templates, Payment Terms and Reminders | invoice-gen.net",
         "Free guides for freelancers and small businesses: how to make an invoice, payment terms, reminders, receipts, and invoice templates for your type of work.",
         "Invoicing guides", "Guides", '''  <p>Short, practical guides to invoicing and getting paid. Each one links to a free generator so you can put it into practice straight away.</p>
@@ -747,6 +761,8 @@ article("/guides/", "Invoicing Guides: Templates, Payment Terms and Reminders | 
   <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in GUIDES) + '''</ul>
   <h2>Invoice templates by business</h2>
   <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n in INDUSTRY) + '''<li><a href="/timesheet-invoice/">Timesheet invoice for restaurant and hourly staff</a></li></ul>
+  <h2>Invoice templates by country</h2>
+  <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in COUNTRY) + '''</ul>
   <h2>Other documents</h2>
   <ul>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS if u != "/") + '''</ul>
 ''' + CTA)
@@ -808,14 +824,14 @@ article("/terms/", "Terms of Use | invoice-gen.net", "The terms for using invoic
 # ---------------------------------------------------------------- 404
 
 # ---------------------------------------------------------------- all tools page
-INDUSTRY_DESC = {
+INDUSTRY_DESC = dict({x[0]: x[2] for x in seo_pages.TRADE_PAGES}, **{
     "/contractor-invoice/": "Labour and materials on separate lines, deposit taken off.",
     "/cleaning-invoice/": "Each visit with start and end time, hours worked out for you.",
     "/consulting-invoice/": "Hourly, day rate or monthly retainer billing.",
     "/photography-invoice/": "Session, editing, prints and travel, with a booking deposit.",
     "/self-employed-invoice/": "A simple invoice under your own name.",
     "/freelance-invoice/": "Hourly or project work, clients at home or abroad.",
-}
+})
 GUIDE_DESC = {
     "/how-to-make-an-invoice/": "What to include, step by step, with a checklist.",
     "/invoice-template/": "What the free template includes and how to fill it in.",
@@ -823,6 +839,7 @@ GUIDE_DESC = {
     "/payment-terms/": "Net 30, due on receipt and deposits, with wording to copy.",
     "/payment-reminder/": "Three polite to firm emails for unpaid invoices.",
 }
+GUIDE_DESC.update({x[0]: x[2] for x in seo_pages.GUIDE_PAGES})
 ARROW_SVG = _svg('<path d="M5 12h14m-5-5 5 5-5 5"/>')
 def _card(u, n, d, icon=""):
     ico = f'<span class="tc-ico">{_svg(icon)}</span>' if icon else ""
@@ -845,6 +862,12 @@ TOOLS_MAIN = f"""<section class="page-head tools-head">
   <div class="wrap">
     <h2 id="t-biz">Invoice templates by business</h2>
     <ul class="tool-grid tool-grid-sm">{"".join(_card(u, n, INDUSTRY_DESC.get(u, "")) for u, n in INDUSTRY)}</ul>
+  </div>
+</section>
+<section class="band band-line tools-band" aria-labelledby="t-country">
+  <div class="wrap">
+    <h2 id="t-country">Invoice templates by country</h2>
+    <ul class="tool-grid tool-grid-sm">{"".join(_card(u, n, d) for u, n, d in COUNTRY)}</ul>
   </div>
 </section>
 <section class="band band-line tools-band" aria-labelledby="t-guides">
@@ -870,7 +893,8 @@ SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS
     ("/invoice-tools/", "monthly", "0.8"), ("/invoice-template/", "monthly", "0.8"), ("/how-to-make-an-invoice/", "monthly", "0.8"),
     ("/freelance-invoice/", "monthly", "0.8")] + [(u, "monthly", "0.8") for u, n in INDUSTRY if u != "/freelance-invoice/"] + [
     ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
-    ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")]
+    ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")] + [
+    (x[0], "monthly", "0.8") for x in seo_pages.COUNTRY_PAGES] + [(x[0], "monthly", "0.7") for x in seo_pages.GUIDE_PAGES]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
     for u, c, pr in SITEMAP:
@@ -890,7 +914,8 @@ def _meta(u):
     return title, desc
 _groups = [("Free generators", [u for u, n, d in TOOLS] + ["/invoice-tools/", "/invoice-template/"]),
            ("Invoices by business", [u for u, n in INDUSTRY]),
-           ("Guides", ["/how-to-make-an-invoice/", "/invoice-vs-receipt/", "/payment-terms/", "/payment-reminder/", "/guides/"]),
+           ("Invoices by country", [x[0] for x in seo_pages.COUNTRY_PAGES]),
+           ("Guides", ["/how-to-make-an-invoice/", "/invoice-vs-receipt/", "/payment-terms/", "/payment-reminder/", "/guides/"] + [x[0] for x in seo_pages.GUIDE_PAGES]),
            ("About", ["/about/", "/contact/", "/privacy/", "/terms/"])]
 with open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8") as f:
     f.write("# invoice-gen.net\n\n> Free online invoice generator. Make invoices, quotes, receipts, estimates and proforma invoices in the browser and download a PDF, with no sign-up and no watermark. 28 currencies, tax and VAT, discounts, logos, and invoice styles for the US, UK, EU, Canada, Australia, Japan, Asia, the Middle East and more. A free account adds saved invoices, saved clients, a payments dashboard and emailing invoices.\n\n")

@@ -2029,3 +2029,7 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 @media print { .ex-btn { display: none !important; } }
 .gen[data-kind="quote"] .t-row.t-paid, .gen[data-kind="estimate"] .t-row.t-paid { display: none !important; }
 @media (max-width: 560px) { .t-dep > span:first-child { white-space: nowrap; } }
+/* footer with a By country column */
+@media (min-width: 1001px) { .site-footer .foot-grid { grid-template-columns: 1.3fr repeat(5, 1fr); gap: 28px 22px; } }
+@media (min-width: 1001px) and (max-width: 1200px) { .site-footer .foot-grid { grid-template-columns: repeat(3, 1fr); } .site-footer .foot-brand { grid-column: 1 / -1; } }
+@media (min-width: 1001px) { .site-footer .foot-mail { white-space: nowrap; font-size: .82rem; padding-inline: 12px; } .site-footer .foot-mail svg { flex: none; } }

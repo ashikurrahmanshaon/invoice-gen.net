@@ -27,6 +27,21 @@ PAGES = {
     "/payment-terms/": ("Guide", "Invoice payment terms", "Net 30, due on receipt and more, explained with examples.", "Invoice", "$1,250.00", "Due in 30 days"),
     "/payment-reminder/": ("Email templates", "Payment reminders", "Polite, firm and final reminder emails for unpaid invoices.", "Invoice", "$1,250.00", "Reminder sent"),
     "/guides/": ("Free guides", "Invoicing guides", "Templates, payment terms and reminders to help you get paid on time.", "Invoice", "$1,250.00", "Paid on time"),
+    "/uk-invoice-template/": ("HMRC VAT rules", "UK invoice template", "VAT number, tax point and VAT at 20%, 5% or 0%. Pounds and A4.", "Invoice", "£1,500.00", "VAT 20% added"),
+    "/gst-invoice/": ("Australia and NZ", "GST tax invoice", "ABN, GST at 10% and the words Tax Invoice, as the ATO requires.", "Tax Invoice", "A$1,375.00", "GST included"),
+    "/canada-invoice-template/": ("GST and HST", "Canada invoice template", "Your GST/HST number, GST at 5% or HST for your province.", "Invoice", "C$1,312.50", "GST 5% added"),
+    "/eu-vat-invoice/": ("EU VAT Directive", "EU VAT invoice", "Both VAT IDs, date of supply, VAT per rate and reverse charge.", "Invoice", "€1.487,50", "Reverse charge"),
+    "/uae-vat-invoice/": ("FTA rules", "UAE VAT tax invoice", "Your TRN, the customer's TRN, VAT at 5% and amounts in AED.", "Tax Invoice", "AED 5,250.00", "VAT 5% added"),
+    "/gst-invoice-india/": ("GST Rule 46", "GST invoice for India", "GSTIN, HSN/SAC, place of supply, CGST + SGST or IGST.", "Tax Invoice", "Rs. 11,800.00", "GST 18% added"),
+    "/web-design-invoice/": ("For web designers", "Web design invoice", "Project stages, hours, hosting and care plans on one invoice.", "Invoice", "$3,600.00", "Deposit paid"),
+    "/graphic-design-invoice/": ("For designers", "Graphic design invoice", "Concepts, revisions, final files and usage rights.", "Invoice", "$1,200.00", "Paid in full"),
+    "/construction-invoice/": ("For builders", "Construction invoice", "Stages, labour, materials, variations and deposits.", "Invoice", "$18,450.00", "Stage 2 done"),
+    "/landscaping-invoice/": ("For lawn care", "Landscaping invoice", "Visits, mowing, plants, mulch and green waste.", "Invoice", "$540.00", "Paid in full"),
+    "/tutoring-invoice/": ("For tutors", "Tutoring invoice", "Lessons by the hour or in packages, for parents and schools.", "Invoice", "$360.00", "Paid in full"),
+    "/handyman-invoice/": ("For handymen", "Handyman invoice", "Call-out fee, labour by the hour and parts, from your phone.", "Invoice", "$285.00", "Paid on the spot"),
+    "/invoice-number/": ("Guide", "How to number invoices", "Formats that work, what tax offices expect, and fixing mistakes.", "Invoice", "INV-0042", "Next: INV-0043"),
+    "/how-to-write-a-quote/": ("Guide", "How to write a quote", "What to include so clients say yes, with a free template.", "Quote", "$5,100.00", "Quote accepted"),
+    "/deposit-invoice/": ("Guide", "Deposit invoices", "Ask for a deposit, then show it paid on the final invoice.", "Invoice", "$3,570.00", "Deposit 30% paid"),
 }
 
 def html(pill, h1, sub, word, total, chip):
