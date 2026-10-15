@@ -200,7 +200,7 @@
     if (what === "del") {
       if (!window.confirm("Delete " + r.number + "? You can bring it back from Settings, Recently deleted.")) return;
       const { error } = await IG.cloud.from("invoices").delete().eq("id", r.id);
-      if (error) return IG.toast("Could not delete: " + error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
       invoices = invoices.filter((x) => x.id !== r.id);
       renderAll();
       loadDeleted();
@@ -210,7 +210,7 @@
     if (what === "pdf") {
       try { await IG.loadPdf(); } catch (e) { return IG.toast("The PDF maker could not load. Try again.", "err"); }
       const { data, error } = await IG.cloud.from("invoices").select("data,status").eq("id", r.id).single();
-      if (error) return IG.toast(error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
       const inv = Object.assign(IG.blankInvoice(), data.data, { status: data.status });
       try {
         const f = IG.savePdf(inv);
@@ -223,7 +223,7 @@
       const patch = { status: what, balance: what === "paid" ? 0 : r.total };
       if (data) patch.data = Object.assign({}, data.data, { status: what, paid: what === "paid" ? r.total : 0 });
       const { error } = await IG.cloud.from("invoices").update(patch).eq("id", r.id);
-      if (error) return IG.toast("Could not update: " + error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
       Object.assign(r, { status: what, balance: patch.balance });
       renderAll();
       IG.toast(r.number + (what === "paid" ? " marked as paid." : " marked as unpaid."), "ok");
@@ -261,7 +261,7 @@
       if (!window.confirm("Restore the version from " + when(h.changed_at) + "? The current version stays in the history.")) return;
       const row = rowFrom(h.data, h.status);
       const { error: e2 } = await IG.cloud.from("invoices").update(row).eq("id", r.id);
-      if (e2) return IG.toast("Could not restore: " + e2.message, "err");
+      if (e2) return IG.toast(IG.dbError(e2), "err");
       Object.assign(r, row); dlg.close(); renderAll();
       IG.toast(r.number + " restored.", "ok");
     };
@@ -279,7 +279,7 @@
       const h = gone.find((x) => String(x.id) === b.dataset.undelete); if (!h) return;
       b.disabled = true;
       const { data: ins, error: e2 } = await IG.cloud.from("invoices").insert(rowFrom(h.data, h.status, { id: h.invoice_id })).select("id,number,client_name,client_email,issue_date,due_date,currency,total,balance,status,created_at,title:data->>title").single();
-      if (e2) { b.disabled = false; return IG.toast("Could not restore: " + e2.message, "err"); }
+      if (e2) { b.disabled = false; return IG.toast(IG.dbError(e2), "err"); }
       invoices.unshift(Object.assign({ title: (h.data && h.data.title) || "Invoice" }, ins)); renderAll(); loadDeleted();
       IG.toast((h.number || "Invoice") + " is back.", "ok");
     };
@@ -296,7 +296,7 @@
       IG.cloud.from("clients").select("*").order("name"),
       IG.cloud.from("profiles").select("data").eq("id", user.id).maybeSingle()
     ]);
-    if (a.error) return IG.toast("Could not make the backup: " + a.error.message, "err");
+    if (a.error) return IG.toast(IG.dbError(a.error), "err");
     const out = { app: "invoice-gen.net", version: 1, exported_at: new Date().toISOString(), account: user.email, profile: (c.data && c.data.data) || profile, clients: b.data || [], invoices: a.data || [] };
     download("invoice-gen-backup-" + IG.isoDate(new Date()) + ".json", JSON.stringify(out, null, 2), "application/json");
     IG.toast("Backup downloaded: " + out.invoices.length + " documents and " + out.clients.length + " clients.", "ok");
@@ -315,10 +315,10 @@
     if (!window.confirm("Restore " + j.invoices.length + " documents and " + (j.clients || []).length + " clients from " + (j.exported_at || "").slice(0, 10) + "? Documents you have now stay; ones with the same ID are replaced by the backup.")) return;
     const cl = (j.clients || []).map((c) => ({ id: c.id, user_id: user.id, name: c.name, email: c.email || null, phone: c.phone || null, address: c.address || null }));
     const iv = j.invoices.map((r) => rowFrom(r.data || {}, r.status, { id: r.id }));
-    if (cl.length) { const { error } = await IG.cloud.from("clients").upsert(cl); if (error) return IG.toast("Could not restore clients: " + error.message, "err"); }
+    if (cl.length) { const { error } = await IG.cloud.from("clients").upsert(cl); if (error) return IG.toast(IG.dbError(error), "err"); }
     for (let i = 0; i < iv.length; i += 100) {
       const { error } = await IG.cloud.from("invoices").upsert(iv.slice(i, i + 100));
-      if (error) return IG.toast("Could not restore documents: " + error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
     }
     IG.toast("Backup restored.", "ok");
     setTimeout(() => location.reload(), 900);
@@ -386,7 +386,7 @@
         IG.cloud.from("clients").select("*").order("name"),
         IG.cloud.from("profiles").select("data").eq("id", user.id).maybeSingle()
       ]);
-      if (a.error) IG.toast("Could not load invoices: " + a.error.message, "err");
+      if (a.error) IG.toast(IG.dbError(a.error), "err");
       invoices = a.data || []; clients = b.data || [];
       profile = (c.data && c.data.data) || IG.store.get("ig_profile", {}) || {};
     }
@@ -437,7 +437,7 @@
       const row = { name, email: f.cemail.value.trim() || null, phone: f.cphone.value.trim() || null, address: f.caddress.value.trim() || null };
       {
         const { data, error } = await IG.cloud.from("clients").insert(Object.assign({ user_id: user.id }, row)).select().single();
-        if (error) return IG.toast("Could not add client: " + error.message, "err");
+        if (error) return IG.toast(IG.dbError(error), "err");
         clients.push(data);
       }
       clients.sort((a, b) => a.name.localeCompare(b.name));
@@ -456,7 +456,7 @@
         const c = clients.find((x) => x.id === del.dataset.delClient);
         if (!window.confirm("Delete " + c.name + "? Invoices you already made stay as they are.")) return;
         const { error } = await IG.cloud.from("clients").delete().eq("id", c.id);
-        if (error) return IG.toast(error.message, "err");
+        if (error) return IG.toast(IG.dbError(error), "err");
         clients = clients.filter((x) => x !== c);
         renderAll();
       }
@@ -473,7 +473,7 @@
       p.taxRate = f.taxRate.value ? Number(f.taxRate.value) || 0 : 0;
       p.dueDays = f.dueDays.value ? Math.max(0, parseInt(f.dueDays.value, 10) || 0) : 14;
       const { error } = await IG.cloud.from("profiles").upsert({ id: user.id, data: p, updated_at: new Date().toISOString() });
-      if (error) return IG.toast("Could not save: " + error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
       profile = p;
       IG.store.set("ig_profile", Object.assign({}, IG.store.get("ig_profile", {}), p));
       IG.toast("Business details saved. New invoices will use them.", "ok");
@@ -484,7 +484,7 @@
       const pw = e.target.newpw.value;
       if (pw.length < 8) return IG.toast("Use a password of at least 8 characters.", "err");
       const { error } = await IG.cloud.auth.updateUser({ password: pw });
-      if (error) return IG.toast(error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
       e.target.reset();
       IG.toast("Password changed.", "ok");
     });

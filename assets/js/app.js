@@ -458,6 +458,7 @@
   /* ---------- saving ---------- */
   let autoTimer = null;
   let exFrom = null, exTo = null;
+  let noStore = false; // account storage not set up yet: stop retrying the autosave
   function changed() {
     clearTimeout(saveTimer);
     saveTimer = setTimeout(() => IG.draft.set(inv), 300);
@@ -465,7 +466,7 @@
     // logged in: save to the account automatically once the basics are filled in
     if (user && !(inv.from.name.trim() && inv.to.name.trim()) && !inv.id) wsSave("need");
     if (inv.isExample && (inv.from.name !== exFrom || inv.to.name !== exTo)) delete inv.isExample;
-    if (user && inv.from.name.trim() && inv.to.name.trim() && !inv.isExample) {
+    if (user && inv.from.name.trim() && inv.to.name.trim() && !inv.isExample && !noStore) {
       clearTimeout(autoTimer);
       setStatus("saving");
       const run = async () => { if (cloudSaving) { autoTimer = setTimeout(run, 800); return; } const ok = await saveCloud(true); setStatus(ok ? "saved" : "error"); };
@@ -535,7 +536,7 @@
   function wsSave(state) {
     const pill = $("#wsSave"); if (!pill) return;
     const small = window.innerWidth < 600;
-    const text = { idle: "Not saved yet", need: small ? "Not saved yet" : "Add your name and client to save", saving: "Saving…", saved: small ? "Saved" : "All changes saved", error: small ? "Not saved" : "Not saved. Check connection" };
+    const text = { idle: "Not saved yet", need: small ? "Not saved yet" : "Add your name and client to save", saving: "Saving…", saved: small ? "Saved" : "All changes saved", error: small ? "Not saved" : "Not saved to your account" };
     pill.title = state === "need" ? "Add your business name and your client's name, then it saves by itself." : "";
     pill.dataset.state = state;
     $("#wsSaveText").textContent = text[state] || "";
@@ -586,7 +587,8 @@
       if (!quiet) IG.toast("Saved to your account.", "ok");
       return true;
     } catch (e) {
-      IG.toast("Could not save: " + (e.message || "check your connection and try again."), "err");
+      if (/schema cache|does not exist|PGRST205|42P01/i.test(String(e && (e.message || e.code)))) noStore = true;
+      IG.toast(IG.dbError(e), "err");
       return false;
     } finally {
       cloudSaving = false;
@@ -635,7 +637,7 @@
     IG.store.set("ig_profile", p);
     if (IG.cloud && user) {
       const { error } = await IG.cloud.from("profiles").upsert({ id: user.id, data: p, updated_at: new Date().toISOString() });
-      if (error) return IG.toast("Could not save your details: " + error.message, "err");
+      if (error) return IG.toast(IG.dbError(error), "err");
     }
     IG.toast("Saved. New invoices will start with your details, logo and design.", "ok");
   }

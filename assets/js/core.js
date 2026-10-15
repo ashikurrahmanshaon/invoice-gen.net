@@ -93,6 +93,8 @@
       zone.setAttribute("aria-live", "polite");
       document.body.appendChild(zone);
     }
+    // the same message only once on screen
+    if ([].some.call(zone.children, (t) => t.textContent === msg)) return;
     const t = document.createElement("div");
     t.className = "toast" + (kind ? " " + kind : "");
     t.textContent = msg;
@@ -133,6 +135,15 @@
     const y = document.querySelector("[data-year]");
     if (y) y.textContent = new Date().getFullYear();
     return user;
+  };
+
+  /* database errors in plain words; a missing table means account storage is still being set up */
+  IG.dbError = function (e) {
+    const m = String((e && (e.message || e.code)) || e || "");
+    if (/schema cache|does not exist|PGRST205|42P01/i.test(m)) return "Saving to accounts is being set up and will be ready soon. Your work is kept in this browser; download the PDF to keep a copy.";
+    if (/failed to fetch|network|load failed/i.test(m)) return "Can't reach the server. Check your internet connection and try again.";
+    if (/JWT|expired|not authenticated|401/i.test(m)) return "Your login has expired. Log in again to keep saving.";
+    return m || "Something went wrong. Try again.";
   };
 
   /* "Copy link" in share bars */
