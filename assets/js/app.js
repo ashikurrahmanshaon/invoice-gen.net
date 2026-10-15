@@ -1085,6 +1085,9 @@
       if (!inv.tplPicked) inv.template = "classic";
       if (!inv.accentPicked) inv.accent = IG.DEFAULT_ACCENT;
     }
+    // ?currency=EUR (from the currency converter) sets the currency of a new invoice
+    const pc = (params.get("currency") || "").toUpperCase();
+    if (pc && !inv.id && IG.CURRENCIES.some((c) => c[0] === pc)) inv.currency = pc;
     // country pages (UK VAT, GST, ...) open in that country's style
     const pageRegion = ($("#create") && $("#create").dataset.region) || "";
     if (pageRegion && IG.REGIONS[pageRegion] && !inv.id && inv.region !== pageRegion) {

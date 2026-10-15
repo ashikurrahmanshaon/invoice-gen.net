@@ -209,7 +209,7 @@ FOOT = '''<footer class="site-footer">
     </div>
     <div>
       <h2>Tools</h2>
-      <ul><li><a href="/invoice-tools/">All tools</a></li>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''</ul>
+      <ul><li><a href="/invoice-tools/">All tools</a></li>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''<li><a href="/currency-converter/">Currency converter</a></li></ul>
     </div>
     <div>
       <h2>By business</h2>
@@ -870,6 +870,12 @@ TOOLS_MAIN = f"""<section class="page-head tools-head">
     <ul class="tool-grid tool-grid-sm">{"".join(_card(u, n, d) for u, n, d in COUNTRY)}</ul>
   </div>
 </section>
+<section class="band band-line tools-band" aria-labelledby="t-fx">
+  <div class="wrap">
+    <h2 id="t-fx">Currency</h2>
+    <ul class="tool-grid tool-grid-sm">{_card("/currency-converter/", "Currency converter", "Today's rates for 160+ currencies.", '<circle cx="12" cy="12" r="9"/><path d="M8 10h7l-2-2M16 14H9l2 2"/>')}{_card("/eur-to-usd/", "EUR to USD", "Euro to US dollar today.")}{_card("/usd-to-gbp/", "USD to GBP", "US dollar to British pound today.")}</ul>
+  </div>
+</section>
 <section class="band band-line tools-band" aria-labelledby="t-guides">
   <div class="wrap">
     <h2 id="t-guides">Guides</h2>
@@ -881,6 +887,58 @@ page("/invoice-tools/", "Free Invoicing Tools: Invoice, Quote, Receipt and More"
      TOOLS_MAIN, "", [{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
         {"@type": "ListItem", "position": 2, "name": "Tools", "item": SITE + "/invoice-tools/"}]}])
+
+# ---------------------------------------------------------------- currency converter (tools/fx_pages.py, assets/js/fx.js)
+import fx_pages as FX
+FX_JS = f'<script src="/assets/js/fx.js?v={V}" defer></script>\n'
+def fx_page(path, title, desc, h1, lead, a, b, crumb, faq, extra_html=""):
+    ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": x}} for q, x in faq]}
+    ld_app = {"@context": "https://schema.org", "@type": "WebApplication", "name": h1, "url": SITE + path, "applicationCategory": "FinanceApplication",
+              "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": desc}
+    crumbs = [{"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
+              {"@type": "ListItem", "position": 2, "name": "Currency converter", "item": SITE + "/currency-converter/"}]
+    if path != "/currency-converter/":
+        crumbs.append({"@type": "ListItem", "position": 3, "name": crumb, "item": SITE + path})
+    main = f'''<section class="page-head fx-head">
+  <div class="wrap">
+    <p class="crumbs"><a href="/">Home</a> / {'<a href="/currency-converter/">Currency converter</a> / ' + crumb if path != "/currency-converter/" else "Currency converter"}</p>
+    <h1>{h1}</h1>
+    <p class="lede">{lead}</p>
+    {FX.converter(a, b)}
+  </div>
+</section>
+<section class="band band-line">
+  <div class="wrap">
+    {FX.tables()}
+    <h2 class="fx-h2">Popular conversions</h2>
+    {FX.chips((a, b) if path != "/currency-converter/" else None)}
+  </div>
+</section>
+<article class="article">
+{extra_html}
+{FX.INVOICE_TIPS}
+<h2>Questions</h2>
+{FX.faq_html(faq)}
+{share_bar(path, h1)}
+</article>'''
+    page(path, title, desc, main, FX_JS, [ld_app, ld_faq, {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": crumbs}])
+
+fx_page("/currency-converter/", "Currency Converter: Live Exchange Rates for 160+ Currencies | invoice-gen.net",
+    "Free currency converter with today's exchange rates for 160+ currencies: dollar, euro, pound, rupee, taka, dirham and more. Convert amounts and make an invoice in any currency.",
+    "Currency converter", "Convert between 160+ currencies with today's exchange rates. Then make an invoice in your client's currency in one click.",
+    "USD", "EUR", "Currency converter",
+    [("Which currencies can I convert?", "More than 160, including the US dollar, euro, British pound, Indian rupee, Bangladeshi taka, UAE dirham, Saudi riyal, Canadian and Australian dollars, yen and yuan."),
+     ("Where do the rates come from?", "From ExchangeRate-API, which collects rates from central banks and market sources and updates them every day. If it can't be reached, the page uses European Central Bank rates through Frankfurter."),
+     ("Is this the rate my bank will give me?", "Not exactly. These are mid-market rates. Banks and payment apps add a margin or fee, so the amount you receive is usually a little lower."),
+     ("Is it free?", "Yes. The converter and the invoice generator are free, with no sign-up.")])
+for _a, _b in FX.PAIRS:
+    _na, _nb = FX.NAMES[_a], FX.NAMES[_b]
+    fx_page(FX.pair_path(_a, _b), f"{_a} to {_b}: Convert {_na} to {_nb} Today | invoice-gen.net",
+        f"Convert {_na} to {_nb} ({_a} to {_b}) with today's exchange rate. Quick conversion table, the reverse rate, and a free invoice generator in {_b}.",
+        f"{_a} to {_b}: {_na} to {_nb}", f"Today's {_na} to {_nb} exchange rate, with a quick table for common amounts and the reverse rate from {_b} to {_a}.",
+        _a, _b, f"{_a} to {_b}", FX.faq_pairs(_a, _b),
+        f'<p>Billing a client who pays in {_b}? Check the rate here, then <a href="/?new=1&amp;currency={_b}#create">make an invoice in {_b}</a>. Going the other way? See <a href="{FX.pair_path(_b, _a)}">{_b} to {_a}</a>.</p>')
 
 page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist.",
      '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/invoice-tools/">See all tools</a></p></section>
@@ -895,7 +953,8 @@ SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS
     ("/freelance-invoice/", "monthly", "0.8")] + [(u, "monthly", "0.8") for u, n in INDUSTRY if u != "/freelance-invoice/"] + [
     ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")] + [
-    (x[0], "monthly", "0.8") for x in seo_pages.COUNTRY_PAGES] + [(x[0], "monthly", "0.7") for x in seo_pages.GUIDE_PAGES]
+    (x[0], "monthly", "0.8") for x in seo_pages.COUNTRY_PAGES] + [(x[0], "monthly", "0.7") for x in seo_pages.GUIDE_PAGES] + [
+    ("/currency-converter/", "daily", "0.8")] + [(FX.pair_path(a, b), "daily", "0.7") for a, b in FX.PAIRS]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
     for u, c, pr in SITEMAP:
@@ -916,6 +975,7 @@ def _meta(u):
 _groups = [("Free generators", [u for u, n, d in TOOLS] + ["/invoice-tools/", "/invoice-template/"]),
            ("Invoices by business", [u for u, n in INDUSTRY]),
            ("Invoices by country", [x[0] for x in seo_pages.COUNTRY_PAGES]),
+           ("Currency converter", ["/currency-converter/"] + [FX.pair_path(a, b) for a, b in FX.PAIRS]),
            ("Guides", ["/how-to-make-an-invoice/", "/invoice-vs-receipt/", "/payment-terms/", "/payment-reminder/", "/guides/"] + [x[0] for x in seo_pages.GUIDE_PAGES]),
            ("About", ["/about/", "/contact/", "/privacy/", "/terms/"])]
 with open(os.path.join(ROOT, "llms.txt"), "w", encoding="utf-8") as f:

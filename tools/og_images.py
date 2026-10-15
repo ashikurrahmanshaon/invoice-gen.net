@@ -44,6 +44,12 @@ PAGES = {
     "/deposit-invoice/": ("Guide", "Deposit invoices", "Ask for a deposit, then show it paid on the final invoice.", "Invoice", "$3,570.00", "Deposit 30% paid"),
 }
 
+import sys as _s; _s.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import fx_pages as _FX
+PAGES["/currency-converter/"] = ("Today's rates", "Currency converter", "Convert 160+ currencies, then make an invoice in your client's currency.", "Invoice", "€1,000.00", "Daily rate")
+for _a, _b in _FX.PAIRS:
+    PAGES[_FX.pair_path(_a, _b)] = ("Today's rate", f"{_a} to {_b}", f"Convert {_FX.NAMES[_a]} to {_FX.NAMES[_b]} with today's exchange rate.", "Invoice", _b + " 1,000.00", "Daily rate")
+
 def html(pill, h1, sub, word, total, chip):
     big = 80 if len(h1) <= 22 else 68
     return f'''<!doctype html><html><head><meta charset="utf-8"><style>

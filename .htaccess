@@ -55,6 +55,7 @@ ErrorDocument 404 /404.html
   RewriteRule ^(proforma|proforma-invoice-generator|pro-forma-invoice)/?$ /proforma-invoice/ [L,R=301,NC]
   RewriteRule ^(timesheet|timesheet-invoice-generator)/?$ /timesheet-invoice/ [L,R=301,NC]
   RewriteRule ^(uk-invoice|vat-invoice|vat-invoice-template)/?$ /uk-invoice-template/ [L,R=301,NC]
+  RewriteRule ^(currency|currencies|converter|exchange-rate|exchange-rates|currency-exchange)/?$ /currency-converter/ [L,R=301,NC]
   RewriteRule ^(gst-invoice-australia|tax-invoice)/?$ /gst-invoice/ [L,R=301,NC]
   RewriteRule ^(gst-bill|gst-invoice-format)/?$ /gst-invoice-india/ [L,R=301,NC]
   # never serve repo/setup files
