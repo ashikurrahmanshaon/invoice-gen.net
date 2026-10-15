@@ -39,8 +39,26 @@ ErrorDocument 404 /404.html
   RewriteRule ^blog/[^/]*template[^/]*/?$ /invoice-template/ [L,R=301,NC]
   RewriteRule ^blog/[^/]*(how-to|guide|what-is|invoice)[^/]*/?$ /how-to-make-an-invoice/ [L,R=301,NC]
   RewriteRule ^blog/.+$ /guides/ [L,R=301,NC]
+  # short and guessed addresses -> the real page
+  RewriteRule ^(templates?|invoice-templates|invoice-templates?/.*)/?$ /invoice-template/ [L,R=301,NC]
+  RewriteRule ^tools/?$ /invoice-tools/ [L,R=301,NC]
+  RewriteRule ^(signup|sign-up|register|create-account)/?$ /login/?signup=1 [L,R=301,NC]
+  RewriteRule ^(signin|sign-in|log-in|account)/?$ /login/ [L,R=301,NC]
+  RewriteRule ^(pricing|price|features|about-us)/?$ /about/ [L,R=301,NC]
+  RewriteRule ^(contact-us|support|help)/?$ /contact/ [L,R=301,NC]
+  RewriteRule ^(privacy-policy)/?$ /privacy/ [L,R=301,NC]
+  RewriteRule ^(terms-of-service|terms-and-conditions|tos)/?$ /terms/ [L,R=301,NC]
+  RewriteRule ^(guide|faq|resources|articles)/?$ /guides/ [L,R=301,NC]
+  RewriteRule ^(quote|quotes|quotation|quotation-generator|quote-maker)/?$ /quote-generator/ [L,R=301,NC]
+  RewriteRule ^(receipt|receipts|receipt-maker)/?$ /receipt-generator/ [L,R=301,NC]
+  RewriteRule ^(estimate|estimates|estimate-generator)/?$ /estimate-maker/ [L,R=301,NC]
+  RewriteRule ^(proforma|proforma-invoice-generator|pro-forma-invoice)/?$ /proforma-invoice/ [L,R=301,NC]
+  RewriteRule ^(timesheet|timesheet-invoice-generator)/?$ /timesheet-invoice/ [L,R=301,NC]
+  RewriteRule ^(uk-invoice|vat-invoice|vat-invoice-template)/?$ /uk-invoice-template/ [L,R=301,NC]
+  RewriteRule ^(gst-invoice-australia|tax-invoice)/?$ /gst-invoice/ [L,R=301,NC]
+  RewriteRule ^(gst-bill|gst-invoice-format)/?$ /gst-invoice-india/ [L,R=301,NC]
   # never serve repo/setup files
-  RewriteRule ^(\.git|supabase|tools|README\.md) - [F,L,NC]
+  RewriteRule ^(\.git|\.github|supabase|tools|README\.md) - [F,L,NC]
 </IfModule>
 
 <IfModule mod_headers.c>

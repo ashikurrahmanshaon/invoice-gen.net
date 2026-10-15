@@ -883,7 +883,8 @@ page("/invoice-tools/", "Free Invoicing Tools: Invoice, Quote, Receipt and More"
         {"@type": "ListItem", "position": 2, "name": "Tools", "item": SITE + "/invoice-tools/"}]}])
 
 page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist.",
-     '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/how-to-make-an-invoice/">Read the guide</a></p></section>''',
+     '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/invoice-tools/">See all tools</a></p></section>
+<section class="band nf-popular" aria-labelledby="nf-pop"><div class="wrap"><h2 id="nf-pop">Popular pages</h2><ul class="tool-grid tool-grid-sm">''' + "".join(_card(u, n, d, TOOL_ICONS.get(u, "")) for u, n, d in TOOLS) + _card("/invoice-template/", "Invoice templates", "Fill in online and download a PDF.") + _card("/guides/", "Guides", "Payment terms, reminders and more.") + _card("/login/", "Log in", "Your saved invoices and clients.") + '''</ul></div></section>''',
      noindex=True)
 
 # ---------------------------------------------------------------- sitemap

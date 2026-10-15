@@ -2047,3 +2047,4 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .bk-empty { color: var(--muted); font-size: .86rem; justify-content: flex-start !important; }
 .hist-list { max-height: min(60vh, 460px); overflow: auto; }
 @media (min-width: 600px) { #histModal { width: min(520px, calc(100vw - 32px)); } }
+.nf-popular { padding-top: 32px; } .nf-popular h2 { font-size: 1.15rem; margin-bottom: 14px; }
