@@ -2120,3 +2120,4 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
   .calc-form, .calc-out { padding: 16px; }
   .calc-out { border-left: 0; border-top: 1px solid #d5efe2; }
 }
+@media (max-width: 760px) { .sp-example { min-height: 44px; padding: 6px 0; } .items-hint .ex-btn { display: inline-block; padding: 8px 0; } }

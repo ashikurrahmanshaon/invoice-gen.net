@@ -416,7 +416,7 @@
     reader.onload = () => {
       const img = new Image();
       img.onload = () => {
-        const scale = Math.min(1, 600 / Math.max(img.width, img.height));
+        const scale = Math.min(1, 900 / Math.max(img.width, img.height)); // sharp in print, still light
         const c = document.createElement("canvas");
         c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
         c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
@@ -661,9 +661,18 @@
   function closeReady() { const d = $("#pdfReady"); if (typeof d.close === "function") d.close(); else d.removeAttribute("open"); }
 
   async function pdfLibReady() {
-    try { await IG.loadPdf(); return true; }
+    try {
+      await IG.loadPdf();
+      if (IG.pdfNeedsFont(inv)) await IG.loadPdfFont().catch(() => {});
+      if (IG.pdfUnsupported(inv) && !pdfWarned) {
+        pdfWarned = true;
+        IG.toast("Some letters (like Bangla, Arabic or Chinese) can't be printed in the PDF yet and show as ?. Use English letters for names and items.", "err");
+      }
+      return true;
+    }
     catch (e) { IG.toast("The PDF maker could not load. Check your connection and try again.", "err"); return false; }
   }
+  let pdfWarned = false;
 
   async function downloadPdf(e) {
     if (!checkReady() || !(await pdfLibReady())) return;

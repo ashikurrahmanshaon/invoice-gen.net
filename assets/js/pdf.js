@@ -10,12 +10,45 @@
   }
 
   // Latin-1 only for the built-in PDF font
+  // UNI: this PDF uses Noto Sans, which prints accented, Greek and Cyrillic letters and currency signs
+  let UNI = false;
+  const UNI_OK = /[^\u0000-\u024f\u0259\u02c6-\u02dd\u0300-\u052f\u1e00-\u1eff\u2000-\u206f\u20a0-\u20cf\u2100-\u214f\u2190-\u2199\u2212\u2215\n]/g;
   function clean(s) {
-    return String(s == null ? "" : s)
-      .replace(/[‘’]/g, "'").replace(/[“”]/g, '"')
-      .replace(/[–—]/g, "-").replace(/…/g, "...")
+    s = String(s == null ? "" : s).replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
+    if (UNI) return s.replace(UNI_OK, "?");
+    return s.replace(/[–—]/g, "-").replace(/…/g, "...")
       // eslint-disable-next-line no-control-regex
       .replace(/[^\u0000-ÿ€\n]/g, "?");
+  }
+  /* does this invoice have letters the standard PDF font can't print? */
+  IG.pdfNeedsFont = function (inv) {
+    try { return /[^\u0000-ÿ€‘’“”–—…\n]/.test(JSON.stringify(Object.assign({}, inv, { logo: "" }))); } catch (e) { return false; }
+  };
+  /* letters no PDF font here can print (Bangla, Arabic, Hindi, Chinese, Thai...) */
+  IG.pdfUnsupported = function (inv) {
+    try { return /[\u0590-\u1dff\u2e80-\ua4ff\uac00-\ud7af]/.test(JSON.stringify(Object.assign({}, inv, { logo: "" }))); } catch (e) { return false; }
+  };
+  IG.loadPdfFont = function () {
+    if (window.IG_PDF_FONT) return Promise.resolve();
+    if (IG._fontP) return IG._fontP;
+    IG._fontP = new Promise((res, rej) => {
+      const s = document.createElement("script"); s.src = "/assets/vendor/noto-sans-pdf.js?v=1"; s.async = true;
+      s.onload = res; s.onerror = () => { IG._fontP = null; rej(new Error("font")); }; document.head.appendChild(s);
+    });
+    return IG._fontP;
+  };
+  function useUnicodeFont(doc) {
+    const f = window.IG_PDF_FONT;
+    if (!f) return false;
+    doc.addFileToVFS("NotoSans-Regular.ttf", f.r); doc.addFont("NotoSans-Regular.ttf", "NotoSans", "normal");
+    doc.addFileToVFS("NotoSans-Bold.ttf", f.b); doc.addFont("NotoSans-Bold.ttf", "NotoSans", "bold");
+    const set = doc.setFont.bind(doc);
+    doc.setFont = function (name, style, weight) {
+      if (!name || /helvetica/i.test(name)) { name = "NotoSans"; style = /bold/i.test(String(style || "")) ? "bold" : "normal"; }
+      return set(name, style, weight);
+    };
+    doc.setFont("helvetica", "normal");
+    return true;
   }
 
   function imageFormat(dataUrl) {
@@ -43,6 +76,7 @@
     const { jsPDF } = window.jspdf;
     IG.setRegion(inv.region);
     const doc = new jsPDF({ unit: "mm", format: (IG.REGIONS[inv.region] || {}).paper || "a4", compress: true });
+    UNI = IG.pdfNeedsFont(inv) && useUnicodeFont(doc);
     const t = IG.calc(inv);
     const cur = inv.currency;
     const M = (v) => IG.moneyPdf(v, cur);
