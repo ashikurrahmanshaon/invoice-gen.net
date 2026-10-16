@@ -37,6 +37,16 @@
 - [UAE VAT Tax Invoice Template: Free TRN Invoice Generator](https://invoice-gen.net/uae-vat-invoice/): Make a UAE tax invoice with your TRN, the customer's TRN, VAT at 5% and amounts in AED, as the FTA requires. Works for Saudi VAT at 15% too. Free PDF.
 - [GST Invoice Format (India): Free GST Bill Generator with HSN](https://invoice-gen.net/gst-invoice-india/): Create a GST tax invoice for India with GSTIN, HSN/SAC codes, place of supply, CGST + SGST or IGST and the amount in words. Free GST bill generator, download the PDF.
 
+## Calculators
+
+- [VAT Calculator: Add or Remove VAT (UK 20% and EU Rates) | invoice-gen.net](https://invoice-gen.net/vat-calculator/): Free VAT calculator. Add VAT to a net price or remove VAT from a gross price at 20%, 5% or any EU rate. See the net, VAT and gross amounts instantly.
+- [GST Calculator: Add or Remove GST (Australia, NZ, India) | invoice-gen.net](https://invoice-gen.net/gst-calculator/): Free GST calculator for Australia (10%), New Zealand (15%), India (5%, 18%, 40%) and more. Add or remove GST and see the CGST and SGST split.
+- [Sales Tax Calculator: Add Sales Tax or Find the Pre-Tax Price | invoice-gen.net](https://invoice-gen.net/sales-tax-calculator/): Free sales tax calculator for US states. Add sales tax to a price or find the price before tax from a total. Enter your combined state and local rate.
+- [Late Payment Fee & Interest Calculator for Overdue Invoices | invoice-gen.net](https://invoice-gen.net/late-fee-calculator/): Work out the late fee or interest on an overdue invoice: yearly interest rate, monthly percentage or flat fee, by the number of days late. Free calculator.
+- [Invoice Due Date Calculator: Net 15, Net 30, Net 60, EOM | invoice-gen.net](https://invoice-gen.net/due-date-calculator/): Find the due date of an invoice from its date and payment terms: Net 7, 15, 30, 45, 60, 90, end of month, or business days. Free due date calculator.
+- [Freelance Hourly Rate Calculator: What Should I Charge? | invoice-gen.net](https://invoice-gen.net/hourly-rate-calculator/): Work out your freelance hourly and day rate from the income you want, your business costs, time off and how many hours you can really bill. Free calculator.
+- [Profit Margin & Markup Calculator: Find Your Selling Price | invoice-gen.net](https://invoice-gen.net/profit-margin-calculator/): Free profit margin calculator. Enter cost and price to get margin and markup, or enter cost and target margin to get the selling price. Margin vs markup explained.
+
 ## Currency converter
 
 - [Currency Converter: Live Exchange Rates for 160+ Currencies | invoice-gen.net](https://invoice-gen.net/currency-converter/): Free currency converter with today's exchange rates for 160+ currencies: dollar, euro, pound, rupee, taka, dirham and more. Convert amounts and make an invoice in any currency.

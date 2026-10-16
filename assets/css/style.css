@@ -2090,3 +2090,33 @@ main > .band { content-visibility: auto; contain-intrinsic-size: auto 720px; }
 .fx-head h1 { margin-bottom: 10px; }
 .fx-f select.in { padding-right: 34px; text-overflow: ellipsis; white-space: nowrap; overflow: hidden; }
 .fx-rate { line-height: 1.5; }
+
+/* ===== Calculators ===== */
+.calc-card { margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 0; background: var(--paper); border: 1px solid var(--rule); border-radius: 18px; overflow: hidden; box-shadow: 0 18px 40px -28px rgba(15, 23, 42, .35); }
+.calc-form { padding: 22px; display: grid; gap: 14px; align-content: start; }
+.calc-out { padding: 22px; background: #f3fbf7; border-left: 1px solid #d5efe2; display: grid; gap: 4px; align-content: start; }
+.cf { display: grid; gap: 6px; min-width: 0; }
+.cf[hidden] { display: none; }
+.cf-l { font-size: .84rem; font-weight: 600; color: var(--ink); }
+.cf-in { position: relative; display: block; }
+.cf-in .in { width: 100%; height: 48px; font-size: 1.05rem; padding-right: 40px; }
+.cf .in { height: 48px; width: 100%; }
+.cf-suf { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-style: normal; color: var(--muted); font-weight: 600; }
+.cf-suf[hidden] { display: none; }
+.cf-hint { color: var(--muted); font-size: .78rem; line-height: 1.4; }
+.cf-check { display: flex; align-items: center; gap: 10px; font-size: .9rem; font-weight: 500; cursor: pointer; }
+.cf-check input { width: 18px; height: 18px; accent-color: #059669; }
+.cf .seg { height: 46px; }
+.cf .seg button { font-size: .88rem; }
+.co-big { display: grid; gap: 2px; padding-bottom: 14px; margin-bottom: 6px; border-bottom: 1px solid #d5efe2; }
+.co-big span { color: var(--muted); font-size: .9rem; font-weight: 500; }
+.co-big b { font-size: clamp(1.8rem, 4vw, 2.5rem); letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.co-row { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; font-size: .95rem; border-bottom: 1px dashed #d5efe2; }
+.co-row span { color: var(--muted); }
+.co-row b { font-variant-numeric: tabular-nums; text-align: right; }
+.calc-out .btn { margin-top: 14px; }
+@media (max-width: 760px) {
+  .calc-card { grid-template-columns: 1fr; border-radius: 16px; }
+  .calc-form, .calc-out { padding: 16px; }
+  .calc-out { border-left: 0; border-top: 1px solid #d5efe2; }
+}

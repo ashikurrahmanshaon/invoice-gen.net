@@ -52,6 +52,8 @@ TOOLS = [
 ]
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import seo_pages
+import calc_pages as CALC
+CALC_ICON = '<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01M8 18.5h8"/>'
 COUNTRY = [(x[0], x[1], x[2]) for x in seo_pages.COUNTRY_PAGES]
 INDUSTRY = [
     ("/contractor-invoice/", "Contractor invoice"),
@@ -209,7 +211,7 @@ FOOT = '''<footer class="site-footer">
     </div>
     <div>
       <h2>Tools</h2>
-      <ul><li><a href="/invoice-tools/">All tools</a></li>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''<li><a href="/currency-converter/">Currency converter</a></li></ul>
+      <ul><li><a href="/invoice-tools/">All tools</a></li>''' + "".join(f'<li><a href="{u}">{n}</a></li>' for u, n, d in TOOLS) + '''<li><a href="/currency-converter/">Currency converter</a></li><li><a href="/vat-calculator/">VAT calculator</a></li><li><a href="/hourly-rate-calculator/">Hourly rate calculator</a></li></ul>
     </div>
     <div>
       <h2>By business</h2>
@@ -872,8 +874,8 @@ TOOLS_MAIN = f"""<section class="page-head tools-head">
 </section>
 <section class="band band-line tools-band" aria-labelledby="t-fx">
   <div class="wrap">
-    <h2 id="t-fx">Currency</h2>
-    <ul class="tool-grid tool-grid-sm">{_card("/currency-converter/", "Currency converter", "Today's rates for 160+ currencies.", '<circle cx="12" cy="12" r="9"/><path d="M8 10h7l-2-2M16 14H9l2 2"/>')}{_card("/eur-to-usd/", "EUR to USD", "Euro to US dollar today.")}{_card("/usd-to-gbp/", "USD to GBP", "US dollar to British pound today.")}</ul>
+    <h2 id="t-fx">Calculators and currency</h2>
+    <ul class="tool-grid tool-grid-sm">{_card("/currency-converter/", "Currency converter", "Today's rates for 160+ currencies.", '<circle cx="12" cy="12" r="9"/><path d="M8 10h7l-2-2M16 14H9l2 2"/>')}{_card("/eur-to-usd/", "EUR to USD", "Euro to US dollar today.")}{_card("/usd-to-gbp/", "USD to GBP", "US dollar to British pound today.")}{"".join(_card(x["path"], x["name"], x["card"], CALC_ICON) for x in CALC.CALCS)}</ul>
   </div>
 </section>
 <section class="band band-line tools-band" aria-labelledby="t-guides">
@@ -940,6 +942,42 @@ for _a, _b in FX.PAIRS:
         _a, _b, f"{_a} to {_b}", FX.faq_pairs(_a, _b),
         f'<p>Billing a client who pays in {_b}? Check the rate here, then <a href="/?new=1&amp;currency={_b}#create">make an invoice in {_b}</a>. Going the other way? See <a href="{FX.pair_path(_b, _a)}">{_b} to {_a}</a>.</p>')
 
+# ---------------------------------------------------------------- calculators (tools/calc_pages.py, assets/js/calc.js)
+def calc_page(c):
+    ld_faq = {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [
+        {"@type": "Question", "name": q, "acceptedAnswer": {"@type": "Answer", "text": x}} for q, x in c["faq"]]}
+    ld_app = {"@context": "https://schema.org", "@type": "WebApplication", "name": c["name"], "url": SITE + c["path"], "applicationCategory": "FinanceApplication",
+              "operatingSystem": "Any (web browser)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": c["desc"]}
+    crumb = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE + "/"},
+        {"@type": "ListItem", "position": 2, "name": "Tools", "item": SITE + "/invoice-tools/"},
+        {"@type": "ListItem", "position": 3, "name": c["name"], "item": SITE + c["path"]}]}
+    others = "".join(f'<li><a href="{x["path"]}"><b>{x["name"]}</b></a></li>' for x in CALC.CALCS if x["path"] != c["path"])
+    main = f'''<section class="page-head fx-head">
+  <div class="wrap">
+    <p class="crumbs"><a href="/">Home</a> / <a href="/invoice-tools/">Tools</a> / {c["name"]}</p>
+    <h1>{c["h1"]}</h1>
+    <p class="lede">{c["lead"]}</p>
+    <div class="calc-card" data-calc="{c["key"]}">
+      <div class="calc-form">{c["form"]}</div>
+      <div class="calc-out" aria-live="polite">{c["results"]}
+        <a class="btn btn-primary btn-block" href="{c["cta_href"]}">{c["cta"]}</a>
+      </div>
+    </div>
+  </div>
+</section>
+<article class="article">
+{c["body"]}
+<h2>Questions</h2>
+{FX.faq_html(c["faq"])}
+<h2>More free calculators</h2>
+<ul class="chips-links">{others}<li><a href="/currency-converter/"><b>Currency converter</b></a></li></ul>
+{share_bar(c["path"], c["h1"])}
+</article>'''
+    page(c["path"], c["title"], c["desc"], main, f'<script src="/assets/js/calc.js?v={V}" defer></script>\n', [ld_app, ld_faq, crumb])
+for _c in CALC.CALCS:
+    calc_page(_c)
+
 page("/404.html", "Page not found | invoice-gen.net", "This page doesn't exist.",
      '''<section class="article notfound"><p class="nf-code">404</p><h1>That page doesn't exist</h1><p>The link may be old or mistyped. Everything you need starts on the invoice generator.</p><p class="nf-actions"><a class="btn btn-primary" href="/">Make an invoice</a><a class="btn btn-ghost" href="/invoice-tools/">See all tools</a></p></section>
 <section class="band nf-popular" aria-labelledby="nf-pop"><div class="wrap"><h2 id="nf-pop">Popular pages</h2><ul class="tool-grid tool-grid-sm">''' + "".join(_card(u, n, d, TOOL_ICONS.get(u, "")) for u, n, d in TOOLS) + _card("/invoice-template/", "Invoice templates", "Fill in online and download a PDF.") + _card("/guides/", "Guides", "Payment terms, reminders and more.") + _card("/login/", "Log in", "Your saved invoices and clients.") + '''</ul></div></section>''',
@@ -954,7 +992,7 @@ SITEMAP = [("/", "weekly", "1.0")] + [(u, "monthly", "0.9") for u, n, d in TOOLS
     ("/guides/", "monthly", "0.7"), ("/invoice-vs-receipt/", "monthly", "0.7"), ("/payment-terms/", "monthly", "0.7"), ("/payment-reminder/", "monthly", "0.7"), ("/about/", "yearly", "0.4"), ("/contact/", "yearly", "0.4"),
     ("/privacy/", "yearly", "0.2"), ("/terms/", "yearly", "0.2")] + [
     (x[0], "monthly", "0.8") for x in seo_pages.COUNTRY_PAGES] + [(x[0], "monthly", "0.7") for x in seo_pages.GUIDE_PAGES] + [
-    ("/currency-converter/", "daily", "0.8")] + [(FX.pair_path(a, b), "daily", "0.7") for a, b in FX.PAIRS]
+    ("/currency-converter/", "daily", "0.8")] + [(x["path"], "monthly", "0.8") for x in CALC.CALCS] + [(FX.pair_path(a, b), "daily", "0.7") for a, b in FX.PAIRS]
 with open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8") as f:
     f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n')
     for u, c, pr in SITEMAP:
@@ -975,6 +1013,7 @@ def _meta(u):
 _groups = [("Free generators", [u for u, n, d in TOOLS] + ["/invoice-tools/", "/invoice-template/"]),
            ("Invoices by business", [u for u, n in INDUSTRY]),
            ("Invoices by country", [x[0] for x in seo_pages.COUNTRY_PAGES]),
+           ("Calculators", [x["path"] for x in CALC.CALCS]),
            ("Currency converter", ["/currency-converter/"] + [FX.pair_path(a, b) for a, b in FX.PAIRS]),
            ("Guides", ["/how-to-make-an-invoice/", "/invoice-vs-receipt/", "/payment-terms/", "/payment-reminder/", "/guides/"] + [x[0] for x in seo_pages.GUIDE_PAGES]),
            ("About", ["/about/", "/contact/", "/privacy/", "/terms/"])]

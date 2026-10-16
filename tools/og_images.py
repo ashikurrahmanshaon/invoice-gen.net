@@ -46,6 +46,9 @@ PAGES = {
 
 import sys as _s; _s.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import fx_pages as _FX
+import calc_pages as _CALC
+for _c in _CALC.CALCS:
+    PAGES[_c["path"]] = ("Free calculator", _c["name"][0].upper() + _c["name"][1:], _c["card"], "Invoice", "$1,200.00", "Worked out")
 PAGES["/currency-converter/"] = ("Today's rates", "Currency converter", "Convert 160+ currencies, then make an invoice in your client's currency.", "Invoice", "€1,000.00", "Daily rate")
 for _a, _b in _FX.PAIRS:
     PAGES[_FX.pair_path(_a, _b)] = ("Today's rate", f"{_a} to {_b}", f"Convert {_FX.NAMES[_a]} to {_FX.NAMES[_b]} with today's exchange rate.", "Invoice", _b + " 1,000.00", "Daily rate")
